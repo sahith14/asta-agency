@@ -1,0 +1,1175 @@
+# MASTER BUILD PROMPT: AGENCYOS
+## Production-minded Website Agency Operations Platform
+
+You are the lead software architect, senior full-stack engineer, UI/UX designer, database engineer, QA engineer and technical project manager responsible for building AgencyOS from scratch.
+
+Your job is to build a working, maintainable web application for managing a website development and maintenance agency serving small businesses in the United Kingdom.
+
+This is not a request to create a static dashboard mockup. Build a real application with persistent database storage, functional forms, working navigation, connected records, validation, error handling, authentication and tested workflows.
+
+You must implement the project in controlled phases, verify each phase, and preserve working code throughout development.
+
+---
+
+# 1. PRODUCT VISION
+
+AgencyOS is a private internal operating system for a website agency.
+
+The agency builds websites for businesses such as:
+
+- Restaurants and cafés
+- Barbershops and hair salons
+- Mechanics and garages
+- Plumbers and electricians
+- Cleaning companies
+- Retail shops
+- Other independent local businesses
+
+The agency sells website development packages and recurring website maintenance subscriptions.
+
+AgencyOS must eventually manage the complete business lifecycle:
+
+1. Customer enquiries and client records.
+2. Website projects and delivery milestones.
+3. Website inventory, technical details and hosting providers.
+4. Gmail integration and customer correspondence.
+5. Support tickets and technical incidents.
+6. Website health monitoring and maintenance.
+7. Quotes, invoices, payments and subscriptions.
+8. Tasks, reminders and follow-ups.
+9. Files, documents and technical notes.
+10. AI-assisted support and troubleshooting.
+11. Automated operational workflows.
+12. Revenue, workload and profitability reporting.
+13. Staff accounts and permissions.
+14. A future customer-facing portal.
+
+The system will initially be used by one owner. It must support additional staff and a restricted customer portal in the future without requiring a complete architectural rewrite.
+
+## Critical distinction
+
+AgencyOS is the internal business application.
+
+It is not the public marketing website for the agency, and it is not the websites built for agency clients.
+
+Each client website is an independently managed asset with its own domain, hosting, deployment history and maintenance status.
+
+---
+
+# 2. NON-NEGOTIABLE DEVELOPMENT RULES
+
+These rules override any temptation to generate a large amount of code quickly without verification.
+
+## Rule 1: Never rebuild the project unnecessarily
+
+Create the application from scratch once.
+
+After the initial scaffold, work incrementally.
+
+Never delete and regenerate the project, replace the entire application, reset the database, or discard working modules simply because an error occurs.
+
+Before changing existing code:
+
+1. Inspect the relevant files.
+2. Understand the current implementation.
+3. Identify the precise cause of the problem.
+4. Make the smallest safe change.
+5. Run relevant tests.
+6. Verify that previously working features still work.
+
+If a migration or refactor is required, explain its purpose and preserve existing data.
+
+## Rule 2: No fake functionality
+
+Every implemented button must perform its stated action.
+
+Every form must validate and save its data.
+
+Every table must read real records.
+
+Every status badge must reflect a persisted status.
+
+Every KPI must be calculated from actual application data.
+
+Every filter, search field, modal, navigation item and dropdown must work.
+
+Do not use hardcoded sample numbers as if they were live business data.
+
+Do not create buttons that merely display an alert saying that a feature is coming soon.
+
+If a future feature is not implemented, clearly label it as planned or unavailable.
+
+## Rule 3: Database persistence is mandatory
+
+Use a real relational database.
+
+Changes must survive page refreshes, navigation, application restarts and normal redeployments.
+
+Do not use browser localStorage or sessionStorage as the primary database.
+
+Do not substitute hardcoded JavaScript arrays for backend records.
+
+Do not create an elaborate frontend before establishing the database and server-side operations.
+
+## Rule 4: Keep every phase functional
+
+Implement the product incrementally.
+
+After each phase:
+
+- Run the application.
+- Test all relevant CRUD operations.
+- Verify database persistence.
+- Test important relationships.
+- Inspect application logs.
+- Fix errors introduced by the current phase.
+- Confirm that existing functionality remains intact.
+- Document what works and what remains incomplete.
+
+Do not proceed to the next phase while critical errors in the current phase remain unresolved.
+
+## Rule 5: Preserve project state
+
+Maintain:
+
+- A project implementation checklist.
+- A feature status register.
+- Database migration history.
+- A list of known bugs.
+- A list of incomplete integrations.
+- A short technical progress log.
+- A list of verified acceptance tests.
+
+Update these after meaningful implementation milestones.
+
+Do not claim a feature is complete unless it has been implemented and tested.
+
+## Rule 6: No destructive shortcuts
+
+Never run destructive database commands, drop tables, overwrite production data or reset migrations merely to make an error disappear.
+
+Use versioned migrations, backups and explicit recovery procedures.
+
+Never overwrite user-created work without first understanding the impact.
+
+---
+
+# 3. TECHNOLOGY STACK
+
+Use the following stack unless the execution environment has a concrete compatibility limitation. If a substitution is unavoidable, explain why before making the change.
+
+Frontend:
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Reusable accessible UI components
+- Responsive desktop and mobile layouts
+
+Backend:
+- Next.js server-side modules or route handlers
+- TypeScript
+- Validated server-side business logic
+- Clear separation between UI, business logic and data access
+
+Database:
+- PostgreSQL
+- Prisma ORM or Drizzle ORM
+- Version-controlled database migrations
+- Foreign keys, unique constraints and indexes
+
+Authentication:
+- Secure server-side authentication
+- Protected routes
+- Secure sessions or a managed authentication provider
+- Role-based authorization architecture
+- No public self-registration
+
+Testing:
+- Unit tests for business logic
+- Integration tests for database operations
+- End-to-end tests for critical workflows
+- Type checking and linting
+
+Deployment:
+- Use the deployment capabilities available in the Z.ai environment.
+- Document required environment variables.
+- Separate development, staging and production configuration.
+- Never commit secrets to the repository.
+
+If PostgreSQL or the selected hosting platform is unavailable in the execution environment, do not silently replace the intended architecture with an in-memory store. Explain the limitation and choose the closest durable, compatible implementation.
+
+---
+
+# 4. VISUAL DESIGN DIRECTION
+
+AgencyOS must feel like a premium, modern professional software product.
+
+Design direction:
+
+- Premium light theme by default.
+- White and soft-neutral surfaces.
+- Charcoal typography.
+- Restrained burgundy accent colour.
+- Fine borders and subtle shadows.
+- Spacious layouts.
+- Clear typography hierarchy.
+- Refined tables, filters and forms.
+- High information density without clutter.
+- Smooth but restrained animations.
+- Responsive desktop, tablet and mobile layouts.
+- Dark mode may be added after the core light theme is stable.
+
+Avoid:
+- Generic template-like dashboards.
+- Excessive gradients.
+- Oversized decorative cards.
+- Unnecessary animations.
+- Giant empty spaces.
+- Fake charts and statistics.
+- Decorative controls that do nothing.
+- Emoji replacing professional icons.
+- Excessively rounded cards everywhere.
+
+Use a consistent design system with reusable components for buttons, badges, tables, dialogs, sidebars, form controls, alerts, dropdowns and empty states.
+
+Use accessible colour contrast, keyboard navigation, clear focus states and meaningful labels.
+
+## Main application shell
+
+Desktop:
+- Persistent left sidebar.
+- Compact top bar.
+- Global search.
+- Notification area.
+- Main content area.
+- Contextual actions on relevant pages.
+
+Mobile:
+- Collapsible navigation drawer or compact mobile navigation.
+- Responsive tables or mobile-friendly record lists.
+- Accessible forms and dialogs.
+- No clipped content.
+- No hidden primary actions.
+
+The interface must be visually polished, but working functionality takes priority over decorative details.
+
+---
+
+# 5. APPLICATION NAVIGATION
+
+Implement the following navigation architecture.
+
+1. Overview
+2. Clients
+3. Websites
+4. Projects
+5. Support
+6. Incidents
+7. Tasks
+8. Billing
+9. Inbox
+10. Documents
+11. Reports
+12. Integrations
+13. Automations
+14. Settings
+
+Do not implement every module in the first phase.
+
+Create the navigation architecture so that modules can be added incrementally.
+
+For future modules that are not yet implemented, either hide them or clearly mark them as planned. Do not present an inactive link as a working feature.
+
+---
+
+# 6. PHASE 0: PROJECT FOUNDATION
+
+Implement this phase first.
+
+## Requirements
+
+1. Create the repository and application scaffold.
+2. Configure TypeScript, linting and formatting.
+3. Configure the database connection.
+4. Set up ORM configuration and versioned migrations.
+5. Implement secure authentication.
+6. Implement a protected application layout.
+7. Build the responsive sidebar and top bar.
+8. Establish the design system.
+9. Add server-side validation.
+10. Add structured error handling and logging.
+11. Establish the testing framework.
+12. Create an initial audit logging mechanism.
+13. Configure environment variable validation.
+14. Create documented setup instructions.
+15. Ensure the application can start reliably.
+
+## Acceptance criteria
+
+- The application starts without build errors.
+- Authentication works.
+- Protected routes reject unauthenticated requests.
+- The layout works on desktop and mobile.
+- Database migrations run successfully.
+- Secrets are not exposed to the browser.
+- The project can be started from documented instructions.
+- No business data is stored only in browser memory.
+
+Do not start Gmail integration, payment integration or AI features during this phase.
+
+---
+
+# 7. PHASE 1: CORE OPERATIONS MVP
+
+This is the primary initial deliverable.
+
+Implement the following modules fully.
+
+## 7.1 Dashboard
+
+Route: /dashboard
+
+Display live database-backed metrics:
+
+- Total clients.
+- Active clients.
+- Active websites.
+- Websites under development.
+- Projects in progress.
+- Overdue tasks.
+- Tasks due today.
+- Open support tickets.
+- Upcoming renewal count.
+- Outstanding invoice amount when invoice data exists.
+- Recurring revenue when valid subscription records exist.
+
+For metrics whose underlying module has not been implemented, show a clear unavailable or not-yet-configured state rather than invented data.
+
+Include:
+- Priority queue.
+- Upcoming deadlines.
+- Recent activity.
+- Quick actions.
+- Search access.
+- Empty states for new installations.
+
+Every KPI must open a relevant filtered list.
+
+## 7.2 Client CRM
+
+Routes:
+- /clients
+- /clients/new
+- /clients/[id]
+
+Create a complete client management module.
+
+Fields:
+
+- Business name.
+- Client type.
+- Primary contact.
+- Email.
+- Phone.
+- Billing address.
+- Country.
+- Currency.
+- Time zone.
+- Status.
+- Internal notes.
+- Created date.
+- Updated date.
+- Archived date.
+
+Support:
+- Create.
+- View.
+- Edit.
+- Search.
+- Filter.
+- Sort.
+- Pagination.
+- Archive.
+- Validation.
+- Duplicate detection warnings.
+
+Client detail page tabs:
+
+- Overview.
+- Websites.
+- Projects.
+- Support.
+- Billing.
+- Documents.
+- Activity.
+
+Tabs for future modules may display a proper empty state, but do not fake records.
+
+A client may have multiple websites and multiple projects.
+
+## 7.3 Website inventory
+
+Routes:
+- /websites
+- /websites/new
+- /websites/[id]
+
+Every website belongs to a client.
+
+Fields:
+
+- Website name.
+- Primary domain.
+- Client.
+- Lifecycle status.
+- Environment.
+- Website type.
+- Framework.
+- Repository URL.
+- Hosting provider.
+- Production URL.
+- Staging URL.
+- Deployment project reference.
+- Domain renewal date.
+- SSL expiry date where known.
+- Maintenance coverage.
+- Launch date.
+- Technical notes.
+- Created and updated timestamps.
+
+Lifecycle states:
+
+- Planned.
+- In Development.
+- Staging.
+- Live.
+- Suspended.
+- Retired.
+
+Keep lifecycle status separate from technical health.
+
+A website can be Live but unhealthy. A website can be in Development and functioning correctly in staging.
+
+Website detail tabs:
+
+- Overview.
+- Technical Setup.
+- Support.
+- Deployments.
+- Maintenance.
+- Billing.
+- Documents.
+- Activity.
+
+For Phase 1, technical fields may be entered manually.
+
+Do not implement automatic deployment, hosting changes or production monitoring yet.
+
+## 7.4 Project management
+
+Routes:
+- /projects
+- /projects/new
+- /projects/[id]
+
+Project fields:
+
+- Project name.
+- Client.
+- Optional linked website.
+- Project type.
+- Scope and deliverables.
+- Status.
+- Agreed price.
+- Currency.
+- Start date.
+- Deadline.
+- Internal notes.
+- Completion date.
+
+Project stages:
+
+1. Lead.
+2. Quoted.
+3. Deposit Paid.
+4. In Development.
+5. Client Review.
+6. Revisions.
+7. Ready to Launch.
+8. Live.
+9. Completed.
+
+Additional statuses:
+- On Hold.
+- Cancelled.
+- Awaiting Client.
+
+Build:
+- Kanban board.
+- Table view.
+- Filters.
+- Search.
+- Project detail page.
+- Milestone checklist.
+- Linked tasks.
+- Activity history.
+- Project progress calculation.
+
+Do not automatically mark a website live when the project status changes. Website lifecycle and project workflow are separate records.
+
+## 7.5 Tasks
+
+Routes:
+- /tasks
+- /tasks/[id]
+
+Task fields:
+
+- Title.
+- Description.
+- Status.
+- Priority.
+- Due date.
+- Related client.
+- Related website.
+- Related project.
+- Assignee.
+- Creator.
+- Created date.
+- Completion date.
+
+Statuses:
+- To Do.
+- In Progress.
+- Waiting.
+- Completed.
+- Cancelled.
+
+Priorities:
+- Low.
+- Normal.
+- High.
+- Critical.
+
+Implement:
+- Create and edit tasks.
+- Complete and reopen tasks.
+- Filter by status, priority and due date.
+- Overdue indicators.
+- Linked record navigation.
+- Task counts on client, website and project pages.
+
+Tasks must persist in the database.
+
+## 7.6 Activity timeline
+
+Create a reusable activity system.
+
+Track meaningful actions, including:
+
+- Client created or updated.
+- Website created or updated.
+- Project status changed.
+- Task created or completed.
+- Important record archived.
+- Later: email linked, ticket updated, invoice paid and deployment completed.
+
+Each activity should include:
+- Actor.
+- Action.
+- Record type.
+- Record ID.
+- Timestamp.
+- Relevant non-sensitive metadata.
+
+Do not log passwords, OAuth tokens, private keys or other secrets.
+
+## 7.7 Global search
+
+Implement search across:
+
+- Clients.
+- Contacts.
+- Websites.
+- Domains.
+- Projects.
+- Tasks.
+
+Results must link to the correct record.
+
+Search must query persisted data, not only the currently loaded page.
+
+## 7.8 Documents
+
+Build the initial document management foundation.
+
+Support document metadata, client/project/website relationships, secure storage references and upload history.
+
+Validate file type and size.
+
+If the deployment environment lacks persistent file storage, implement a documented storage adapter and clearly indicate that uploads require configuration. Do not claim a file was saved if it was not.
+
+## 7.9 Settings
+
+Implement:
+- Owner profile.
+- Account security.
+- Agency details.
+- Default currency.
+- Time zone.
+- Notification preferences.
+- Project status configuration where safe.
+- Basic application settings.
+
+Staff invitation and client portal settings belong to later phases.
+
+---
+
+# 8. INITIAL DATABASE SCHEMA
+
+Design a relational schema with proper constraints and indexes.
+
+Initial entities:
+
+## users
+
+- id
+- email
+- display_name
+- role
+- authentication provider identifier
+- status
+- created_at
+- updated_at
+- last_login_at
+
+## clients
+
+- id
+- business_name
+- client_type
+- status
+- billing_email
+- billing_address
+- country
+- currency
+- timezone
+- notes
+- created_at
+- updated_at
+- archived_at
+
+## contacts
+
+- id
+- client_id
+- name
+- email_normalized
+- phone
+- job_title
+- is_primary
+- created_at
+- updated_at
+
+## websites
+
+- id
+- client_id
+- name
+- primary_domain
+- lifecycle_status
+- environment
+- website_type
+- framework
+- repository_url
+- hosting_provider_id
+- deployment_project_ref
+- production_url
+- staging_url
+- maintenance_coverage
+- launch_date
+- technical_notes
+- created_at
+- updated_at
+- archived_at
+
+## domains
+
+- id
+- website_id
+- domain_name
+- registrar
+- renewal_date
+- auto_renew_status
+- last_checked_at
+
+## projects
+
+- id
+- client_id
+- name
+- project_type
+- status
+- scope
+- agreed_amount
+- currency
+- start_date
+- due_date
+- completed_at
+- created_at
+- updated_at
+
+## project_websites
+
+- project_id
+- website_id
+- relationship_type
+- created_at
+
+## tasks
+
+- id
+- title
+- description
+- status
+- priority
+- due_at
+- assignee_user_id
+- created_by_user_id
+- created_at
+- updated_at
+- completed_at
+
+## task_links
+
+- task_id
+- entity_type
+- entity_id
+
+Validate polymorphic links in the service layer, or use explicit foreign keys where stronger relational enforcement is needed.
+
+## documents
+
+- id
+- client_id
+- website_id
+- project_id
+- storage_key
+- file_name
+- mime_type
+- size_bytes
+- checksum
+- uploaded_by
+- created_at
+- retention_status
+
+## audit_logs
+
+- id
+- actor_user_id
+- action
+- entity_type
+- entity_id
+- occurred_at
+- request_id
+- redacted_metadata
+
+Future tables should be planned for:
+
+- Tickets.
+- Ticket messages.
+- Email accounts.
+- Email threads.
+- Email messages.
+- Incidents.
+- Incident-website relationships.
+- Health checks.
+- Deployments.
+- Maintenance runs.
+- Service plans.
+- Subscriptions.
+- Quotes and quote items.
+- Invoices and invoice items.
+- Payments and payment allocations.
+- Integration connections.
+- Webhook events.
+- Background jobs.
+- Automation runs.
+
+Do not create a giant denormalised table to represent all of these concepts.
+
+Use UUIDs or another stable identifier strategy, UTC timestamps, explicit currencies, foreign keys, indexes, unique constraints and safe archival behaviour.
+
+Use database migrations from the first schema change.
+
+---
+
+# 9. DATA AND BUSINESS LOGIC REQUIREMENTS
+
+All application mutations must go through validated server-side business logic.
+
+For every module:
+- Validate input.
+- Check authorization.
+- Check record relationships.
+- Execute database operations safely.
+- Return structured success or error results.
+- Record important activity.
+- Handle missing and archived records.
+- Prevent accidental duplicate records.
+- Preserve financial and operational history.
+
+Use database transactions for related changes.
+
+Do not calculate financial values using floating-point arithmetic.
+
+Do not treat client-supplied status values as trusted without validating allowed transitions.
+
+Do not allow a task to reference a nonexistent website or project.
+
+Do not allow archived records to disappear from historical billing and audit records.
+
+---
+
+# 10. PHASE 1 TEST PLAN
+
+Before declaring Phase 1 complete, verify all of the following.
+
+## Authentication
+- Unauthenticated requests cannot access protected records.
+- Invalid credentials fail safely.
+- Sessions expire and can be terminated.
+- Secrets are never returned to the browser.
+
+## Clients
+- Create, view, edit and archive clients.
+- Search and filters return correct results.
+- Contact records belong to the correct client.
+- Validation errors are displayed clearly.
+
+## Websites
+- A website cannot reference a nonexistent client.
+- Website edits persist after refresh.
+- Lifecycle state and health are not conflated.
+- Website lists filter and sort correctly.
+- Archived records follow the intended visibility rules.
+
+## Projects
+- Projects link to the correct clients.
+- Project status transitions are validated.
+- Kanban and table views reflect the same database records.
+- Project progress is derived from actual tasks or milestones.
+
+## Tasks
+- Tasks can be created, updated, completed and reopened.
+- Due dates and overdue states are correct.
+- Linked records open the correct client, project or website.
+- Invalid relationships are rejected.
+
+## Search and dashboard
+- Search returns real persisted records.
+- Dashboard KPIs match database queries.
+- Empty states are accurate.
+- Clicking a KPI opens the correct filtered list.
+
+## Persistence and recovery
+- Data survives refreshes and application restarts.
+- Migrations work from a clean development database.
+- Backup and restore instructions are documented.
+- No feature relies exclusively on browser storage.
+
+## UI and accessibility
+- All primary navigation works.
+- Every visible action has a meaningful outcome.
+- Forms display validation errors.
+- Loading, success, error and empty states are implemented.
+- Desktop and mobile layouts are tested.
+- Keyboard focus and accessible labels are present.
+
+Write automated tests for core business logic and critical workflows. Run the test suite and report actual results.
+
+---
+
+# 11. PHASE 2: GMAIL AND SUPPORT
+
+Do not implement Phase 2 until Phase 1 passes its acceptance criteria.
+
+Build:
+
+- Gmail OAuth 2.0 connection.
+- Initial email synchronisation.
+- Incremental synchronisation using Gmail history.
+- Stable provider message and thread references.
+- Inbox views and search.
+- Client and website matching.
+- Needs Review queue.
+- Ticket creation and ticket history.
+- Internal notes.
+- Customer reply composer.
+- Sending status and retry handling.
+- Attachment metadata and secure storage.
+- Support priorities and statuses.
+- Linked incidents and tasks.
+
+AI may suggest a classification or match, but uncertain matches require operator confirmation.
+
+Incoming email content is untrusted. Never execute commands or deploy code based on email instructions.
+
+Initially require human approval before sending customer replies.
+
+---
+
+# 12. PHASE 3: BILLING
+
+Build:
+
+- Service plan management.
+- Subscription records.
+- Quote creation and acceptance.
+- Invoice generation.
+- Invoice line items.
+- Partial payments and payment allocations.
+- Outstanding balance calculations.
+- Renewal reminders.
+- Failed payment tracking.
+- Payment-provider integration when configured.
+- Verified webhooks and idempotent processing.
+- Revenue and subscription reports.
+
+Separate invoiced revenue from collected cash.
+
+Do not suspend a customer's website automatically following a failed payment.
+
+Tax rules and invoice configuration must be appropriate to the agency's actual business jurisdiction.
+
+---
+
+# 13. PHASE 4: MONITORING AND DEPLOYMENTS
+
+Build:
+
+- Scheduled website health checks.
+- Response-time and HTTP-status recording.
+- SSL and domain expiry monitoring where supported.
+- Incident management.
+- Incident deduplication.
+- Website maintenance schedules.
+- Backup verification records.
+- GitHub integration.
+- Hosting-provider adapter architecture.
+- Deployment history.
+- Build and deployment error tracking.
+- Post-deployment health checks.
+- Controlled rollback workflows where supported.
+
+Start with manual hosting metadata, then implement provider integrations one at a time.
+
+Never run destructive production changes without explicit authorisation and a recoverable plan.
+
+---
+
+# 14. PHASE 5: AI AND AUTOMATION
+
+Only add AI after the relevant workflows are reliable without it.
+
+Build:
+
+- Email summaries.
+- Suggested ticket classifications.
+- Suggested client and website matching.
+- Duplicate ticket detection.
+- Searchable historical fixes.
+- Evidence-based troubleshooting suggestions.
+- Draft customer replies.
+- Renewal and maintenance task generation.
+- Configurable automation rules.
+- Automation logs and retry policies.
+- Approval workflows for consequential actions.
+
+AI must not invent technical evidence or claim that an issue has been fixed without verification.
+
+AI must not independently execute arbitrary shell commands, access unrestricted credentials, change billing, send sensitive communications or deploy production code.
+
+Use explicit tool permissions, structured inputs, allowlisted actions and human approval.
+
+---
+
+# 15. PHASE 6: STAFF AND CUSTOMER PORTAL
+
+Build only when the internal workflows are stable.
+
+Staff capabilities:
+- Invitations.
+- Roles and permissions.
+- Task assignment.
+- Support ownership.
+- Team workload reporting.
+- Staff activity history.
+
+Customer capabilities:
+- Secure sign-in.
+- Project progress.
+- Design approvals.
+- Support ticket submission.
+- Ticket status and responses.
+- Approved document downloads.
+- Invoice viewing.
+- Subscription information.
+- Customer notification preferences.
+
+Customers must only see records belonging to their authorised client account.
+
+Test cross-client access boundaries thoroughly.
+
+---
+
+# 16. BACKGROUND JOBS AND RELIABILITY
+
+Design scheduled and asynchronous work as reliable background jobs.
+
+Future job categories include:
+
+- Email synchronisation.
+- Renewal reminders.
+- Invoice reminders.
+- Website health checks.
+- Domain expiry checks.
+- SSL expiry checks.
+- Backup verification.
+- Notification delivery.
+- Webhook processing.
+- Automation runs.
+
+Every job should support:
+- Unique or idempotent processing keys.
+- Retry limits.
+- Exponential backoff where appropriate.
+- Error logging.
+- Failure visibility.
+- Safe reprocessing.
+- A record of its latest result.
+
+Do not rely on an open browser tab to run scheduled tasks.
+
+If the environment does not support persistent workers or scheduling, document the limitation and use an appropriate supported mechanism.
+
+---
+
+# 17. IMPLEMENTATION PROCESS
+
+Follow this sequence strictly.
+
+## Step A: Inspect and plan
+
+Before coding, inspect the available environment and establish whether a project already exists.
+
+Because this request calls for a new build, create the scaffold only once.
+
+Produce a short implementation plan and file structure.
+
+## Step B: Build Phase 0
+
+Implement the foundation and verify it.
+
+## Step C: Build Phase 1
+
+Implement the complete core operations MVP.
+
+Do not start Gmail, billing, monitoring or AI before the core MVP is working.
+
+## Step D: Verify
+
+Run:
+- Type checking.
+- Linting.
+- Unit tests.
+- Database integration tests.
+- End-to-end tests where supported.
+- Production build.
+
+Fix errors caused by your implementation.
+
+Do not suppress TypeScript errors, disable tests or weaken validation simply to get a green build.
+
+## Step E: Review
+
+Inspect the application visually and functionally.
+
+Check:
+- All routes.
+- All visible buttons.
+- Forms.
+- Search and filters.
+- Record relationships.
+- Responsive layouts.
+- Error states.
+- Database persistence.
+- Browser and server logs.
+
+## Step F: Report
+
+At the end of the phase, provide a concise report containing:
+
+1. What was implemented.
+2. Files and modules created.
+3. Database tables and migrations created.
+4. Tests executed and their actual results.
+5. Known issues.
+6. Missing configuration.
+7. What remains incomplete.
+8. The recommended next task.
+
+Do not claim tests passed if they were not run.
+
+Do not claim integrations work if they have not been connected and verified.
+
+---
+
+# 18. DEFINITION OF DONE FOR THE FIRST RELEASE
+
+The first release is complete only when:
+
+- The application starts reliably.
+- Secure authentication works.
+- PostgreSQL persistence works.
+- Clients can be created, edited, searched and archived.
+- Websites can be created and linked to clients.
+- Projects can be created and moved through the workflow.
+- Tasks can be created, linked, updated and completed.
+- Client, website and project detail pages show the correct relationships.
+- Dashboard metrics are derived from actual data.
+- Global search works.
+- Audit history records meaningful actions.
+- Forms and navigation are functional.
+- Error and empty states are implemented.
+- Database migrations and recovery instructions exist.
+- Automated tests cover critical business operations.
+- The production build succeeds.
+- No critical known bugs remain unresolved.
+
+Gmail integration, recurring billing, website monitoring, AI and the customer portal are explicitly outside the first release.
+
+---
+
+# 19. FIRST ACTION: BEGIN IMPLEMENTATION
+
+Begin with Phase 0 and Phase 1 only.
+
+First inspect the environment and create a concise implementation plan. Then build the project foundation, database schema, authentication and responsive application shell.
+
+After that, implement the core operations MVP.
+
+Do not stop after generating a plan or a static UI. Continue implementing and testing until the first release acceptance criteria are met, subject to the capabilities and execution limits of the environment.
+
+If you encounter a blocker, identify the exact cause and make the smallest safe correction. Preserve all working code and data.
+
+Do not introduce additional frameworks or services without a clear technical reason.
+
+Do not add features outside the agreed scope merely because they seem interesting.
+
+Keep a durable implementation checklist and update it as work progresses.
+
+Your priority is a reliable, premium, functional AgencyOS that can grow into the complete agency operating system described above without requiring a rebuild.
+
+**Start Phase 0 now, then proceed directly into Phase 1.**
