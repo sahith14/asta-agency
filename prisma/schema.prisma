@@ -1,0 +1,743 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// IDENTITY & ACCESS
+// ─────────────────────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  CLIENT_MANAGER
+  WEB_DEVELOPER
+  SUPPORT_FINANCE
+  VIDEOGRAPHER
+  VIDEO_EDITOR
+  CREATIVE_DIRECTOR
+  CLIENT
+}
+
+model Employee {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String
+  role               Role      @default(CLIENT_MANAGER)
+  passwordHash       String
+  mustChangePassword Boolean   @default(false)
+  isActive           Boolean   @default(true)
+  phone              String?
+  title              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  tasksAssigned      Task[]    @relation("TaskAssignee")
+  tasksCreated       Task[]    @relation("TaskCreator")
+  projectManaging    Project[] @relation("ProjectManager")
+  commentAuthor      TaskComment[]
+  deliverablesVideographing VideoDeliverable[] @relation("DeliverableVideographer")
+  deliverablesEditing       VideoDeliverable[] @relation("DeliverableEditor")
+  shootsManaging            ShootSession[]     @relation("ShootManager")
+  shootAssignments          ShootAssignment[]  @relation("ShootAssignments")
+}
+
+model Client {
+  id              String    @id @default(cuid())
+  name            String
+  businessCategory String    @default("Other")
+  contactName     String?
+  contactEmail    String?
+  contactPhone    String?
+  address         String?
+  notes           String?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  portalUsers     ClientUser[]
+  projects        Project[]
+  invoices        Invoice[]
+  tickets         Ticket[]
+  contacts        Contact[]
+  meetings        Meeting[]
+}
+
+model ClientUser {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String
+  passwordHash       String
+  clientId           String
+  mustChangePassword Boolean   @default(false)
+  isActive           Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  client             Client    @relation(fields: [clientId], references: [id])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  token        String   @unique
+  userType     String // "EMPLOYEE" | "CLIENT_USER"
+  userId       String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId, userType])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  userType    String // "EMPLOYEE" | "CLIENT_USER"
+  userId      String
+  consumedAt  DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([userId, userType])
+}
+
+// Corporate-grade access request: prospects/clients request access, Founder approves
+model SignupRequest {
+  id         String    @id @default(cuid())
+  name       String
+  email      String
+  company    String?
+  message    String?
+  status     String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  decidedById String?
+  decidedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([status])
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// SHARED DELIVERY (both divisions)
+// ─────────────────────────────────────────────────────────────
+
+enum ServiceType {
+  WEBSITE
+  VIDEO_PRODUCTION
+}
+
+enum ProjectStatus {
+  DISCOVERY
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+  ON_HOLD
+  CANCELLED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Project {
+  id               String        @id @default(cuid())
+  reference        String        @unique
+  name             String
+  serviceType      ServiceType
+  clientId         String
+  managerId        String?
+  status           ProjectStatus @default(DISCOVERY)
+  priority         Priority      @default(MEDIUM)
+  brief            String?
+  notes            String?
+  startDate        DateTime?
+  targetDate       DateTime?
+  agreedPrice      Float?
+  budget           Float?
+  isArchived       Boolean       @default(false)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  client           Client        @relation(fields: [clientId], references: [id])
+  manager          Employee?     @relation("ProjectManager", fields: [managerId], references: [id])
+  videoProject     VideoProject?
+  deliverables     VideoDeliverable[]
+  shoots           ShootSession[]
+  tasks            Task[]
+  invoices         Invoice[]
+  expenses         ProductionExpense[]
+  mediaAssets      MediaAsset[]
+  tickets          Ticket[]
+  meetings         Meeting[]
+
+  @@index([serviceType, status])
+  @@index([clientId])
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  projectId   String?
+  assigneeId  String?
+  createdById String?
+  status      String       @default("TODO") // TODO | IN_PROGRESS | BLOCKED | DONE
+  priority    Priority     @default(MEDIUM)
+  dueDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  project     Project?     @relation(fields: [projectId], references: [id])
+  assignee    Employee?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  creator     Employee?    @relation("TaskCreator", fields: [createdById], references: [id])
+  comments    TaskComment[]
+
+  @@index([assigneeId, status])
+  @@index([projectId])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author    Employee @relation(fields: [authorId], references: [id])
+
+  @@index([taskId])
+}
+
+model Meeting {
+  id          String    @id @default(cuid())
+  title       String
+  clientId    String?
+  projectId   String?
+  startAt     DateTime
+  endAt       DateTime
+  location    String?
+  notes       String?
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  client      Client?   @relation(fields: [clientId], references: [id])
+  project     Project?  @relation(fields: [projectId], references: [id])
+
+  @@index([startAt])
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  company     String?
+  jobTitle    String?
+  clientId    String?
+  notes       String?
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  client      Client?  @relation(fields: [clientId], references: [id])
+
+  @@index([name])
+}
+
+model Ticket {
+  id          String       @id @default(cuid())
+  reference   String       @unique
+  clientId    String
+  projectId   String?
+  subject     String
+  body        String
+  status      String       @default("OPEN") // OPEN | IN_PROGRESS | RESOLVED | CLOSED
+  priority    Priority     @default(MEDIUM)
+  raisedByType String?      // "CLIENT_USER" | "EMPLOYEE"
+  raisedById  String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  client      Client       @relation(fields: [clientId], references: [id])
+  project     Project?     @relation(fields: [projectId], references: [id])
+  replies     TicketReply[]
+
+  @@index([clientId, status])
+}
+
+model TicketReply {
+  id           String   @id @default(cuid())
+  ticketId     String
+  authorType   String // "CLIENT_USER" | "EMPLOYEE"
+  authorId     String
+  authorName   String
+  body         String
+  isInternal   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  ticket       Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userType  String // "EMPLOYEE" | "CLIENT_USER"
+  userId    String
+  type      String
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userType, userId, readAt])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorType  String // "EMPLOYEE" | "CLIENT_USER" | "SYSTEM"
+  actorId    String?
+  actorName  String
+  action     String
+  entityType String
+  entityId   String?
+  summary    String
+  metadata   String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  VOID
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  number     String        @unique
+  clientId   String
+  projectId  String?
+  amount     Float
+  status     InvoiceStatus @default(DRAFT)
+  issuedAt   DateTime?
+  dueDate    DateTime?
+  paidAt     DateTime?
+  notes      String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  client     Client        @relation(fields: [clientId], references: [id])
+  project    Project?      @relation(fields: [projectId], references: [id])
+
+  @@index([clientId, status])
+}
+
+// ─────────────────────────────────────────────────────────────
+// VIDEO PRODUCTION DIVISION
+// ─────────────────────────────────────────────────────────────
+
+model VideoPackage {
+  id                  String   @id @default(cuid())
+  name                String
+  description         String?
+  businessCategory    String   @default("Other")
+  videoCount          Int      @default(0)
+  photoDeliverables   String?
+  shootSessions       Int      @default(1)
+  shootDurationHours  Float?
+  revisionRounds      Int      @default(1)
+  deliverableFormats  String?
+  turnaroundDays      Int?
+  licensingTerms      String?
+  additionalWorkTerms String?
+  price               Float?
+  isActive            Boolean  @default(true)
+  // JSON string: [{ title, category, platform, aspectRatio, durationSec }]
+  deliverableTemplate String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  videoProjects       VideoProject[]
+
+  @@index([isActive])
+}
+
+// 1:1 video-specific extension of Project (avoids optional-field bloat on Project)
+model VideoProject {
+  id                    String   @id @default(cuid())
+  projectId             String   @unique
+  businessCategory      String   @default("Other")
+  creativeDirection     String?
+  campaignObjective     String?
+  targetAudience        String?
+  distributionPlatforms String?
+  targetFormats         String?
+  shootLocations        String?
+  // Contract snapshot — later package edits never rewrite these
+  packageId             String?
+  packageNameSnapshot   String?
+  agreedVideoCount      Int
+  revisionAllowance     Int      @default(1)
+  contractNotes         String?
+  clientVisibleNotes    String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  project               Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  package               VideoPackage?    @relation(fields: [packageId], references: [id])
+  deliverables          VideoDeliverable[]
+  scopeChanges          ProjectScopeChange[]
+}
+
+enum DeliverableStatus {
+  PLANNED
+  SCHEDULED
+  SHOT
+  FOOTAGE_READY
+  EDITING
+  INTERNAL_REVIEW
+  CLIENT_REVIEW
+  REVISION_REQUIRED
+  APPROVED
+  DELIVERED
+  CANCELLED
+}
+
+enum VideoCategory {
+  FOOD_SOCIAL_REEL
+  RESTAURANT_PROMO
+  BUSINESS_PROMO
+  PROPERTY_WALKTHROUGH
+  PRODUCT_AD
+  CORPORATE_BRAND_FILM
+  EVENT_COVERAGE
+  PERSONAL_BRAND
+  TESTIMONIAL
+  OTHER
+}
+
+model VideoDeliverable {
+  id                   String           @id @default(cuid())
+  reference            String           @unique
+  projectId            String
+  videoProjectId       String
+  title                String
+  description          String?
+  category             VideoCategory    @default(OTHER)
+  status               DeliverableStatus @default(PLANNED)
+  priority             Priority         @default(MEDIUM)
+  targetPlatform       String?
+  aspectRatio          String?
+  targetDurationSec    Int?
+  videographerId       String?
+  editorId             String?
+
+  plannedShootDate     DateTime?
+  actualShootDate      DateTime?
+  shootCompletedAt     DateTime?
+  footageReceivedAt    DateTime?
+  footageBackupVerified Boolean         @default(false)
+  revisionCount        Int              @default(0)
+  revisionAllowance    Int              @default(1)
+  deadline             DateTime?
+  blockers             String?
+  internalNotes        String?
+  clientNotes          String?
+  // Final delivery metadata (required before DELIVERED)
+  deliveredAt          DateTime?
+  deliveredById        String?
+  deliveryReference    String?
+  // Replacement linkage
+  replacesId           String?
+  cancelReason         String?
+  isReplacement        Boolean          @default(false)
+  currentVersionNumber Int              @default(0)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  project              Project          @relation(fields: [projectId], references: [id])
+  videoProject         VideoProject     @relation(fields: [videoProjectId], references: [id])
+  videographer         Employee?        @relation("DeliverableVideographer", fields: [videographerId], references: [id])
+  editor               Employee?        @relation("DeliverableEditor", fields: [editorId], references: [id])
+  replaces             VideoDeliverable? @relation("DeliverableReplacement", fields: [replacesId], references: [id])
+  replacedBy           VideoDeliverable[] @relation("DeliverableReplacement")
+  versions             VideoVersion[]
+  shootLinks           ShootDeliverable[]
+  briefVersions        CreativeBriefVersion[]
+  mediaAssets          MediaAsset[]
+
+  @@index([videoProjectId, status])
+  @@index([editorId])
+  @@index([videographerId])
+  @@index([deadline])
+}
+
+model CreativeBriefVersion {
+  id            String   @id @default(cuid())
+  deliverableId String
+  versionNumber Int
+  // Structured brief stored as JSON: objective, audience, keyMessage, hook, script,
+  // scenes, shotList, voiceover, dialogue, musicDirection, branding, onScreenText,
+  // captions, callToAction, referenceLinks, requiredAssets
+  content       String
+  approvalStatus String  @default("DRAFT") // DRAFT | INTERNAL_APPROVED | CLIENT_APPROVED
+  createdById   String?
+  createdAt     DateTime @default(now())
+
+  deliverable   VideoDeliverable @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+
+  @@unique([deliverableId, versionNumber])
+  @@index([deliverableId])
+}
+
+enum VersionReviewStatus {
+  PENDING_INTERNAL
+  INTERNAL_REJECTED
+  PENDING_CLIENT
+  CLIENT_REJECTED
+  APPROVED
+  SUPERSEDED
+}
+
+model VideoVersion {
+  id                String              @id @default(cuid())
+  deliverableId     String
+  versionNumber     Int
+  previewReference  String?
+  uploadedById      String?
+  uploadedByName    String?
+  changeSummary     String?
+  reviewStatus      VersionReviewStatus @default(PENDING_INTERNAL)
+  internalReviewerId String?
+  internalFeedback  String?
+  approvedAt        DateTime?
+  createdAt         DateTime            @default(now())
+
+  deliverable       VideoDeliverable    @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+  comments          VersionComment[]
+
+  @@unique([deliverableId, versionNumber])
+  @@index([deliverableId, reviewStatus])
+}
+
+model VersionComment {
+  id         String   @id @default(cuid())
+  versionId  String
+  authorType String // "EMPLOYEE" | "CLIENT_USER"
+  authorId   String
+  authorName String
+  timecode   String?
+  body       String
+  createdAt  DateTime @default(now())
+
+  version    VideoVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([versionId])
+}
+
+enum ShootStatus {
+  PLANNED
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+model ShootSession {
+  id                 String      @id @default(cuid())
+  reference          String      @unique
+  projectId          String
+  title              String
+  date               DateTime
+  startTime          String // HH:mm
+  endTime            String // HH:mm
+  timezone           String      @default("Europe/London")
+  address            String?
+  locationNotes      String?
+  managerId          String?
+  status             ShootStatus @default(PLANNED)
+  clientContact      String?
+  accessArrangements String?
+  callSheetNotes     String?
+  transportNotes     String?
+  budgetedTravelCost Float?
+  actualCost         Float?
+  attendanceNotes    String?
+  completionNotes    String?
+  incidentNotes      String?
+  rescheduleReason   String?
+  cancelReason       String?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  project            Project          @relation(fields: [projectId], references: [id])
+  manager            Employee?        @relation("ShootManager", fields: [managerId], references: [id])
+  assignments        ShootAssignment[]
+  deliverableLinks   ShootDeliverable[]
+  equipmentReservations EquipmentReservation[]
+
+  @@index([projectId, date])
+  @@index([date, status])
+}
+
+model ShootAssignment {
+  id         String @id @default(cuid())
+  sessionId  String
+  employeeId String
+  crewRole   String // MANAGER | VIDEOGRAPHER | ASSISTANT
+  notes      String?
+
+  session    ShootSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  employee   Employee     @relation("ShootAssignments", fields: [employeeId], references: [id])
+
+  @@unique([sessionId, employeeId, crewRole])
+  @@index([employeeId])
+}
+
+model ShootDeliverable {
+  id            String @id @default(cuid())
+  sessionId     String
+  deliverableId String
+
+  session       ShootSession      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  deliverable   VideoDeliverable  @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, deliverableId])
+}
+
+model EquipmentItem {
+  id        String   @id @default(cuid())
+  name      String
+  category  String?
+  serial    String?
+  status    String   @default("AVAILABLE") // AVAILABLE | RESERVED | MAINTENANCE | RETIRED
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reservations EquipmentReservation[]
+
+  @@index([status])
+}
+
+model EquipmentReservation {
+  id         String   @id @default(cuid())
+  itemId     String
+  sessionId  String
+  startAt    DateTime
+  endAt      DateTime
+
+  item       EquipmentItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  session    ShootSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([itemId, startAt, endAt])
+}
+
+enum ScopeChangeType {
+  ADDITIONAL_DELIVERABLES
+  PACKAGE_CHANGE
+  OTHER
+}
+
+model ProjectScopeChange {
+  id              String          @id @default(cuid())
+  videoProjectId  String
+  type            ScopeChangeType
+  description     String
+  addedVideoCount Int             @default(0)
+  priceImpact     Float           @default(0)
+  status          String          @default("PROPOSED") // PROPOSED | APPROVED | REJECTED
+  requestedById   String?
+  decidedById     String?
+  decidedAt       DateTime?
+  createdAt       DateTime        @default(now())
+
+  videoProject    VideoProject    @relation(fields: [videoProjectId], references: [id], onDelete: Cascade)
+
+  @@index([videoProjectId, status])
+}
+
+enum ExpenseCategory {
+  VIDEOGRAPHER
+  EDITOR_FREELANCER
+  TRAVEL_FUEL
+  EQUIPMENT_RENTAL
+  LOCATION_FEE
+  MUSIC_LICENCE
+  OTHER
+}
+
+model ProductionExpense {
+  id           String         @id @default(cuid())
+  projectId    String
+  category     ExpenseCategory @default(OTHER)
+  description  String
+  amount       Float
+  incurredAt   DateTime       @default(now())
+  recordedById String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  project      Project        @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+enum MediaAssetKind {
+  ORIGINAL_FOOTAGE
+  PROXY
+  MUSIC
+  IMAGE
+  SCRIPT
+  PREVIEW_EXPORT
+  FINAL_EXPORT
+  CLIENT_REFERENCE
+}
+
+model MediaAsset {
+  id            String          @id @default(cuid())
+  projectId     String
+  deliverableId String?
+  kind          MediaAssetKind
+  title         String
+  fileName      String?
+  mimeType      String?
+  sizeBytes     Int?
+  storageKey    String?
+  externalUrl   String?
+  status        String          @default("REGISTERED") // REGISTERED | FAILED | VERIFIED
+  accessScope   String          @default("INTERNAL") // INTERNAL | CLIENT
+  licenseExpiry DateTime?
+  notes         String?
+  uploadedById  String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  project       Project          @relation(fields: [projectId], references: [id])
+  deliverable   VideoDeliverable? @relation(fields: [deliverableId], references: [id])
+
+  @@index([projectId])
+  @@index([deliverableId])
+}
+
+
