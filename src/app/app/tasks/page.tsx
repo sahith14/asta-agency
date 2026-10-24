@@ -32,6 +32,7 @@ export default function TasksPage() {
   const [mine, setMine] = useState(searchParams.get('mine') === 'true')
   const [expanded, setExpanded] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
 
   const load = (mineOnly: boolean) => {
     api<{ tasks: Task[] }>(`/api/tasks?pageSize=100${mineOnly ? '&mine=true' : ''}`).then(d => setTasks(d.tasks)).catch(e => setError(e.message))
@@ -148,6 +149,7 @@ function TaskDetail({ task, onCommented }: { task: Task; onCommented: () => void
   const [comments, setComments] = useState<Array<{ id: string; body: string; createdAt: string; author: { name: string } }>>([])
   const [body, setBody] = useState('')
   const [busy, setBusy] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
 
   useEffect(() => {
     api<{ comments: typeof comments }>(`/api/tasks/${task.id}/comments`).then(d => setComments(d.comments)).catch(() => {})
@@ -156,12 +158,16 @@ function TaskDetail({ task, onCommented }: { task: Task; onCommented: () => void
   async function submit() {
     if (!body.trim()) return
     setBusy(true)
+    setSendError(null)
     try {
-      await api(`/api/tasks/${task.id}/comments`, { method: 'POST', body: { body: body.trim() } })
+      // Comments are created via POST /api/tasks/[id] (the comments route is read-only)
+      await api(`/api/tasks/${task.id}`, { method: 'POST', body: { body: body.trim() } })
       setBody('')
       const d = await api<{ comments: typeof comments }>(`/api/tasks/${task.id}/comments`)
       setComments(d.comments)
       onCommented()
+    } catch (err) {
+      setSendError(err instanceof Error ? err.message : 'Failed to add comment')
     } finally { setBusy(false) }
   }
 
@@ -173,10 +179,11 @@ function TaskDetail({ task, onCommented }: { task: Task; onCommented: () => void
           <p key={c.id} className="text-xs rounded bg-muted px-3 py-1.5"><strong>{c.author.name}</strong>: {c.body}</p>
         ))}
       </div>
+      {sendError && <p className="text-xs text-destructive" role="alert">{sendError}</p>}
       <div className="flex gap-2">
         <Input value={body} onChange={e => setBody(e.target.value)} placeholder="Add a comment…" maxLength={4000}
           onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); submit() } }} aria-label="Comment" />
-        <Button size="sm" onClick={submit} disabled={busy || !body.trim()}><Send className="h-3.5 w-3.5" /></Button>
+        <Button size="sm" onClick={submit} disabled={busy || !body.trim()}><Send className="h-3.5 w-3.5" /><span className="sr-only">Add comment</span></Button>
       </div>
     </div>
   )

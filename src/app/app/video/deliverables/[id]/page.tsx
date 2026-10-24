@@ -69,6 +69,13 @@ export default function DeliverableDetailPage() {
   const load = useCallback(() => {
     api<{ deliverable: Deliverable }>(`/api/video/deliverables/${id}`).then(x => { setD(x.deliverable) }).catch(e => setError(e.message))
     api<{ versions: Version[] }>(`/api/video/deliverables/${id}/versions`).then(x => setVersions(x.versions)).catch(() => {})
+    // Brief history: content is stored as a JSON string — parse for rendering
+    api<{ briefs: Array<Brief & { content: string | Brief['content'] }> }>(`/api/video/deliverables/${id}/brief`)
+      .then(x => setBriefs(x.briefs.map(b => {
+        if (typeof b.content !== 'string') return b
+        try { return { ...b, content: JSON.parse(b.content) as Brief['content'] } } catch { return { ...b, content: {} as Brief['content'] } }
+      })))
+      .catch(() => {})
   }, [id])
 
   useEffect(() => { load() }, [load])

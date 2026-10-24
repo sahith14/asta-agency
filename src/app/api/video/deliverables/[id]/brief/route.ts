@@ -26,6 +26,27 @@ const briefSchema = z.object({
   deliveryPlatform: z.string().max(80).optional(),
 })
 
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  // Brief version history for this deliverable (newest first)
+  const { user, error } = await requireStaff(req)
+  if (error) return error
+  const { id } = await ctx.params
+  const deliverable = await db.videoDeliverable.findUnique({
+    where: { id },
+    select: { id: true, editorId: true, videographerId: true },
+  })
+  if (!deliverable) return jsonError('Deliverable not found', 404)
+  if (!['OWNER', 'CLIENT_MANAGER', 'SUPPORT_FINANCE', 'CREATIVE_DIRECTOR'].includes(user.role) &&
+      deliverable.editorId !== user.userId && deliverable.videographerId !== user.userId) {
+    return jsonError('You do not have access to this deliverable', 403)
+  }
+  const briefs = await db.creativeBriefVersion.findMany({
+    where: { deliverableId: id },
+    orderBy: { versionNumber: 'desc' },
+  })
+  return json({ briefs })
+}
+
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   // Create a new creative brief version (version history preserved)
   const { user, error } = await requireStaff(req)

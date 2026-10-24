@@ -111,11 +111,33 @@ export function jsonError(message: string, status = 400) {
 
 export const STAFF_ROLES = ['OWNER', 'CLIENT_MANAGER', 'WEB_DEVELOPER', 'SUPPORT_FINANCE', 'VIDEOGRAPHER', 'VIDEO_EDITOR', 'CREATIVE_DIRECTOR'] as const
 
+/**
+ * Accounts provisioned with a one-time temporary password must change it before
+ * the API will serve anything beyond the essentials. This is enforced server-side
+ * (never UI-only) while the shells route the user to the change-password page.
+ */
+const PASSWORD_CHANGE_ALLOWLIST: Array<{ method: string; path: RegExp }> = [
+  { method: 'GET', path: /^\/api\/auth\/me$/ },
+  { method: 'POST', path: /^\/api\/auth\/password$/ },
+  { method: 'POST', path: /^\/api\/auth\/logout$/ },
+  { method: 'GET', path: /^\/api\/notifications$/ },
+]
+
+function passwordChangeBlocked(req: NextRequest, user: AuthUser): NextResponse | null {
+  if (!user.mustChangePassword) return null
+  const path = req.nextUrl.pathname
+  const method = req.method.toUpperCase()
+  if (PASSWORD_CHANGE_ALLOWLIST.some(a => a.method === method && a.path.test(path))) return null
+  return jsonError('Password change required before using the application', 403)
+}
+
 /** Requires an authenticated employee (any active staff role). Returns the user or a 401/403 response. */
 export async function requireStaff(req: NextRequest): Promise<{ user: AuthUser; error: null } | { user: null; error: NextResponse }> {
   const user = await getAuthUser(req)
   if (!user) return { user: null, error: jsonError('Authentication required', 401) }
   if (user.userType !== 'EMPLOYEE') return { user: null, error: jsonError('Staff access required', 403) }
+  const blocked = passwordChangeBlocked(req, user)
+  if (blocked) return { user: null, error: blocked }
   return { user, error: null }
 }
 
@@ -132,6 +154,8 @@ export async function requireClientUser(req: NextRequest): Promise<{ user: AuthU
   const user = await getAuthUser(req)
   if (!user) return { user: null, error: jsonError('Authentication required', 401) }
   if (user.userType !== 'CLIENT_USER' || !user.clientId) return { user: null, error: jsonError('Client portal access required', 403) }
+  const blocked = passwordChangeBlocked(req, user)
+  if (blocked) return { user: null, error: blocked }
   return { user, error: null }
 }
 

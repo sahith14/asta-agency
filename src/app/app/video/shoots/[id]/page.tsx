@@ -79,7 +79,6 @@ export default function ShootDetailPage() {
   }
   if (!shoot) return <div className="space-y-4"><Skeleton className="h-8 w-80" /><Skeleton className="h-64" /></div>
 
-  const canComplete = ['OWNER', 'CLIENT_MANAGER', 'VIDEOGRAPHER'].includes(shoot.manager?.id === undefined ? '' : '') || true // server enforces; UI shows for managers/crew
   const active = ['PLANNED', 'SCHEDULED'].includes(shoot.status)
 
   return (

@@ -68,10 +68,15 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
     router.push('/login')
   }, [router])
 
-  // Redirect unauthenticated visitors in an effect — never during render
+  // Redirect unauthenticated visitors in an effect — never during render.
+  // Staff accounts belong in the staff app; portal users with a temporary
+  // password must change it before using the portal.
   useEffect(() => {
-    if (!loading && !me) router.replace('/login')
-  }, [loading, me, router])
+    if (loading) return
+    if (!me) router.replace('/login')
+    else if (me.userType === 'EMPLOYEE') router.replace('/app')
+    else if (me.mustChangePassword && pathname !== '/portal/account') router.replace('/portal/account')
+  }, [loading, me, router, pathname])
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
@@ -102,7 +107,7 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="ml-auto flex items-center gap-2">
-            <Link href="/portal" aria-label={`Notifications (${unread} unread)`} className="relative hidden sm:block">
+            <Link href="/portal/notifications" aria-label={`Notifications (${unread} unread)`} className="relative hidden sm:block">
               <Button variant="ghost" size="icon"><Bell className="h-5 w-5" /></Button>
               {unread > 0 && <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-[10px] flex items-center justify-center rounded-full">{unread}</Badge>}
             </Link>

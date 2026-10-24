@@ -26,10 +26,8 @@ export default function DeliverablesPage() {
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
-  const [me, setMe] = useState<string>('')
 
   useEffect(() => {
-    api<{ user: { userId?: string } }>('/api/auth/me').then(() => {}).catch(() => {})
     const params = new URLSearchParams({ pageSize: '100' })
     api<{ deliverables: Row[] }>(`/api/video/deliverables?${params}`).then(d => setRows(d.deliverables)).catch(e => setError(e.message))
   }, [])

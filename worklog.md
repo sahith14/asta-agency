@@ -131,3 +131,36 @@ Stage Summary:
 - Login fully functional again: all 9 accounts, panel on /login, one-click + manual flows verified on both viewports.
 - Root cause was environmental (sandbox reset wiped DB + credential files), not code. Permanent mitigation: `bun run dev` now self-heals an empty/desynced environment automatically.
 - Note for future modules: after any session restart, simply running the dev server is guaranteed to yield a working login; `bun run demo:reset` force-rebuilds demo data on demand.
+
+---
+Task ID: S2-AUDIT-1
+Agent: Z.ai Code (main)
+Task: Live Preview Acceptance Audit — inspect, test, fix confirmed defects, final verification; "make each and every single option work".
+
+Work Log:
+- Inspection: main @ e8b8a5b, clean tree; preview running expected code; docs + worklog read; 58 API routes / 31 models / 20 staff pages / 8 portal pages verified on disk; fresh pre-audit backup taken (custom-2026-10-24-pre-audit.db, verified).
+- Baseline suites: tsc 0 errors; eslint 0 errors; tests/api-security-suite.sh initially 18/32 passing.
+- Harness defect found & fixed: set-test-credentials.ts had drifted from the .seed-credentials format the suite parses ("OWNER:" colon format). Restored canonical format (shared with seed.ts), re-rotated, suite → 50/50 PASS. All 32 "failures" were cascades of dead staff cookie jars, not app defects.
+- Static dead-option inventory (84 links, 132 buttons, 93 fetch sites cross-checked): confirmed 5 dead links (missing /app/projects page ×4 + href="#" delivery ref), 1 broken task-comment endpoint (405), 1 write-only brief feature (no GET), 1 dead-end portal bell, 4 dead-code items, 1 always-undefined shoot managerId, missing forgot-password UI for an existing API.
+- Defects fixed (all verified live):
+  1. NEW src/app/app/projects/page.tsx — website projects list + create dialog (repairs nav entry, dashboard stat, "View all", back button). Creation tested via UI (201 + row renders).
+  2. Task comments: POST retargeted to /api/tasks/[id] (the comments route is read-only) + inline error handling — UI round-trip verified (201 + comment renders).
+  3. Brief history: added GET /api/video/deliverables/[id]/brief + page now fetches/parses/renders version history; "New brief vN" advances correctly — verified live with saved v1.
+  4. NEW src/app/portal/notifications/page.tsx + portal bell now links there (client notifications are portal-safe by construction) — verified live.
+  5. Portal deliveries: non-URL delivery references now render as a labelled reference (no dead href="#").
+  6. Shoot dialog: real "Shoot manager" select wired to managerId (was always undefined).
+  7. Login page: "Forgot password?" dialog wired to /api/auth/forgot-password with honest founder-mediated messaging — verified live (200 + honest copy).
+  8. mustChangePassword is now ENFORCED server-side in auth.ts (requireStaff/requireRole/requireClientUser; allowlist: me/password/logout/notifications GET). Verified: fresh staff login 200 but /api/overview 403 until password changed; shells redirect to the account page; change → sessions revoked → re-login → full access. Full loop tested via Team-page provisioning + UI password change.
+  9. Shell cross-guards: staff bounced from /portal to /app; portal users bounced from /app to /portal — both verified live.
+  10. Mobile grid blowout on staff overview fixed (explicit grid-cols-1 below breakpoints) — scrollWidth 390=390 after fix.
+  11. Dead code swept (unused me state, canManage, canComplete placeholder).
+- Video tracking accuracy (Phase 3): new scripts/verify-video-tracking.ts — 67/67 PASS using a 20-video audit fixture: contract quantity=20 with 20 distinct deliverables; schedule≠filmed, film≠delivered; footage-backup gate enforced (422 without verification); EDITING/INTERNAL_REVIEW/CLIENT_REVIEW/REVISION_REQUIRED/APPROVED distinct; version-bound approval (v1 rejected, v2 revision→REVISION_REQUIRED+counter, v3 approved & bound); delivered counts/remaining accurate; cancel+replacement restore contracted math; dashboard stageCounts partition exact (no double counting); shoot conflict detection (overlap flagged, clear slot passes). Includes the password-change gate round-trip.
+- Browser coverage (agent-browser): desktop 1440×900 + mobile 390×844. Landing, request-access submit, login (one-click ×many + manual), signup approval → portal provisioning (Alice) with one-time password, forced password change (Sam), task comments, client create, website project create, deliverable detail/brief/versions, portal review dialog (revision request → REVISION_REQUIRED), portal overview/projects/deliverables/deliveries/invoices/support/account/notifications, notifications mark-all-read, settings access-requests approval, team provisioning, unauthorized redirects (anon→/login both shells, staff↔portal bounces), zero console errors.
+- Security: tests/api-security-suite.sh 50/50 PASS (rerun after auth-gate change); cross-client isolation re-verified (Marta sees only Anchor data in UI + API); tsc clean (src); eslint clean.
+- Cleanup: scripts/cleanup-audit-records.ts removed all audit-created records (2 projects, 2 audit clients, Alice, Sam Temp, 2 signup requests, audit task comment, audit brief version, audit reset tokens). AuditLog entries intentionally preserved (append-only by design). Sanity: employees=7 clients=2 projects=3; dashboard totals back to seeded baseline (contracted 7, delivered 2).
+- Final backup: backups/custom-2026-10-24-post-audit.db (VACUUM INTO, row-count verified). Git hygiene re-verified: .env/.seed-credentials/db/backups all ignored, no secrets tracked.
+
+Stage Summary:
+- All major areas PASS: auth+RBAC, staff app, video division lifecycle/counting, client portal + isolation, dashboard accuracy, finance guards, conflict detection.
+- 11 confirmed defects fixed, every previously-dead UI option now functional; two new pages (website projects, portal notifications) closed the last dead ends.
+- Known limitations re-verified and honestly surfaced in-UI: media storage not configured (metadata-only registry, no fake uploads), no email delivery (in-app only, stated in notifications pages), founder-mediated password recovery (stated in the reset dialog), single currency/timezone. No deployment, no production changes, no commits (changes left uncommitted per audit instruction).

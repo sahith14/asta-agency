@@ -27,10 +27,9 @@ export default function FinancePage() {
   const [projects, setProjects] = useState<Array<{ id: string; name: string }>>([])
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const [canManage, setCanManage] = useState(false)
 
   const load = () => {
-    api<{ invoices: Invoice[] }>('/api/invoices?pageSize=100').then(d => { setInvoices(d.invoices); setCanManage(true) }).catch(e => setError(e.message))
+    api<{ invoices: Invoice[] }>('/api/invoices?pageSize=100').then(d => { setInvoices(d.invoices) }).catch(e => setError(e.message))
     api<Summary>('/api/finance/summary').then(setSummary).catch(() => {})
   }
   useEffect(() => {

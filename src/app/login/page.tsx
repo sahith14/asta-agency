@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { setStoredToken } from '@/lib/client'
 import { Clapperboard, FlaskConical, Loader2 } from 'lucide-react'
 
@@ -41,6 +42,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [accounts, setAccounts] = useState<TestAccount[] | null | undefined>(undefined)
   const [activeEmail, setActiveEmail] = useState<string | null>(null)
+  const [forgotOpen, setForgotOpen] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotBusy, setForgotBusy] = useState(false)
+  const [forgotDone, setForgotDone] = useState(false)
+  const [forgotError, setForgotError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -97,6 +103,24 @@ export default function LoginPage() {
     signIn(account.email, account.password)
   }
 
+  async function submitForgot(e: FormEvent) {
+    e.preventDefault()
+    setForgotBusy(true); setForgotError(null)
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail }), credentials: 'same-origin',
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error ?? 'Request failed')
+      setForgotDone(true)
+    } catch (err) {
+      setForgotError(err instanceof Error ? err.message : 'Request failed')
+    } finally {
+      setForgotBusy(false)
+    }
+  }
+
   const staff = (accounts ?? []).filter(a => a.userType === 'EMPLOYEE')
   const clients = (accounts ?? []).filter(a => a.userType === 'CLIENT_USER')
   const showPanel = Array.isArray(accounts) && accounts.length > 0
@@ -128,7 +152,13 @@ export default function LoginPage() {
                 <Input id="email" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <button type="button" onClick={() => { setForgotOpen(true); setForgotDone(false); setForgotError(null); setForgotEmail(email) }}
+                    className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+                    Forgot password?
+                  </button>
+                </div>
                 <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
@@ -143,6 +173,38 @@ export default function LoginPage() {
             </p>
           </CardContent>
         </Card>
+
+        <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Reset your password</DialogTitle>
+              <DialogDescription>
+                Email delivery is not configured in this environment. Your request is recorded securely and a one-time reset is completed by the Founder (account manager) — you&apos;ll receive the new temporary password from them directly.
+              </DialogDescription>
+            </DialogHeader>
+            {forgotDone ? (
+              <Alert>
+                <AlertDescription>
+                  Request recorded. If an account exists for <strong>{forgotEmail}</strong>, the Founder has been notified to complete the reset — ask them for your temporary password.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <form onSubmit={submitForgot} className="space-y-4">
+                {forgotError && <Alert variant="destructive"><AlertDescription>{forgotError}</AlertDescription></Alert>}
+                <div className="space-y-1.5">
+                  <Label htmlFor="forgot-email">Work email</Label>
+                  <Input id="forgot-email" type="email" required maxLength={200} value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} placeholder="you@company.com" />
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setForgotOpen(false)}>Cancel</Button>
+                  <Button type="submit" disabled={forgotBusy}>
+                    {forgotBusy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Request reset
+                  </Button>
+                </DialogFooter>
+              </form>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {isLoadingAccounts && (
           <Card className="mt-6" aria-label="Test accounts loading">

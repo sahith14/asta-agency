@@ -151,10 +151,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     router.push('/login')
   }, [router])
 
-  // Redirect unauthenticated visitors in an effect — never during render
+  // Redirect unauthenticated visitors in an effect — never during render.
+  // Client-portal accounts belong in the portal; staff with a temporary
+  // password must change it before using the app.
   useEffect(() => {
-    if (!loading && !me) router.replace('/login')
-  }, [loading, me, router])
+    if (loading) return
+    if (!me) router.replace('/login')
+    else if (me.userType === 'CLIENT_USER') router.replace('/portal')
+    else if (me.mustChangePassword && pathname !== '/app/account') router.replace('/app/account')
+  }, [loading, me, router, pathname])
 
   if (loading) {
     return (

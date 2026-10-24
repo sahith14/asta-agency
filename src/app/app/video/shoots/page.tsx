@@ -164,6 +164,7 @@ function ScheduleShootDialog({ presetProjectId, onDone }: { presetProjectId?: st
   const [projectId, setProjectId] = useState(presetProjectId ?? '')
   const [crew, setCrew] = useState<string[]>([])
   const [items, setItems] = useState<string[]>([])
+  const [managerId, setManagerId] = useState('none')
 
   useEffect(() => {
     if (!open) return
@@ -184,11 +185,11 @@ function ScheduleShootDialog({ presetProjectId, onDone }: { presetProjectId?: st
         address: String(fd.get('address')) || undefined,
         clientContact: String(fd.get('contact')) || undefined,
         callSheetNotes: String(fd.get('notes')) || undefined,
-        managerId: crew.includes('__manager__') ? undefined : undefined,
+        managerId: managerId === 'none' ? undefined : managerId,
         videographerIds: crew, equipmentItemIds: items,
         deliverableIds: fd.getAll('deliverable') as string[],
       } })
-      setOpen(false); setCrew([]); setItems([]); onDone()
+      setOpen(false); setCrew([]); setItems([]); setManagerId('none'); onDone()
       if (res.conflicts.length) setConflicts(res.conflicts)
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : 'Failed to schedule shoot')
@@ -228,6 +229,18 @@ function ScheduleShootDialog({ presetProjectId, onDone }: { presetProjectId?: st
           </div>
           <div className="space-y-1.5"><Label htmlFor="sh-address">Location address</Label><Input id="sh-address" name="address" maxLength={400} /></div>
           <div className="space-y-1.5"><Label htmlFor="sh-contact">Client contact on site</Label><Input id="sh-contact" name="contact" maxLength={120} /></div>
+          {team.length > 0 && (
+            <div className="space-y-1.5">
+              <Label>Shoot manager</Label>
+              <Select value={managerId} onValueChange={setManagerId}>
+                <SelectTrigger aria-label="Shoot manager"><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Unassigned</SelectItem>
+                  {team.filter(t => ['OWNER', 'CLIENT_MANAGER', 'CREATIVE_DIRECTOR', 'VIDEOGRAPHER'].includes(t.role)).map(m => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {videographers.length > 0 && (
             <div className="space-y-1.5">
               <Label>Crew (videographers)</Label>

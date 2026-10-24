@@ -38,10 +38,16 @@ export default function PortalDeliveriesPage() {
                   <p className="text-xs text-muted-foreground">{d.project.name} · {d.platform ?? '—'} {d.aspectRatio ? `· ${d.aspectRatio}` : ''} · delivered {d.deliveredAt ? fmtDateTime(d.deliveredAt) : '—'}</p>
                 </div>
                 {d.deliveryReference && (
-                  <a href={d.deliveryReference.startsWith('http') ? d.deliveryReference : '#'} target={d.deliveryReference.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-primary underline underline-offset-2">
-                    <ExternalLink className="h-3.5 w-3.5" />Delivery file
-                  </a>
+                  d.deliveryReference.startsWith('http') ? (
+                    <a href={d.deliveryReference} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm text-primary underline underline-offset-2">
+                      <ExternalLink className="h-3.5 w-3.5" />Delivery file
+                    </a>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-sm text-muted-foreground" title="Your delivery reference — ask your account manager for access">
+                      <PackageCheck className="h-3.5 w-3.5" />Ref: {d.deliveryReference}
+                    </span>
+                  )
                 )}
               </CardContent>
             </Card>

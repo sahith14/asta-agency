@@ -89,8 +89,10 @@ async function main() {
     '',
     ...accounts.map(a =>
       a.userType === 'EMPLOYEE'
-        ? `STAFF  ${a.role.padEnd(17)} ${a.email.padEnd(26)} / ${a.password}`
-        : `CLIENT (${a.clientName})${' '.repeat(Math.max(1, 18 - (a.clientName?.length ?? 0)))} ${a.email.padEnd(26)} / ${a.password}`,
+        ? // Canonical format shared with scripts/seed.ts — tests/api-security-suite.sh
+          // parses role tokens like "OWNER:" from this file; do not drop the colon.
+          `STAFF ${a.role}: ${a.email} / ${a.password}`
+        : `CLIENT (${a.clientName}): ${a.email} / ${a.password}`,
     ),
     '',
   ]
