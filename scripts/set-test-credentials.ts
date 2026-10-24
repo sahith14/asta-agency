@@ -97,9 +97,15 @@ async function main() {
   writeFileSync('.seed-credentials', lines.join('\n'), { mode: 0o600 })
 
   // ── .env (gitignored) — preserve existing non-secret lines ────
-  const existing = readFileSync('.env', 'utf8')
-    .split('\n')
-    .filter(l => l.trim() && !l.startsWith('TEST_ACCOUNTS_JSON=') && !l.startsWith('ENABLE_TEST_ACCOUNTS='))
+  let existing: string[] = []
+  try {
+    existing = readFileSync('.env', 'utf8')
+      .split('\n')
+      .filter(l => l.trim() && !l.startsWith('TEST_ACCOUNTS_JSON=') && !l.startsWith('ENABLE_TEST_ACCOUNTS='))
+  } catch {
+    // .env missing entirely (e.g. sandbox reset) — start from a fresh file
+    existing = ['DATABASE_URL=file:/home/z/my-project/db/custom.db']
+  }
   const envContent = [
     ...existing,
     'ENABLE_TEST_ACCOUNTS=true',
