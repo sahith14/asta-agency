@@ -109,3 +109,25 @@ Stage Summary:
 - Login now works in ALL contexts: top-level browser (cookie), preview-panel iframe (Bearer fallback), and cookie-blocking browsers
 - Session model unchanged (DB-backed, scrypt passwords, HttpOnly primary); Bearer token is the same DB session token delivered over the same origin
 - Founder must reload the preview panel once to pick up the new client bundle
+
+---
+Task ID: S2-HOTFIX-1
+Agent: Z.ai Code (main)
+Task: Fix "Login isn't working" reported by Founder.
+
+Work Log:
+- Diagnosis: dev.log showed GET /api/auth/test-accounts → 404; the sandbox session restart at 17:13 had wiped all gitignored/untracked state: live SQLite DB recreated EMPTY (0 accounts), .env truncated to DATABASE_URL only (ENABLE_TEST_ACCOUNTS + TEST_ACCOUNTS_JSON gone), .seed-credentials deleted, backups/ removed. With no accounts and no stored credentials, every login path was dead.
+- Recovery: bun run db:push (schema) → bun scripts/seed.ts (demo data) → bun scripts/set-test-credentials.ts (fresh random passwords for all 9 accounts; plaintext only into gitignored .env + .seed-credentials; sessions revoked; AuditLog entry written).
+- Verified via curl: /api/auth/test-accounts 200; POST /api/auth/login 200 for staff (EMPLOYEE) and client (CLIENT_USER); wrong password → 401.
+- Root-cause hardening: new scripts/bootstrap-if-empty.ts wired into package.json "dev" (bun run dev). Idempotent pre-start check: runs prisma db push if schema missing; if Employee count = 0 → runs seed + rotation; if stored TEST_ACCOUNTS_JSON missing/malformed or its founder password no longer matches the DB scrypt hash → re-runs rotation so panel and DB always agree; otherwise fast no-op. Prevents any future sandbox reset from producing a broken login.
+- set-test-credentials.ts hardened to tolerate a fully missing .env (recreates it with DATABASE_URL).
+- REAL end-to-end test of the self-heal loop: stopped server, deleted db/custom.db + .seed-credentials, truncated .env to DATABASE_URL only (exact observed wipe state), ran bun run dev → bootstrap auto-detected missing schema + empty DB, rebuilt everything, server Ready in 687 ms. No manual steps.
+- Browser verification (agent-browser, desktop 1440×900 + mobile 390×844): login page renders with Test & demo accounts panel (7 staff + 2 client rows, scrollable, role badges, one-click Sign in); one-click staff login (Tom) → /app with full dashboard data; one-click Founder login → /app "Welcome back, Founder"; one-click client login (Marta) → /portal "Welcome, The Anchor Bar & Grill"; manual form login (Daniel) → /app; Sign out → /login ×3; zero console errors / zero page errors.
+- Security hygiene: credential-bearing /tmp screenshots deleted after verification; git check-ignore confirmed .env, .seed-credentials, db/, backups/ all ignored; committed only code + config (no secrets).
+- Backup recreated: backups/custom-2026-10-24-post-login-fix.db (VACUUM INTO snapshot, per-table row-count verification passed).
+- Committed as 33024fe "Self-healing dev bootstrap: auto-restore demo login after sandbox resets" — package.json now references scripts/bootstrap-if-empty.ts, so the bootstrap itself survives future resets.
+
+Stage Summary:
+- Login fully functional again: all 9 accounts, panel on /login, one-click + manual flows verified on both viewports.
+- Root cause was environmental (sandbox reset wiped DB + credential files), not code. Permanent mitigation: `bun run dev` now self-heals an empty/desynced environment automatically.
+- Note for future modules: after any session restart, simply running the dev server is guaranteed to yield a working login; `bun run demo:reset` force-rebuilds demo data on demand.
