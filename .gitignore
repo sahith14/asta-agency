@@ -58,3 +58,4 @@ server.log
 .seed-credentials
 /tool-results
 /upload
+.env

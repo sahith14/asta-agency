@@ -41,3 +41,34 @@ Stage Summary:
 - Test evidence: 50/50 API security checks, tsc 0 errors, eslint 0 errors, browser flows verified desktop+mobile
 - Known limitations documented: no binary media storage (honest registry), no email delivery (in-app notifications only, founder-mediated resets), single-currency GBP formatting
 - Full report: docs/VIDEO-DIVISION-REPORT.md
+
+---
+Task ID: S2-0
+Agent: Z.ai Code (main)
+Task: Stage 2 gate — fresh verified backup, security hygiene (.env untracked), and Founder-requested "show all login details on the login page for testing"
+
+Work Log:
+- Created + verified fresh backup backups/custom-2026-10-24-pre-stage2.db (VACUUM INTO, 31/31 table row counts match, sha256 7163b0f2...; new reusable tool scripts/backup-db.ts)
+- Backup revealed active db/custom.db was EMPTY (0 rows all tables — prior seed data not present); scripts/inspect-accounts.ts (read-only) confirmed no accounts existed
+- Fixed §1 hygiene gap: .env was git-TRACKED → git rm --cached .env + added .env rule to .gitignore (verified via git check-ignore)
+- Ran scripts/seed.ts to populate DB: 7 employees (OWNER, CLIENT_MANAGER, WEB_DEVELOPER, SUPPORT_FINANCE, VIDEOGRAPHER, VIDEO_EDITOR, CREATIVE_DIRECTOR), 2 clients (The Anchor Bar & Grill, Brightcuts Consulting) + 2 portal users, projects/packages/deliverables/shoot/invoices/expenses/tasks/meetings/contacts demo data
+- Created scripts/set-test-credentials.ts: rotated ALL 9 accounts to fresh random passwords (scrypt, same scheme as src/lib/auth.ts), mustChangePassword=false, all sessions revoked, rotation recorded in AuditLog; values written ONLY to gitignored .env (TEST_ACCOUNTS_JSON) and .seed-credentials (mode 0600); nothing printed to stdout
+- Took verified post-seed backup backups/custom-2026-10-24-post-seed.db (31/31 match, sha256 0c445e7e...)
+- New API route src/app/api/auth/test-accounts/route.ts: server-only, reads gitignored .env from disk (mtime-cached), gated by ENABLE_TEST_ACCOUNTS=true else 404
+- Reworked src/app/login/page.tsx: corporate "Test & demo accounts" panel (role badges, name, email, mono password, one-click sign-in per row; staff/client groupings; scrollable list; skeleton while loading; renders nothing when feature flag off)
+- Added slim scrollbar utility to globals.css
+- Fixed lint finding (function named useAccount triggered rules-of-hooks → renamed signInAs); fixed UI bug where flag-off left an eternal skeleton card
+
+Verification (all actually executed):
+- bun run lint: clean (0 errors)
+- Browser desktop 1440x900: /login renders 9 account rows with full details; one-click Founder sign-in → /app rendered with full founder nav; one-click Marta sign-in → /portal rendered with client nav; wrong-password submit → POST /api/auth/login 401 in dev.log + role=alert "Invalid email or password"
+- Browser mobile 390x844: no horizontal overflow (scrollWidth 390), panel fits, screenshot captured
+- Flag gate: ENABLE_TEST_ACCOUNTS=false → API HTTP 404 + panel + skeleton hidden; true → HTTP 200 + panel visible
+- git status shows only intended changes; .env/.seed-credentials/db/backups all gitignored; no secrets in any tracked file; no console/page errors
+
+Stage Summary:
+- Founder can now see and use every login credential directly on /login (one-click sign-in per account) — the explicitly requested feature
+- Passwords live only in gitignored .env + .seed-credentials; re-run `bun scripts/set-test-credentials.ts` anytime to rotate
+- Two verified backups exist: pre-stage2 (empty pre-change state) and post-seed (current known-good state)
+- DB was found empty and reseeded — this was required for ANY login to work
+- Stage 2 module work (Search, Contacts, Client briefs, Meetings, Task comments, Notifications, Activity logs, Settings) NOT yet started — awaiting Founder go per plan; login-details feature delivered first as explicitly requested

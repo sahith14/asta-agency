@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,29 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Clapperboard, Loader2 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Clapperboard, FlaskConical, Loader2 } from 'lucide-react'
+
+interface TestAccount {
+  email: string
+  password: string
+  name: string
+  role: string
+  userType: 'EMPLOYEE' | 'CLIENT_USER'
+  clientName: string | null
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  OWNER: 'Owner',
+  CLIENT_MANAGER: 'Client Manager',
+  WEB_DEVELOPER: 'Web Developer',
+  SUPPORT_FINANCE: 'Support & Finance',
+  VIDEOGRAPHER: 'Videographer',
+  VIDEO_EDITOR: 'Video Editor',
+  CREATIVE_DIRECTOR: 'Creative Director',
+  CLIENT: 'Client',
+}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -16,16 +38,36 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [accounts, setAccounts] = useState<TestAccount[] | null | undefined>(undefined)
+  const [activeEmail, setActiveEmail] = useState<string | null>(null)
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault()
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/auth/test-accounts', { credentials: 'same-origin' })
+      .then(async res => {
+        if (!res.ok) return null
+        const data = await res.json()
+        return Array.isArray(data?.accounts) ? (data.accounts as TestAccount[]) : null
+      })
+      .then(list => {
+        if (!cancelled) setAccounts(list)
+      })
+      .catch(() => {
+        if (!cancelled) setAccounts(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  async function signIn(emailValue: string, passwordValue: string) {
     setError(null)
     setLoading(true)
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: emailValue, password: passwordValue }),
         credentials: 'same-origin',
       })
       const data = await res.json()
@@ -36,11 +78,29 @@ export default function LoginPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign-in failed')
       setLoading(false)
+      setActiveEmail(null)
     }
   }
 
+  function onSubmit(e: FormEvent) {
+    e.preventDefault()
+    signIn(email, password)
+  }
+
+  function signInAs(account: TestAccount) {
+    setEmail(account.email)
+    setPassword(account.password)
+    setActiveEmail(account.email)
+    signIn(account.email, account.password)
+  }
+
+  const staff = (accounts ?? []).filter(a => a.userType === 'EMPLOYEE')
+  const clients = (accounts ?? []).filter(a => a.userType === 'CLIENT_USER')
+  const showPanel = Array.isArray(accounts) && accounts.length > 0
+  const isLoadingAccounts = accounts === undefined
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-10">
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center gap-2 font-bold text-lg mb-6">
           <span className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
@@ -80,6 +140,86 @@ export default function LoginPage() {
             </p>
           </CardContent>
         </Card>
+
+        {isLoadingAccounts && (
+          <Card className="mt-6" aria-label="Test accounts loading">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FlaskConical className="h-4 w-4 text-muted-foreground" /> Test accounts
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </CardContent>
+          </Card>
+        )}
+
+        {showPanel && (
+          <Card className="mt-6" aria-label="Test accounts">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FlaskConical className="h-4 w-4 text-muted-foreground" /> Test &amp; demo accounts
+              </CardTitle>
+              <CardDescription>
+                All login details for reviewing the platform — one click signs you in. Hidden automatically when
+                <code className="mx-1 rounded bg-muted px-1 py-0.5 text-[11px]">ENABLE_TEST_ACCOUNTS</code> is off.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {staff.length > 0 && (
+                <section aria-label="Staff accounts">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Staff — internal workspace</p>
+                  <div className="max-h-80 overflow-y-auto scrollbar-slim space-y-2 pr-1">
+                    {staff.map(a => (
+                      <div key={a.email} className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className="text-[11px]">{ROLE_LABELS[a.role] ?? a.role}</Badge>
+                            <span className="text-sm font-medium truncate">{a.name}</span>
+                          </div>
+                          <div className="mt-1 truncate text-xs text-muted-foreground">{a.email}</div>
+                          <div className="mt-0.5 font-mono text-xs text-foreground/80 select-all">{a.password}</div>
+                        </div>
+                        <Button size="sm" variant="outline" className="shrink-0" disabled={loading} onClick={() => signInAs(a)}>
+                          {activeEmail === a.email && loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sign in'}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+              {clients.length > 0 && (
+                <section aria-label="Client portal accounts">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Client portal</p>
+                  <div className="space-y-2">
+                    {clients.map(a => (
+                      <div key={a.email} className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="secondary" className="text-[11px]">{a.clientName ?? 'Client'}</Badge>
+                            <span className="text-sm font-medium truncate">{a.name}</span>
+                          </div>
+                          <div className="mt-1 truncate text-xs text-muted-foreground">{a.email}</div>
+                          <div className="mt-0.5 font-mono text-xs text-foreground/80 select-all">{a.password}</div>
+                        </div>
+                        <Button size="sm" variant="outline" className="shrink-0" disabled={loading} onClick={() => signInAs(a)}>
+                          {activeEmail === a.email && loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sign in'}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                Credentials live only in gitignored files (<code className="rounded bg-muted px-1">.env</code>,{' '}
+                <code className="rounded bg-muted px-1">.seed-credentials</code>) and are served by
+                <code className="mx-1 rounded bg-muted px-1">/api/auth/test-accounts</code> while the demo flag is enabled.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   )
