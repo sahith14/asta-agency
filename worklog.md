@@ -72,3 +72,17 @@ Stage Summary:
 - Two verified backups exist: pre-stage2 (empty pre-change state) and post-seed (current known-good state)
 - DB was found empty and reseeded — this was required for ANY login to work
 - Stage 2 module work (Search, Contacts, Client briefs, Meetings, Task comments, Notifications, Activity logs, Settings) NOT yet started — awaiting Founder go per plan; login-details feature delivered first as explicitly requested
+
+---
+Task ID: S2-1
+Agent: Z.ai Code (main)
+Task: Fix React console error "Cannot update a component (Router) while rendering a different component (AppShell)" reported by Founder
+
+Work Log:
+- Root cause: AppShell (app-shell.tsx:161) and PortalShell (portal-shell.tsx:74) called router.push('/login') DURING RENDER when /api/auth/me returned no session (triggered by revoked/expired sessions or logged-out direct visits)
+- Fix: moved redirect into useEffect (router.replace('/login') on !loading && !me) in BOTH shells; render now shows spinner until navigation completes; replace() prevents back-button returning to the dead protected page
+- Audited every router.push/replace call site in src (13 found): all others are inside event handlers/callbacks or setTimeout in submit handlers — compliant; no other render-phase offenders
+- Verification: bun run lint clean; browser 1440x900 — logged-out /app → clean redirect to /login with ZERO page errors; logged-out /portal → same; founder one-click login → /app rendered; account menu → Sign out → /login; agent-browser errors empty across all flows; dev.log shows no errors
+
+Stage Summary:
+- Both auth shells now redirect in effects (React-correct); error reported by Founder eliminated and regression-tested across all four auth flows

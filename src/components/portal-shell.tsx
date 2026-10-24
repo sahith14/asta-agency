@@ -67,11 +67,16 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
     router.push('/login')
   }, [router])
 
+  // Redirect unauthenticated visitors in an effect — never during render
+  useEffect(() => {
+    if (!loading && !me) router.replace('/login')
+  }, [loading, me, router])
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
   }
   if (!me) {
-    router.push('/login')
+    // Redirect handled by the effect above; show spinner until navigation completes
     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
   }
 
