@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { api } from '@/lib/client'
+import { api, setStoredToken } from '@/lib/client'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -64,6 +64,7 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     await api('/api/auth/logout', { method: 'POST' }).catch(() => {})
+    setStoredToken(null)
     router.push('/login')
   }, [router])
 

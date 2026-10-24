@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { setStoredToken } from '@/lib/client'
 import { Clapperboard, FlaskConical, Loader2 } from 'lucide-react'
 
 interface TestAccount {
@@ -72,6 +73,8 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Sign-in failed')
+      // Store Bearer fallback for embedded contexts where Lax cookies are withheld
+      if (typeof data.sessionToken === 'string') setStoredToken(data.sessionToken)
       if (data.user.userType === 'CLIENT_USER') router.push('/portal')
       else router.push('/app')
       router.refresh()

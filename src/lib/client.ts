@@ -8,16 +8,49 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Session token storage (Bearer fallback).
+ * Embedded contexts (preview-panel iframes) may withhold SameSite=Lax cookies or
+ * block third-party cookies entirely — the Authorization header keeps auth working there.
+ * The token originates from the login response over the same origin.
+ */
+const TOKEN_KEY = 'agencyos_session_token'
+
+export function getStoredToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function setStoredToken(token: string | null): void {
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token)
+    else localStorage.removeItem(TOKEN_KEY)
+  } catch {
+    // storage unavailable — cookie-only mode
+  }
+}
+
 /** Authenticated fetch helper — returns parsed JSON or throws ApiError */
 export async function api<T = unknown>(path: string, options?: { method?: string; body?: unknown }): Promise<T> {
+  const headers: Record<string, string> = {}
+  if (options?.body !== undefined) headers['Content-Type'] = 'application/json'
+  const token = getStoredToken()
+  if (token) headers['Authorization'] = `Bearer ${token}`
   const res = await fetch(path, {
     method: options?.method ?? 'GET',
-    headers: options?.body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+    headers,
     body: options?.body !== undefined ? JSON.stringify(options.body) : undefined,
     credentials: 'same-origin',
   })
   const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new ApiError((data as { error?: string }).error ?? `Request failed (${res.status})`, res.status)
+  if (!res.ok) {
+    // Stale/revoked session token — clear it so the app falls back to the cookie or a fresh login
+    if (res.status === 401 && !path.startsWith('/api/auth/')) setStoredToken(null)
+    throw new ApiError((data as { error?: string }).error ?? `Request failed (${res.status})`, res.status)
+  }
   return data as T
 }
 

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { api, ROLE_LABELS } from '@/lib/client'
+import { api, setStoredToken, ROLE_LABELS } from '@/lib/client'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -147,6 +147,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     await api('/api/auth/logout', { method: 'POST' }).catch(() => {})
+    setStoredToken(null)
     router.push('/login')
   }, [router])
 

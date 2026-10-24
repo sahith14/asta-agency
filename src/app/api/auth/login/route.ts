@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
     await audit({ userType: 'EMPLOYEE', userId: employee.id, name: employee.name }, 'AUTH_LOGIN', 'Employee', employee.id, 'Signed in')
     const res = NextResponse.json({
       user: { name: employee.name, email: employee.email, role: employee.role, userType: 'EMPLOYEE', mustChangePassword: employee.mustChangePassword },
+      // Bearer fallback for embedded contexts where SameSite=Lax cookies are withheld
+      sessionToken: token,
     })
     res.cookies.set(SESSION_COOKIE, token, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7 })
     return res
@@ -35,6 +37,8 @@ export async function POST(req: NextRequest) {
     await audit({ userType: 'CLIENT_USER', userId: clientUser.id, name: clientUser.name }, 'AUTH_LOGIN', 'ClientUser', clientUser.id, 'Signed in to client portal')
     const res = NextResponse.json({
       user: { name: clientUser.name, email: clientUser.email, role: 'CLIENT', userType: 'CLIENT_USER', mustChangePassword: clientUser.mustChangePassword },
+      // Bearer fallback for embedded contexts where SameSite=Lax cookies are withheld
+      sessionToken: token,
     })
     res.cookies.set(SESSION_COOKIE, token, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7 })
     return res

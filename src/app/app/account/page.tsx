@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { api } from '@/lib/client'
+import { api, setStoredToken } from '@/lib/client'
 import { useMe } from '@/components/app-shell'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -26,6 +26,7 @@ export default function AccountPage() {
       await api('/api/auth/password', { method: 'POST', body: { currentPassword: String(fd.get('current')), newPassword: String(fd.get('next')) } })
       setDone(true)
       // all sessions revoked — back to login
+      setStoredToken(null)
       setTimeout(() => { router.push('/login') }, 1500)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to change password')

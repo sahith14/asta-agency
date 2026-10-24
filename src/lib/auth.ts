@@ -57,8 +57,25 @@ export async function destroySession(token: string): Promise<void> {
   await db.session.deleteMany({ where: { token: hashToken(token) } })
 }
 
+/**
+ * Resolve the session token from a request.
+ * Primary: HttpOnly cookie (SameSite=Lax — works for top-level browsing).
+ * Fallback: `Authorization: Bearer <token>` header — needed in embedded contexts
+ * (e.g. preview-panel iframes) where browsers withhold SameSite=Lax cookies or
+ * block third-party cookies entirely. The token is delivered to the client in the
+ * login response body over the same origin, so this stays within the session model.
+ */
+export function getSessionToken(req: NextRequest): string | null {
+  const header = req.headers.get('authorization')
+  if (header?.startsWith('Bearer ')) {
+    const bearer = header.slice(7).trim()
+    if (bearer) return bearer
+  }
+  return req.cookies.get(SESSION_COOKIE)?.value ?? null
+}
+
 export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
-  const token = req.cookies.get(SESSION_COOKIE)?.value
+  const token = getSessionToken(req)
   if (!token) return null
   const session = await db.session.findUnique({ where: { token: hashToken(token) } })
   if (!session || session.expiresAt < new Date()) return null

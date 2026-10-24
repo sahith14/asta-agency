@@ -86,3 +86,26 @@ Work Log:
 
 Stage Summary:
 - Both auth shells now redirect in effects (React-correct); error reported by Founder eliminated and regression-tested across all four auth flows
+
+---
+Task ID: S2-2
+Agent: Z.ai Code (main)
+Task: Fix "Login isn't working" reported by Founder (preview panel context)
+
+Work Log:
+- Diagnosis: server-side auth was healthy (curl round-trip 200/200; all 9 accounts active; login route sound). dev.log showed the signature POST /api/auth/login 200 → GET /api/auth/me 401 repeatedly
+- Root cause reproduced with a cross-site embedder (page on 127.0.0.1:4173 embedding localhost:3000 in an iframe): the session cookie is SameSite=Lax WITHOUT Secure, and browsers WITHHOLD Lax cookies on requests from inside a cross-site iframe (preview panel) → login succeeds but the next request is unauthenticated → bounce back to /login
+- Fix (Bearer fallback, keeps HttpOnly cookie as primary):
+  - src/lib/auth.ts: getSessionToken(req) resolves cookie first, then Authorization: Bearer; getAuthUser uses it
+  - src/app/api/auth/login/route.ts: login response body now also carries sessionToken (same token as the cookie)
+  - src/app/api/auth/logout/route.ts: destroys session from cookie OR Bearer
+  - src/lib/client.ts: token store in localStorage (agencyos_session_token), api() attaches Authorization header, auto-clears token on non-auth 401s (stale token safety)
+  - src/app/login/page.tsx: stores sessionToken after successful sign-in
+  - account pages (app+portal): clear stored token after password change (all sessions revoked)
+  - both shells: logout clears stored token
+- Verification: lint clean; curl Bearer-only round-trip (login→me 200→logout→me 401); cookie-path regression 200/200; IFRAME cross-site test — founder one-click login now lands and STAYS on /app with /api/auth/me 200 + notifications 200 and full founder workspace rendered (previously me 401 bounce); top-level fresh-state flow login→/app→Sign out→/login all clean; zero page errors; dev.log clean
+
+Stage Summary:
+- Login now works in ALL contexts: top-level browser (cookie), preview-panel iframe (Bearer fallback), and cookie-blocking browsers
+- Session model unchanged (DB-backed, scrypt passwords, HttpOnly primary); Bearer token is the same DB session token delivered over the same origin
+- Founder must reload the preview panel once to pick up the new client bundle
