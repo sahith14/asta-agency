@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   LayoutDashboard, Users, UserCircle, Briefcase, Clapperboard, Package, Film, CalendarDays,
   ListChecks, Wallet, BarChart3, Bell, Settings, Search, Menu, LogOut, KeyRound, ScrollText,
-  Wrench, Mail, MonitorSmartphone, Loader2,
+  Wrench, Mail, MonitorSmartphone, Loader2, Inbox, Images,
 } from 'lucide-react'
 
 export interface Me {
@@ -36,6 +36,7 @@ const NAV: Array<{ section: string; items: Array<{ href: string; label: string; 
       { href: '/app', label: 'Overview', icon: LayoutDashboard, roles: ['OWNER', 'CLIENT_MANAGER', 'WEB_DEVELOPER', 'SUPPORT_FINANCE', 'VIDEOGRAPHER', 'VIDEO_EDITOR', 'CREATIVE_DIRECTOR'] },
       { href: '/app/clients', label: 'Clients', icon: Users, roles: ['OWNER', 'CLIENT_MANAGER', 'SUPPORT_FINANCE'] },
       { href: '/app/contacts', label: 'Contacts', icon: UserCircle, roles: ['OWNER', 'CLIENT_MANAGER', 'SUPPORT_FINANCE'] },
+      { href: '/app/enquiries', label: 'Website Enquiries', icon: Inbox, roles: ['OWNER', 'CLIENT_MANAGER', 'SUPPORT_FINANCE'] },
       { href: '/app/team', label: 'Team', icon: Briefcase, roles: ['OWNER', 'CLIENT_MANAGER'] },
       { href: '/app/calendar', label: 'Calendar', icon: CalendarDays, roles: ['OWNER', 'CLIENT_MANAGER', 'WEB_DEVELOPER', 'SUPPORT_FINANCE', 'VIDEOGRAPHER', 'VIDEO_EDITOR', 'CREATIVE_DIRECTOR'] },
       { href: '/app/tasks', label: 'Tasks', icon: ListChecks, roles: ['OWNER', 'CLIENT_MANAGER', 'WEB_DEVELOPER', 'SUPPORT_FINANCE', 'VIDEOGRAPHER', 'VIDEO_EDITOR', 'CREATIVE_DIRECTOR'] },
@@ -67,6 +68,7 @@ const NAV: Array<{ section: string; items: Array<{ href: string; label: string; 
       { href: '/app/reports', label: 'Reports', icon: BarChart3, roles: ['OWNER', 'CLIENT_MANAGER', 'SUPPORT_FINANCE', 'CREATIVE_DIRECTOR'] },
       { href: '/app/notifications', label: 'Notifications', icon: Bell, roles: ['OWNER', 'CLIENT_MANAGER', 'WEB_DEVELOPER', 'SUPPORT_FINANCE', 'VIDEOGRAPHER', 'VIDEO_EDITOR', 'CREATIVE_DIRECTOR'] },
       { href: '/app/audit', label: 'Audit Log', icon: ScrollText, roles: ['OWNER', 'CLIENT_MANAGER'] },
+      { href: '/app/portfolio', label: 'Site Portfolio', icon: Images, roles: ['OWNER', 'CLIENT_MANAGER', 'CREATIVE_DIRECTOR'] },
       { href: '/app/settings', label: 'Settings', icon: Settings, roles: ['OWNER'] },
     ],
   },

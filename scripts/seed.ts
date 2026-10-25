@@ -226,6 +226,10 @@ async function main() {
     data: { reference: ref('VD'), projectId: bp.id, videoProjectId: bvp.id, title: 'Corporate brand film', category: 'CORPORATE_BRAND_FILM', status: 'PLANNED', priority: 'LOW', aspectRatio: '16:9', targetDurationSec: 150, deadline: new Date(now + 25 * 86400000), revisionAllowance: 2 },
   })
 
+  // ── Public-site portfolio (clearly-labelled sample projects) ─
+  const { seedPortfolio } = await import('./seed-portfolio')
+  await seedPortfolio(db)
+
   // ── App settings ─────────────────────────────────────────────
   await db.appSetting.create({ data: { key: 'agencyName', value: 'AgencyOS Studio' } })
   await db.appSetting.create({ data: { key: 'supportEmail', value: 'support@agencyos.local' } })

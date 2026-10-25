@@ -126,6 +126,58 @@ model AppSetting {
 }
 
 // ─────────────────────────────────────────────────────────────
+// PUBLIC WEBSITE
+// ─────────────────────────────────────────────────────────────
+
+// Enquiries submitted from the public site contact form (no account required).
+// Staff triage them here; "convert" promotes an enquiry into a CRM Contact.
+model SiteEnquiry {
+  id                 String    @id @default(cuid())
+  reference          String    @unique
+  name               String
+  email              String?
+  phone              String?
+  companyName        String?
+  service            String
+  message            String
+  contactMethod      String    @default("NO_PREFERENCE") // EMAIL | PHONE | NO_PREFERENCE
+  status             String    @default("NEW") // NEW | IN_PROGRESS | CONVERTED | CLOSED
+  convertedContactId String?
+  handledById        String?
+  notes              String?
+  ipHash             String? // sha256 of client IP — abuse tracking only, never raw IP
+  userAgent          String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([status, createdAt])
+}
+
+// Public portfolio content. Published items appear on the public /portfolio page;
+// `isDemo` marks clearly-labelled sample work so demo content is never presented
+// as real client work.
+model PortfolioItem {
+  id           String   @id @default(cuid())
+  title        String
+  category     String // WEBSITE | RESTAURANT_VIDEO | REAL_ESTATE_VIDEO | PRODUCT_PHOTO | BRAND_VIDEO | OTHER
+  division     String   @default("WEB") // WEB | VIDEO
+  summary      String
+  description  String?
+  thumbnailUrl String?
+  mediaUrl     String?
+  projectUrl   String?
+  featured     Boolean  @default(false)
+  published    Boolean  @default(false)
+  isDemo       Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdById  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([published, featured])
+}
+
+// ─────────────────────────────────────────────────────────────
 // SHARED DELIVERY (both divisions)
 // ─────────────────────────────────────────────────────────────
 

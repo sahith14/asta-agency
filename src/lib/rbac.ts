@@ -29,6 +29,9 @@ export type Capability =
   | 'tasks.work'
   | 'meetings.manage'
   | 'contacts.manage'
+  | 'enquiries.read'        // view public-site enquiries
+  | 'enquiries.manage'      // triage/convert public-site enquiries
+  | 'portfolio.manage'      // manage public-site portfolio content
   | 'finance.manage'        // invoices create/transition, expenses create
   | 'finance.read'
   | 'reports.read'
@@ -43,6 +46,7 @@ const OWNER: Capability[] = [
   'deliverables.markFootage', 'deliverables.edit', 'deliverables.internalReview',
   'deliverables.deliver', 'briefs.edit', 'shoots.manage', 'shoots.markComplete',
   'equipment.manage', 'tasks.manage', 'tasks.work', 'meetings.manage', 'contacts.manage',
+  'enquiries.read', 'enquiries.manage', 'portfolio.manage',
   'finance.manage', 'finance.read', 'reports.read', 'audit.read', 'settings.manage',
   'signup.approve', 'search.global',
 ]
@@ -52,6 +56,7 @@ const CLIENT_MANAGER: Capability[] = [
   'packages.manage', 'packages.read', 'deliverables.manage', 'deliverables.deliver',
   'briefs.edit', 'shoots.manage', 'shoots.markComplete', 'equipment.manage',
   'tasks.manage', 'tasks.work', 'meetings.manage', 'contacts.manage',
+  'enquiries.read', 'enquiries.manage', 'portfolio.manage',
   'finance.read', 'reports.read', 'search.global',
 ]
 
@@ -63,6 +68,7 @@ const WEB_DEVELOPER: Capability[] = [
 const SUPPORT_FINANCE: Capability[] = [
   'clients.read', 'projects.read', 'packages.read', 'tasks.manage', 'tasks.work',
   'finance.manage', 'finance.read', 'reports.read', 'search.global', 'contacts.manage',
+  'enquiries.read', 'enquiries.manage',
 ]
 
 const VIDEOGRAPHER: Capability[] = [
@@ -77,7 +83,7 @@ const VIDEO_EDITOR: Capability[] = [
 
 const CREATIVE_DIRECTOR: Capability[] = [
   'projects.read', 'packages.read', 'deliverables.manage', 'deliverables.internalReview',
-  'briefs.edit', 'tasks.work', 'meetings.manage', 'search.global',
+  'briefs.edit', 'tasks.work', 'meetings.manage', 'search.global', 'portfolio.manage',
 ]
 
 const CAPABILITIES: Record<string, Capability[]> = {

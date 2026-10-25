@@ -225,3 +225,56 @@ Stage Summary:
 - Root cause: sandbox environment-loss event (wiped DB/.env/backups) already mitigated by the self-healing bootstrap; the genuine residual defect was the bootstrap's founder-only health check, now fixed to verify ALL 9 advertised demo accounts and self-heal credential drift (T1/T2 evidence).
 - Changes (uncommitted, per task §5 no-commit rule): scripts/bootstrap-if-empty.ts (all-account health check + loud unhealable warnings), package.json (dev script group-tee so bootstrap output lands in dev.log), src/lib/rbac.ts (+roleCan), src/app/app/projects/page.tsx + src/app/app/video/projects/page.tsx (role-gated create UI + lazy dialog data). Backup: backups/custom-2026-10-25-pre-demofix.db (VERIFIED).
 - Verification: 9/9 advertised demo accounts pass the nine-step UI protocol including refresh persistence, isolation, logout enforcement, and two full server restarts; embedded cross-site iframe login verified (Bearer fallback); regressions green (tsc 0, lint 0, security 51/51, video tracking 69/69).
+
+---
+Task ID: PUB-2
+Agent: general-purpose (image generation)
+Task: Generate 8 public-site marketing images into public/images/site/
+
+Work Log:
+- Created /home/z/my-project/public/images/site/ and generated 8 photorealistic JPEGs via the z-ai image-generation skill (z-ai CLI; hero via z-ai-web-dev-sdk script because the CLI whitelist/size validation blocked a wider-than-1344x768 hero and the documented 1440x720 is rejected by the API — 720 is not a multiple of 32)
+- Final files (verified with `file`):
+  - /home/z/my-project/public/images/site/hero-studio.jpg — JPEG image data, 2048x1152, components 3 (16:9)
+  - /home/z/my-project/public/images/site/service-web.jpg — JPEG image data, 1344x768, components 3
+  - /home/z/my-project/public/images/site/service-video.jpg — JPEG image data, 1344x768, components 3
+  - /home/z/my-project/public/images/site/about-studio.jpg — JPEG image data, 1344x768, components 3
+  - /home/z/my-project/public/images/site/work-restaurant-reel.jpg — JPEG image data, 1152x864, components 3 (4:3)
+  - /home/z/my-project/public/images/site/work-realestate.jpg — JPEG image data, 1152x864, components 3
+  - /home/z/my-project/public/images/site/work-website.jpg — JPEG image data, 1152x864, components 3
+  - /home/z/my-project/public/images/site/work-product.jpg — JPEG image data, 1152x864, components 3
+- QA pass with z-ai vision on all 8 images (text/faces/palette check): first round found 3 violations — hero-studio, service-web, work-website were blue-dominant, and service-web also had readable menu words on the monitor. Regenerated those (stronger warm-palette + zero-text prompts): re-checked → all TEXT: NO, FACES: NO, warm amber/brown/neutral dominant across all 8
+- Temp SDK script written outside the project (/home/z/.tmp-pub2/) and deleted after use; no other project files touched, nothing committed, no dev server started
+
+Stage Summary:
+- 8/8 site images delivered as true JPEGs at public/images/site/ (hero 2048x1152; 3 service/about cards 1344x768; 4 work cards 1152x864), all photorealistic warm amber/neutral, no readable text, no logos/watermarks, no faces — ready for the new marketing site build
+
+---
+Task ID: PUB-1..PUB-4 (Public Agency Website with Optional Login)
+Agent: Z.ai Code (main; PUB-2 imagery via general-purpose subagent)
+Task: Build a polished public-facing agency website around the existing AgencyOS platform — public homepage, services, portfolio, about, contact/enquiry — without breaking staff dashboards, client portal, auth, permissions, or workflows. Login stays optional; browsing requires no account.
+
+Work Log:
+- Pre-flight: git status clean on main; read worklog; verified dev server healthy (bootstrap "9 demo accounts verified"); created + verified backup backups/custom-2026-10-25-pre-public-site.db (31/31 tables row-matched, sha256 recorded)
+- Inspected: routing tree (/, /login, /request-access, /app/*, /portal/*), custom auth (scrypt + DB sessions + requireStaff/requireClientUser/requireRole), RBAC capability matrix, CRM Contact model + /api/contacts, app-shell nav, theme (neutral monochrome, primary=near-black)
+- PUB-2 (subagent): generated 8 photographic images into public/images/site/ (hero, 2 service cards, 4 portfolio samples, about) — vision-QA'd: no readable text, no faces, warm palette; exact sizes 2048x1152 / 1344x768 / 1152x864
+- Schema (PUB-1): added SiteEnquiry (reference, contact fields, service, message, contactMethod, status NEW/IN_PROGRESS/CONVERTED/CLOSED, convertedContactId, ipHash-only abuse tracking, userAgent) + PortfolioItem (title, category, division, summary, description, thumbnailUrl, mediaUrl, projectUrl, featured, published, isDemo, sortOrder); db:push OK
+- RBAC (PUB-1): new capabilities enquiries.read / enquiries.manage (OWNER, CLIENT_MANAGER, SUPPORT_FINANCE) and portfolio.manage (OWNER, CLIENT_MANAGER, CREATIVE_DIRECTOR) — additive to existing matrix
+- APIs (PUB-1): POST /api/enquiries (public: zod validation, honeypot field, submit-speed trap, link-count heuristic, per-hashed-IP 5/h + 12/d rate limits + 150/d global circuit, sha256 IP digest — never raw IP, audit as SYSTEM, OWNER notifications, honest no-email messaging); GET /api/enquiries (staff), PATCH /api/enquiries/[id] (status/notes), POST /api/enquiries/[id]/convert (creates CRM Contact reusing existing model); /api/portfolio GET/POST + [id] GET/PATCH/DELETE (staff portfolio.manage)
+- Public site (PUB-3): src/lib/site-content.ts single-source copy (company, tagline, divisions, 7-step process with web/video adaptations, packages — only the real VideoPackage £720/mo price shown and labelled indicative, all others "Custom quote", about, privacy); (site) route group layout with skip-link + sticky header (Client Login button + separate Staff Login) + sticky footer (min-h-screen flex-col + mt-auto); pages: / (hero w/ 2 CTAs, intro, industries, divisions, DB-backed work preview, process, packages, CTA), /services, /services/web-development, /services/video-production, /portfolio (DB-backed, category filters, empty state, Sample badges), /about, /contact (validated form + privacy notice + consent); server-side publicFileExists() gradient fallbacks so wiped media files never break pages
+- Staff UI (PUB-4): /app/enquiries (filter tabs, triage dialog, status changes, convert-to-contact) + /app/portfolio (create/edit dialog, publish/feature toggles, delete confirm); nav items added to app-shell (roles-gated); scripts/seed-portfolio.ts idempotent demo items (generic titles, isDemo=true — never attributed to real clients) + wired into scripts/seed.ts for future resets; root layout metadata de-Z.ai'd to AgencyOS
+- Verification (real browser, logged-out + per-role):
+  * Public browsing: all 8 routes 200, nav links, /#process anchor scroll, portfolio category filter incl. empty-state, images load (lazy verified on scroll)
+  * Enquiry E2E: client-side validation (5 inline errors on empty submit) → valid UI submission saved (ENQ-MVO7IMTP8248, hashed IP, audit SYSTEM, OWNER notification) → staff triage → convert → CRM Contact created + status CONVERTED + handledById
+  * Server-side protections: missing consent/invalid email/short message/unknown service → 400; honeypot + inhuman speed → silent 200 (nothing stored); 5/h rate limit → 429 on 6th request
+  * Isolation: CLIENT_USER /app → redirect /portal; GET /api/enquiries|/api/portfolio as CLIENT_USER → "Staff access required"; as WEB_DEVELOPER → nav hidden + "You do not have permission" (403); logged-out /app|/portal → /login; staff API anon → 401; public pages scanned for internal leakage (client names, staff emails, internal fields) → NONE
+  * Mobile 390px: no horizontal overflow on all 7 public pages (fixed a CTA-row overflow in division-detail), hamburger menu open/navigate/auto-close, sticky footer verified (flex col + footer bottom == viewport bottom)
+  * Console: 0 errors (fixed a Radix Sheet aria-controls hydration mismatch by replacing the mobile menu with deterministic markup, and a next/image fill-parent position warning on /about)
+- Regressions: npx tsc --noEmit PASS; bun run lint PASS (after fixing set-state-in-effect via onClick menu close); tests/api-security-suite.sh 51 passed 0 failed; scripts/verify-video-tracking.ts 67 passed 0 failed; dev.log free of 5xx/⨯; uncommitted per task scope (no commit/push)
+
+Stage Summary:
+- Public site live at / with routes /services, /services/web-development, /services/video-production, /portfolio, /about, /contact; /login unchanged and reachable via Client Login + Staff Login; /app/* and /portal/* untouched and still protected
+- Enquiries flow into the platform (SiteEnquiry → triage → Contact) reusing existing CRM/audit/notification infrastructure — no duplicate customer system
+- Portfolio content staff-manageable; all public sample work labelled "Sample" via isDemo; no fabricated clients/stats/testimonials; copy editable in src/lib/site-content.ts
+- New files: (site) pages + layout, components/site/*, api/enquiries + api/portfolio, lib/{site-content,site-media,rate-limit,portfolio-schema}, scripts/seed-portfolio.ts, public/images/site/* (8 jpg)
+- Modified: prisma/schema.prisma, src/lib/rbac.ts, src/components/app-shell.tsx, src/app/layout.tsx, scripts/seed.ts; deleted src/app/page.tsx (replaced by (site)/page.tsx)
+- Backup: backups/custom-2026-10-25-pre-public-site.db (VERIFIED). Working tree intentionally left uncommitted (task forbids commit/push)
