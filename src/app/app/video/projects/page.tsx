@@ -3,6 +3,8 @@
 import { useEffect, useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { api, fmtDate, fmtMoney } from '@/lib/client'
+import { roleCan } from '@/lib/rbac'
+import { useMe } from '@/components/app-shell'
 import { StatusBadge, PriorityBadge } from '@/components/status-badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -27,6 +29,8 @@ interface ProjectRow {
 const CATEGORIES = ['Restaurant', 'Cafe / Coffee Shop', 'Food and Beverage', 'Real Estate / Property', 'Retail', 'Hospitality', 'Corporate', 'Events', 'Personal Brand', 'Automotive', 'Healthcare / Professional Services', 'Other']
 
 export default function VideoProjectsPage() {
+  const { me } = useMe()
+  const canManageProjects = me ? roleCan(me.role, 'projects.manage') : false
   const [projects, setProjects] = useState<ProjectRow[] | null>(null)
   const [clients, setClients] = useState<Array<{ id: string; name: string }>>([])
   const [packages, setPackages] = useState<Array<{ id: string; name: string; videoCount: number; revisionRounds: number; price: number | null }>>([])
@@ -46,10 +50,16 @@ export default function VideoProjectsPage() {
 
   useEffect(() => {
     api<{ projects: ProjectRow[] }>('/api/projects?serviceType=VIDEO_PRODUCTION').then(d => setProjects(d.projects)).catch(e => setError(e.message))
+  }, [])
+
+  // Create-dialog data (client directory, packages, managers) is restricted to
+  // projects-manage roles by the API — fetch lazily, only when the dialog opens.
+  useEffect(() => {
+    if (!createOpen) return
     api<{ clients: Array<{ id: string; name: string }> }>('/api/clients?pageSize=100').then(d => setClients(d.clients)).catch(() => {})
     api<{ packages: Array<{ id: string; name: string; videoCount: number; revisionRounds: number; price: number | null }> }>('/api/video/packages').then(d => setPackages(d.packages)).catch(() => {})
     api<{ employees: Array<{ id: string; name: string; role: string }> }>('/api/team?pageSize=100').then(d => setManagers(d.employees)).catch(() => {})
-  }, [])
+  }, [createOpen])
 
   const filtered = projects?.filter(p => !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.reference.toLowerCase().includes(search.toLowerCase()) || p.client.name.toLowerCase().includes(search.toLowerCase()))
 
@@ -90,7 +100,7 @@ export default function VideoProjectsPage() {
           <h1 className="text-2xl font-bold flex items-center gap-2"><Film className="h-6 w-6 text-primary" /> Video Projects</h1>
           <p className="text-muted-foreground text-sm">Commercial shoots, reels packages, brand films and property videos.</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" />New video project</Button>
+        {canManageProjects && <Button onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" />New video project</Button>}
       </div>
 
       <div className="relative max-w-sm">
@@ -107,7 +117,7 @@ export default function VideoProjectsPage() {
             <Film className="h-10 w-10 mx-auto mb-3 opacity-30" />
             <p className="font-medium">No video projects yet</p>
             <p className="text-sm mt-1">Create your first video project to start tracking deliverables.</p>
-            <Button className="mt-4" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" />New video project</Button>
+            {canManageProjects && <Button className="mt-4" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" />New video project</Button>}
           </CardContent></Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">

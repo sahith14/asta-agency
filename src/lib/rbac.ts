@@ -95,6 +95,11 @@ export function can(user: AuthUser, capability: Capability): boolean {
   return CAPABILITIES[user.role]?.includes(capability) ?? false
 }
 
+/** Capability check for a raw staff role string (client-side UI gating). */
+export function roleCan(role: string, capability: Capability): boolean {
+  return CAPABILITIES[role]?.includes(capability) ?? false
+}
+
 /**
  * Staff visibility scope for reads:
  * - OWNER / CLIENT_MANAGER / SUPPORT_FINANCE / CREATIVE_DIRECTOR: all records

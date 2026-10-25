@@ -3,6 +3,8 @@
 import { useEffect, useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { api, fmtDate, fmtMoney } from '@/lib/client'
+import { roleCan } from '@/lib/rbac'
+import { useMe } from '@/components/app-shell'
 import { StatusBadge, PriorityBadge } from '@/components/status-badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -23,6 +25,8 @@ interface ProjectRow {
 }
 
 export default function WebsiteProjectsPage() {
+  const { me } = useMe()
+  const canManageProjects = me ? roleCan(me.role, 'projects.manage') : false
   const [projects, setProjects] = useState<ProjectRow[] | null>(null)
   const [clients, setClients] = useState<Array<{ id: string; name: string }>>([])
   const [managers, setManagers] = useState<Array<{ id: string; name: string; role: string }>>([])
@@ -44,9 +48,15 @@ export default function WebsiteProjectsPage() {
 
   useEffect(() => {
     loadProjects()
+  }, [])
+
+  // Create-dialog data (client directory, managers) is restricted to projects-manage
+  // roles by the API — fetch it lazily, only when the dialog is actually opened.
+  useEffect(() => {
+    if (!createOpen) return
     api<{ clients: Array<{ id: string; name: string }> }>('/api/clients?pageSize=100').then(d => setClients(d.clients)).catch(() => {})
     api<{ employees: Array<{ id: string; name: string; role: string }> }>('/api/team?pageSize=100').then(d => setManagers(d.employees)).catch(() => {})
-  }, [])
+  }, [createOpen])
 
   const filtered = projects?.filter(p => !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.reference.toLowerCase().includes(search.toLowerCase()) || p.client.name.toLowerCase().includes(search.toLowerCase()))
 
@@ -81,7 +91,7 @@ export default function WebsiteProjectsPage() {
           <h1 className="text-2xl font-bold flex items-center gap-2"><Globe className="h-6 w-6 text-primary" /> Website Projects</h1>
           <p className="text-muted-foreground text-sm">Website builds, redesigns and ongoing client web work.</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" />New website project</Button>
+        {canManageProjects && <Button onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" />New website project</Button>}
       </div>
 
       <div className="relative max-w-sm">
@@ -98,7 +108,7 @@ export default function WebsiteProjectsPage() {
             <Globe className="h-10 w-10 mx-auto mb-3 opacity-30" />
             <p className="font-medium">No website projects yet</p>
             <p className="text-sm mt-1">Create your first website project to start tracking tasks and deliverables.</p>
-            <Button className="mt-4" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" />New website project</Button>
+            {canManageProjects && <Button className="mt-4" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4 mr-1" />New website project</Button>}
           </CardContent></Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
