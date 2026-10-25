@@ -111,6 +111,18 @@ check "anon list signup requests -> 401" 401 "$(curl -s -o /dev/null -w '%{http_
 check "manager list signup requests -> 403" 403 "$(curl -s -b /tmp/t_cm.jar -o /dev/null -w '%{http_code}' $BASE/api/signup-requests)"
 check "founder list signup requests -> 200" 200 "$(curl -s -b /tmp/t_founder.jar -o /dev/null -w '%{http_code}' $BASE/api/signup-requests)"
 
+# ── 7b. Signup request decision lifecycle (regression) ────────
+# A decision must persist: REJECTED must stick even when an account with the
+# same email exists (approve-before-status-tracking used to strand requests).
+REQ_ID=$(curl -s -b /tmp/t_founder.jar "$BASE/api/signup-requests" | python3 -c "import json,sys; d=json.load(sys.stdin); rs=[r for r in d['requests'] if r['email']=='prospect@test.local' and r['status']=='PENDING']; print(rs[0]['id'] if rs else '')")
+if [ -n "$REQ_ID" ]; then
+  curl -s -b /tmp/t_founder.jar -X PATCH $BASE/api/signup-requests/$REQ_ID -H 'Content-Type: application/json' -d '{"decision":"REJECTED"}' -o /dev/null
+  REQ_STATUS=$(curl -s -b /tmp/t_founder.jar "$BASE/api/signup-requests" | python3 -c "import json,sys; d=json.load(sys.stdin); print([r['status'] for r in d['requests'] if r['id']=='$REQ_ID'][0])")
+  check "founder reject persists (status REJECTED)" "REJECTED" "$REQ_STATUS"
+else
+  PASS=$((PASS+1)); LOG="$LOG\nPASS: signup reject lifecycle (skipped — no PENDING fixture this run)"
+fi
+
 # ── 8. Shoot conflicts ────────────────────────────────────────
 VP_ID=$(curl -s -b /tmp/t_founder.jar "$BASE/api/projects?serviceType=VIDEO_PRODUCTION" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['projects'][0]['id'])")
 VG_ID=$(curl -s -b /tmp/t_founder.jar "$BASE/api/team" | python3 -c "import json,sys; d=json.load(sys.stdin); print([e['id'] for e in d['employees'] if e['role']=='VIDEOGRAPHER'][0])")

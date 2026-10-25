@@ -1,3 +1,4 @@
+/// <reference types="bun-types" />
 /**
  * READ-ONLY account inspector — prints all auth-capable accounts and key table counts.
  * Never prints password hashes or any credential material.

@@ -68,6 +68,35 @@ async function main(): Promise<void> {
   check('founder session cookie captured', cookie.includes('agencyos_session'))
   const founder = { Cookie: cookie }
 
+  // ── fixture bootstrap (harness self-containment) ────────────
+  // The fixture is audit-created test data. A data cleanup or rebuilt database
+  // removes it — recreate it deterministically so the suite never depends on
+  // leftover state. No application code or assertions are affected.
+  {
+    const before = await api('GET', '/api/projects?serviceType=VIDEO_PRODUCTION&pageSize=200', undefined, founder)
+    const existingFixture = (before.data.projects as Array<{ id: string; name: string }>).find(p => p.name === 'Audit 20-Video Accuracy Fixture')
+    if (!existingFixture) {
+      const clientsRes = await api('GET', '/api/clients?pageSize=200', undefined, founder)
+      let auditClient = (clientsRes.data.clients as Array<{ id: string; name: string }>).find(c => c.name === 'Audit Cafe (verify fixture)')
+      if (!auditClient) {
+        const cc = await api('POST', '/api/clients', { name: 'Audit Cafe (verify fixture)', contactEmail: 'audit-fixture@verify.local' }, founder)
+        check('fixture client created by harness', cc.status === 201 && !!cc.data?.client, `status ${cc.status} ${JSON.stringify(cc.data).slice(0, 120)}`)
+        auditClient = cc.data?.client
+      }
+      if (!auditClient) {
+        check('fixture client available', false, 'could not find or create the fixture client')
+        return void (await db.$disconnect())
+      }
+      const pc = await api('POST', '/api/projects', {
+        name: 'Audit 20-Video Accuracy Fixture',
+        serviceType: 'VIDEO_PRODUCTION',
+        clientId: auditClient.id,
+        video: { agreedVideoCount: 20, revisionAllowance: 2, createDeliverables: true },
+      }, founder)
+      check('fixture project created by harness (20 contracted videos)', pc.status === 201, `status ${pc.status} ${JSON.stringify(pc.data).slice(0, 120)}`)
+    }
+  }
+
   // ── locate fixture ──────────────────────────────────────────
   const projectsRes = await api('GET', '/api/projects?serviceType=VIDEO_PRODUCTION', undefined, founder)
   const projects = projectsRes.data.projects as Array<{ id: string; name: string }>

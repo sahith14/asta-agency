@@ -164,3 +164,39 @@ Stage Summary:
 - All major areas PASS: auth+RBAC, staff app, video division lifecycle/counting, client portal + isolation, dashboard accuracy, finance guards, conflict detection.
 - 11 confirmed defects fixed, every previously-dead UI option now functional; two new pages (website projects, portal notifications) closed the last dead ends.
 - Known limitations re-verified and honestly surfaced in-UI: media storage not configured (metadata-only registry, no fake uploads), no email delivery (in-app only, stated in notifications pages), founder-mediated password recovery (stated in the reset dialog), single currency/timezone. No deployment, no production changes, no commits (changes left uncommitted per audit instruction).
+
+---
+Task ID: P0-LOGIN-1
+Agent: Z.ai Code (main)
+Task: Fix Demo Account Sign-In (Root Cause Required) — reproduce, fix, verify all advertised demo accounts end-to-end.
+
+Work Log:
+- Reproduced first (no assumptions): inspected repo (main, clean tree), running preview (bootstrap + next dev, current code), login UI, DB, seed/env consistency. Data layer was HEALTHY: all 9 advertised accounts exist, ENABLE_TEST_ACCOUNTS=true, every advertised password scrypt-matches its DB hash (timingSafeEqual, booleans only), all active, mustChangePassword=false. Wrong-password path returns 401 with visible error.
+- Failure signature from dev.log: Founder's POST /api/auth/login 200 at 12:53:08 (session+audit rows written) → browser NEVER fetched /app, /portal or /api/auth/me → landed on /request-access then /login. Server-side auth fine; the client-side post-login navigation died.
+- Root cause (verified class): post-login navigation is SPA-only (router.push). The user's tab held a JS context from the previous server instance (sandbox restart ~12:53). The plain fetch succeeded against the new server, but the SPA router never fired — stranding a fully-authenticated user on /login with no feedback. Stale-bundle restart repro did NOT fail in a healthy tab (HMR self-heals), which rules out other causes and isolates the dead-context race as the failure class.
+- Fixes (smallest safe):
+  1. src/app/login/page.tsx — hard-navigation fallback: if the SPA hasn't left /login ~1.2s after a successful login, window.location.assign the role-specific destination. Also: visitors who already hold a valid session are redirected from /login to their workspace on mount (self-heal for exactly the stranded state; standard UX). No auth weakening: /api/auth/me + shells still enforce roles; logged-out users stay on the form (verified).
+  2. scripts/backup-db.ts — fixed sha256 logging ([object Object] → digest hex) and removed a dead duplicate hash function.
+  3. scripts/backup-db.ts + scripts/inspect-accounts.ts — added /// <reference types="bun-types"/> (pre-existing tsc errors: bun:sqlite/Bun unresolved; bun-types was installed but never referenced).
+  4. scripts/verify-video-tracking.ts — harness self-containment: recreates the audit fixture client+project (20 deliverables) when a prior cleanup removed it; assertions untouched (67→69 checks when bootstrap runs).
+  5. src/app/api/signup-requests/[id]/route.ts — TWO confirmed defects: (a) APPROVED path provisioned the account but never set request status (PENDING forever, buttons live, re-approve 409) → both approve branches now set APPROVED+decidedBy/At; (b) the duplicate-account 409 guard ran on REJECT too, stranding requests whose account exists → guard moved inside the APPROVED branch only (reject never creates accounts).
+  6. tests/api-security-suite.sh — new regression check "founder reject persists (status REJECTED)" (repeatable HTTP-only lifecycle check).
+- Verification (all actually executed, agent-browser):
+  - Fresh logged-out /login stays put; one-click founder → /app (me/overview/notifications 200) → /app/clients protected page 200 with real data → refresh persists → sign out → /app bounces to /login.
+  - Manual form sign-in (Daniel) via exact on-panel credentials → /app "Welcome back, Daniel" overview 200.
+  - Cross-site iframe (preview-panel simulation, embedder on 127.0.0.1:4173): founder one-click INSIDE iframe → /app fully rendered via Bearer fallback (me/overview 200).
+  - ALL 9 advertised accounts swept independently: 7 staff → /app with personalized welcome; 2 clients → /portal with client-branded welcome; sign-out after each → /login. Zero page errors.
+  - Session persists across full server restart + stale-tab reload (cookie in DB; bootstrap no-op does not revoke).
+  - Self-heal: signed-in visit to /login → auto-redirect to workspace (verified founder → /app).
+  - Client isolation re-verified in UI: Marta — staff APIs 403 (/api/clients, /api/team), portal API 200, direct /app visit bounced to /portal. Staff→portal bounce verified with Daniel.
+  - Non-demo loops rebuilt end-to-end: access requests approved via founder UI on BOTH branches (staff + portal; status now flips to APPROVED in list); temp staff/portal accounts land on account page with protected APIs 403 until password change; change → sessions revoked → re-login → full access (overview/portal 200). Reject path verified via UI (REJECTED persists even with account existing).
+  - Wrong-password 401 + visible "Invalid email or password"; landing page CTAs intact.
+- Suites (actual): tsc --noEmit exit 0 (0 errors); bun run lint exit 0; tests/api-security-suite.sh 51/51 PASS (after in-memory rate-limit window reset — the 429 seen mid-session was the 5/hour/IP public-endpoint limit doing its job during heavy manual testing, not a defect); bun scripts/verify-video-tracking.ts 69/69 PASS with harness bootstrap (67/67 when fixture pre-exists).
+- Cleanup: all session test records removed (5 test accounts, 3 test clients, 6 test requests); AuditLog entries preserved (append-only). Baseline: 7 employees / 2 seeded clients + 1 harness fixture client / projects 3+1 fixture / 2 seeded portal users + 1 fixture reviewer (harness-owned, reset each run).
+- Backups: pre-fix backups/custom-2026-10-25-pre-login-reliability-fix.db and post-fix backups/custom-2026-10-25-post-login-reliability.db (VACUUM INTO, row-count VERIFIED, sha256 logged correctly).
+- Hygiene: no passwords/tokens/hashes in transcript, logs, or tracked files (git diff scanned); .env/.seed-credentials/db/backups all still gitignored; no commits/pushes; no deployment or infra changes.
+
+Stage Summary:
+- Demo sign-in is reliable in every context: top-level, cross-site iframe, stale tab across server restarts, and self-heals when a session already exists. All 9 advertised accounts verified through the real UI with role-correct destinations, persistence, isolation, and logout.
+- Two real defects fixed in the access-request decision flow (status never marked APPROVED; reject blocked by duplicate guard) plus harness/environment repairs (tsc types, backup hash logging, self-contained video fixture, suite regression check).
+- Honest limitations unchanged: no email delivery (founder-mediated, disclosed in UI), media storage not configured (metadata-only registry), single currency/timezone.

@@ -31,17 +31,21 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (request.status !== 'PENDING') return jsonError(`Request already ${request.status.toLowerCase()}`, 422)
 
   const email = request.email.toLowerCase()
-  const existingEmployee = await db.employee.findUnique({ where: { email } })
-  const existingClientUser = await db.clientUser.findUnique({ where: { email } })
-  if (existingEmployee || existingClientUser) return jsonError('An account with this email already exists', 409)
 
   const tempPassword = generateToken().slice(0, 16)
   if (data.decision === 'APPROVED') {
+    // Duplicate guard only blocks account creation (approve). Rejection never
+    // creates an account, so a request whose account already exists (e.g. a
+    // prior approval before status tracking was fixed) can still be decided.
+    const existingEmployee = await db.employee.findUnique({ where: { email } })
+    const existingClientUser = await db.clientUser.findUnique({ where: { email } })
+    if (existingEmployee || existingClientUser) return jsonError('An account with this email already exists', 409)
     if (data.accountType === 'STAFF') {
       const employee = await db.employee.create({
         data: { name: request.name, email, role: data.staffRole ?? 'CLIENT_MANAGER', passwordHash: hashPassword(tempPassword), mustChangePassword: true },
       })
       await audit({ userType: 'EMPLOYEE', userId: user.userId, name: user.name }, 'SIGNUP_APPROVED_STAFF', 'Employee', employee.id, `Approved access request → staff account ${employee.name} (${employee.role})`)
+      await db.signupRequest.update({ where: { id }, data: { status: 'APPROVED', decidedById: user.userId, decidedAt: new Date() } })
       return json({ ok: true, accountType: 'STAFF', temporaryPassword: tempPassword })
     }
     // Client portal account
@@ -52,6 +56,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       data: { name: request.name, email, clientId: client.id, passwordHash: hashPassword(tempPassword), mustChangePassword: true },
     })
     await audit({ userType: 'EMPLOYEE', userId: user.userId, name: user.name }, 'SIGNUP_APPROVED_CLIENT', 'ClientUser', portalUser.id, `Approved access request → portal account ${portalUser.name} for ${client.name}`)
+    await db.signupRequest.update({ where: { id }, data: { status: 'APPROVED', decidedById: user.userId, decidedAt: new Date() } })
     return json({ ok: true, accountType: 'CLIENT_PORTAL', temporaryPassword: tempPassword, clientId: client.id })
   }
 

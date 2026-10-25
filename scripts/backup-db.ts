@@ -1,3 +1,4 @@
+/// <reference types="bun-types" />
 /**
  * Verified database backup tool (Stage gate requirement).
  * Usage: bun scripts/backup-db.ts backups/<name>.db
@@ -30,13 +31,9 @@ function userTables(db: Database): string[] {
   return rows.map(r => r.name)
 }
 
-function sha256(file: string): string {
-  return createHash('sha256').update(Bun.file(file).arrayBuffer ? new Uint8Array(Bun.file(file).arrayBuffer()) : '').toString('hex')
-}
-
 async function fileHash(file: string): Promise<string> {
   const buf = await Bun.file(file).arrayBuffer()
-  return createHash('sha256').update(new Uint8Array(buf)).toString('hex')
+  return createHash('sha256').update(new Uint8Array(buf)).digest('hex')
 }
 
 // ── 1. Snapshot via VACUUM INTO (readonly source) ─────────────

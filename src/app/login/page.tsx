@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, FormEvent } from 'react'
+import { useState, useEffect, useRef, FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { setStoredToken } from '@/lib/client'
+import { api, setStoredToken } from '@/lib/client'
 import { Clapperboard, FlaskConical, Loader2 } from 'lucide-react'
 
 interface TestAccount {
@@ -47,6 +47,30 @@ export default function LoginPage() {
   const [forgotBusy, setForgotBusy] = useState(false)
   const [forgotDone, setForgotDone] = useState(false)
   const [forgotError, setForgotError] = useState<string | null>(null)
+  const signedInRef = useRef(false)
+  const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Self-heal: a visitor who already holds a valid session (e.g. their sign-in
+  // succeeded server-side but the SPA router died before navigating) goes
+  // straight to their workspace instead of staring at the sign-in form again.
+  useEffect(() => {
+    let cancelled = false
+    api<{ user: { userType: string } }>('/api/auth/me')
+      .then(d => {
+        if (cancelled || signedInRef.current) return
+        const target = d.user.userType === 'CLIENT_USER' ? '/portal' : '/app'
+        router.replace(target)
+        // Same guard as sign-in: if the SPA router is in a dead state, force it
+        navTimerRef.current = setTimeout(() => {
+          if (window.location.pathname.startsWith('/login')) window.location.replace(target)
+        }, 1200)
+      })
+      .catch(() => { /* not signed in — stay on the login form */ })
+    return () => {
+      cancelled = true
+      if (navTimerRef.current) clearTimeout(navTimerRef.current)
+    }
+  }, [router])
 
   useEffect(() => {
     let cancelled = false
@@ -81,9 +105,17 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.error ?? 'Sign-in failed')
       // Store Bearer fallback for embedded contexts where Lax cookies are withheld
       if (typeof data.sessionToken === 'string') setStoredToken(data.sessionToken)
-      if (data.user.userType === 'CLIENT_USER') router.push('/portal')
-      else router.push('/app')
+      signedInRef.current = true
+      const destination = data.user.userType === 'CLIENT_USER' ? '/portal' : '/app'
+      router.push(destination)
       router.refresh()
+      // Resilience: if this tab holds a client bundle from a dead previous
+      // server (happens across dev-server restarts), the SPA router can fail
+      // silently after a successful login. Guarantee the user actually arrives.
+      if (navTimerRef.current) clearTimeout(navTimerRef.current)
+      navTimerRef.current = setTimeout(() => {
+        if (window.location.pathname.startsWith('/login')) window.location.assign(destination)
+      }, 1200)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign-in failed')
       setLoading(false)
