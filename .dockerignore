@@ -1,0 +1,13 @@
+# Never bake local secrets, the development database, backups or build output
+# into the production image.
+node_modules
+.next
+.git
+db
+backups
+.env
+.env.*
+!.env.production.example
+.seed-credentials
+*.log
+dev.pid

@@ -6,6 +6,74 @@ any secrets — credentials live only in `.env` (gitignored, never committed).
 
 ---
 
+## 0. Hosting: current status and the exact path to go live
+
+**Status (verified in the development environment):** no hosting integration
+exists yet — there is no git remote, no platform CLI (vercel / fly / railway /
+render / netlify), no CI workflow, and no platform credentials. **The site has
+therefore NOT been deployed to external hosting, and no public URL is claimed.**
+The sandbox preview proxies only `localhost:3000` and is not a production site.
+
+What IS prepared and committed so deployment is one authorization away:
+
+| Artifact | Purpose |
+| --- | --- |
+| `Dockerfile` | Multi-stage build of the standalone server; mounts `/app/db` as a persistent volume for SQLite. **Prepared but not built locally** (Docker is unavailable in the sandbox) — run a smoke deploy first. |
+| `docker-entrypoint.sh` | Applies the Prisma schema non-destructively at container start (refuses to run if a change would destroy data), then starts the server. |
+| `.dockerignore` | Guarantees `.env`, `db/`, `backups/`, `.seed-credentials`, logs never enter the image. |
+| `.env.production.example` | The exact environment variables a production host needs (demo accounts disabled). |
+
+### Option A (recommended — smallest safe change): container host with a persistent volume, keep SQLite
+
+Fly.io (Volumes), Railway (Volumes), Render (Disks), or any VPS + Docker.
+**No database engine migration, no data migration, no schema change** — the
+existing SQLite file and backup/restore tooling work as-is on a persistent
+disk. Right-sized for a single-instance agency app.
+
+Exact actions required from the owner (need your accounts, cannot be done from
+this environment):
+1. Create an account on the chosen platform (Fly.io / Railway / Render / VPS).
+2. Put the repo on GitHub: `git remote add origin <url> && git push -u origin main`
+   (needs your GitHub authorization) — or install the platform CLI locally and
+   `fly deploy` / `railway up` from this machine.
+3. Create a volume mounted at `/app/db` (Fly: `fly volumes create agencyos-data --size 3`).
+4. Set env vars on the platform: `DATABASE_URL="file:/app/db/custom.db"`,
+   `ENABLE_TEST_ACCOUNTS="false"` (leave `TEST_ACCOUNTS_JSON` unset).
+5. Deploy (the Dockerfile is auto-detected; entrypoint applies the schema).
+6. To start from today's data: stop the app, copy
+   `backups/custom-2026-10-26-pre-prod-ready.db` over `/app/db/custom.db`
+   via the platform's one-off shell / SFTP, start again. Otherwise start empty
+   and create your real accounts via `/request-access`.
+7. Smoke test the live URL (public pages → enquiry → staff inbox), then attach
+   your domain and enable the platform's HTTPS.
+
+### Option B: Vercel / serverless — requires a database migration first
+
+Serverless filesystems are ephemeral, so SQLite cannot persist there. This
+path means migrating to Turso (libSQL — closest to SQLite) or Postgres
+( Neon / Supabase / Vercel Postgres): change the Prisma `provider`, verify the
+schema maps 1:1, migrate data, and re-run all regression suites. This is a
+deliberate, planned change that has deliberately **not** been done without your
+sign-off. If you choose this path, say so explicitly and the migration will be
+executed with a verified backup/recovery plan before any cutover.
+
+### Email (independent of hosting choice)
+
+No transactional email provider credentials exist in the environment. To enable
+real email you need to: choose a provider (Resend / Postmark / SES), verify a
+sending domain, and supply an API key as an environment variable on the host.
+Then the notify step in `src/app/api/enquiries/route.ts` can be wired to it.
+Until then, notifications are in-app only and the site says so honestly.
+
+### Domain
+
+No custom domain is configured. Use the platform's `*.fly.dev` /
+`*.up.railway.app` / `*.onrender.com` URL first, verify it end-to-end, then
+attach your real domain in the platform dashboard (a DNS change only you can
+authorize — none is made here).
+
+---
+
 ## 1. What this application is
 
 - **Next.js 16 (App Router) + TypeScript**, standalone output (`output: "standalone"` in `next.config.ts`).

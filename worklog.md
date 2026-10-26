@@ -308,3 +308,28 @@ Stage Summary:
 - Launch blockers remaining (user action required): real contact details (site-content.ts), email provider credentials, external hosting + domain for true production deployment
 - Backups: pre-launch + post-launch-prep, both VERIFIED; DB persistence across restart verified
 - Commit: 498d58d on main; no push (no remote)
+
+---
+Task ID: PRODREADY-1
+Agent: Z.ai Code (main)
+Task: Make AgencyOS production-ready for real clients — inspect & protect, production persistence, deployment readiness, client-acquisition E2E, email audit, security verification
+
+Work Log:
+- Read worklog + DEPLOYMENT.md; git tree clean on main (82ef487 = worklog-only commit); no remote/CLI/deploy-config/email credentials in environment
+- Pre-work backup VERIFIED: backups/custom-2026-10-26-pre-prod-ready.db (VACUUM INTO, row-matched, sha256)
+- Baseline counts confirmed (enq 0, contact 2, client 3, project 4, employee 7, videoProject 3); bootstrap healthy (9 demo accounts), no reset
+- Persistence fail-fast verified empirically: non-file DATABASE_URL → startup throw; .env absent (prod scenario) → startup throw (bun auto-loads project .env / @prisma/client loads schema-dir .env — confounded in-project test, proven via .env hold-and-restore with checksum match); bootstrap-if-empty wired only into `dev`, never `start`
+- Deployment artifacts committed: Dockerfile (multi-stage bun, standalone, VOLUME /app/db, non-destructive prisma db push entrypoint), docker-entrypoint.sh, .dockerignore (excludes .env/db/backups/.seed-credentials/logs), .env.production.example (placeholders only; .gitignore negation added — .env still ignored, verified); DEPLOYMENT.md §0 documents hosting options A (container host + persistent volume, keep SQLite — recommended) and B (serverless + managed DB — needs owner-approved migration) with exact owner actions
+- E2E client-acquisition pipeline (labelled test enquiry ENQ-MVP105T1EFE0, "PROD-READY TEST — delete after verification"): public POST /api/enquiries 201 → DB row + hashed IP + OWNER notification + audit → founder triage (assign/status/contact-attempt/follow-up/note) → dev-server restart → all fields persisted (incl. DB-backed sessions) → convert 201 matched:false → repeat convert 409 (no duplicate; contact count 2→3, exactly 1 test-email contact) → client created + contact linked (verified via GET) → website project created, status DISCOVERY, linked
+- Role isolation re-verified: WEB_DEVELOPER 403 (list + convert), CLIENT_USER 403, anonymous 401
+- Browser verification (agent-browser): public home renders (title, nav, hero, CTAs); /login guards authenticated users; staff inbox shows enquiry (status/owner/follow-up/last-contacted); triage dialog shows all fields + internal note in textarea; mobile 390px no horizontal overflow on 5 public pages; footer pushed naturally on long page; hamburger menu open→navigate→auto-close; client portal isolation (marta: Anchor Bar yes, Brightcuts no, staff nav no); logout → /api/auth/me 401 → /app redirects /login
+- Cleanup: PROD-READY TEST records removed FK-safe (project→tasks→client→contact→enquiry→notification); audit entries kept (append-only convention); post-cleanup counts match baseline exactly
+- Regression suites: tsc 0 errors; lint clean; api-security 51/0; video-tracking 67/0 (first two attempts hit a wedged long-running dev server — bun fetch 300s TimeoutError; fresh restart resolved; suite green on first healthy run)
+- Email audit: no provider libs (package.json clean), no credentials (.env has 3 non-secret keys), in-app notifications only — honestly documented
+- Post-verification backup VERIFIED: backups/custom-2026-10-26-post-prodready-verify.db
+
+Stage Summary:
+- Client acquisition pipeline operational and browser+API verified end-to-end; conversions idempotent (409 guard + duplicate-safe matching); restart persistence proven; role isolation intact
+- Deployment NOT performed: no authorized hosting integration exists (no git remote/CLI/credentials). Deployment is one owner authorization away: Option A (recommended) container host + persistent volume keeps SQLite, no migration; artifacts committed. Exact actions in DEPLOYMENT.md §0
+- Remaining genuine blockers (user action): 1) hosting account/authorization, 2) real contact details in src/lib/site-content.ts, 3) transactional email provider credentials, 4) custom domain (optional; platform URL works first)
+- Backups: pre-work + post-verification, both VERIFIED; commit follows this entry
