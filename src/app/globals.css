@@ -41,6 +41,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-display: var(--font-display);
+  --color-electric: var(--electric);
 }
 
 :root {
@@ -135,5 +137,141 @@
   &::-webkit-scrollbar-thumb {
     background-color: var(--border);
     border-radius: 9999px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PUBLIC SITE IDENTITY — `.site-dark`
+   Dark editorial system for the public marketing site only. Scoped here so
+   the staff app (/app), client portal (/portal) and login keep their existing
+   light theme. Semantic shadcn tokens are overridden inside the scope, so
+   every existing `bg-background` / `text-muted-foreground` style component
+   automatically adopts the dark identity.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Electric amber — the single restrained accent (harmonises with the warm studio imagery) */
+  --electric: oklch(0.8 0.155 68);
+}
+
+.site-dark {
+  --background: oklch(0.135 0.008 75);
+  --foreground: oklch(0.955 0.006 85);
+  --card: oklch(0.17 0.009 75);
+  --card-foreground: oklch(0.955 0.006 85);
+  --popover: oklch(0.16 0.009 75);
+  --popover-foreground: oklch(0.955 0.006 85);
+  --primary: var(--electric);
+  --primary-foreground: oklch(0.13 0.008 75);
+  --secondary: oklch(0.215 0.01 75);
+  --secondary-foreground: oklch(0.955 0.006 85);
+  --muted: oklch(0.19 0.009 75);
+  --muted-foreground: oklch(0.66 0.012 80);
+  --accent: oklch(0.215 0.01 75);
+  --accent-foreground: oklch(0.955 0.006 85);
+  --border: oklch(0.255 0.01 75);
+  --input: oklch(0.255 0.01 75);
+  --ring: var(--electric);
+
+  font-family: var(--font-body), "Geist", ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  color-scheme: dark;
+}
+
+.site-dark h1,
+.site-dark h2,
+.site-dark h3 {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.site-dark ::selection {
+  background: var(--electric);
+  color: oklch(0.13 0.008 75);
+}
+
+.site-dark *:focus-visible {
+  outline: 2px solid var(--electric);
+  outline-offset: 2px;
+}
+
+.site-dark .scrollbar-slim,
+.site-dark [role="dialog"] {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.3 0.01 75) transparent;
+}
+
+/* ── Cinematic helpers ─────────────────────────────────────────────────── */
+
+/* Chrome/silver gradient text for select display moments */
+.site-dark .chrome-text {
+  background: linear-gradient(
+    100deg,
+    oklch(0.92 0.004 85) 0%,
+    oklch(0.62 0.008 85) 28%,
+    oklch(0.96 0.003 85) 50%,
+    oklch(0.58 0.008 85) 72%,
+    oklch(0.9 0.005 85) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Hairline metadata separators */
+.site-dark .hairline {
+  border-color: oklch(0.28 0.008 75);
+}
+
+/* Mono-ish metadata styling (uses body font, spaced uppercase) */
+.site-dark .eyebrow {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Subtle film-grain overlay for the hero (pure CSS, no assets) */
+.site-dark .grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+}
+
+/* Marquee strip */
+@keyframes site-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.site-dark .marquee-track {
+  animation: site-marquee 36s linear infinite;
+}
+
+/* Scroll-cue drip */
+@keyframes site-scrolldrip {
+  0% { transform: translateY(-100%); }
+  60% { transform: translateY(200%); }
+  100% { transform: translateY(200%); }
+}
+.site-dark .scroll-drip {
+  animation: site-scrolldrip 2.2s ease-in-out infinite;
+}
+
+/* Respect reduced-motion: kill decorative loops inside the site scope */
+@media (prefers-reduced-motion: reduce) {
+  .site-dark .marquee-track,
+  .site-dark .scroll-drip {
+    animation: none;
+  }
+  .site-dark *,
+  .site-dark *::before,
+  .site-dark *::after {
+    scroll-behavior: auto !important;
   }
 }

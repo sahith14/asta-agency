@@ -347,3 +347,27 @@ Work Log:
 Stage Summary:
 - All four suites green after hardening commit; dev-server wedge documented as sandbox dev-mode characteristic with exact restart command
 - Commit: db.ts hardening + DEPLOYMENT.md memory note + worklog
+
+---
+Task ID: ASTAS-3D
+Agent: Z.ai Code (main)
+Task: PROJECT ASTAS — extreme interactive 3D transformation of the public agency website (astasagency.space-z.ai)
+
+Work Log:
+- Inspected first: git tree clean apart from sandbox chmod mode-noise; read worklog/DEPLOYMENT.md; verified backup VERIFIED (custom-2026-10-26-pre-3d-experience.db) before any work; identified genuine assets (8 site images, DB portfolio samples labelled isDemo, £720/mo verified package price)
+- Deps: added three@0.186.1 + @react-three/fiber@9.8.2 (+@types/three) — no GSAP/drei needed; framer-motion/zustand already present; fonts: Syne (display) + Space Grotesk (body) via next/font/google, scoped to public site
+- Design system: .site-dark scope in globals.css overrides shadcn tokens (rich warm black, charcoal, silver, electric amber --electric) so /app, /portal, /login keep the existing light theme untouched; chrome-text/eyebrow/grain/marquee helpers; reduced-motion killswitches
+- 3D hero ("The Monolith"): chrome monolith + fresnel rim shader (custom GLSL) + electric edge lines, 14-blade ring, reflective plain, drifting shards; camera rig = CatmullRom arc driven by smoothed scroll progress with pointer parallax + entrance dolly; PMREM RoomEnvironment env-map (no external HDRI); quality tiers (blades 14→9, DPR 1.75→1.25, AA off on low); reduced-motion = static framing; frameloop pauses when journey offscreen or tab hidden; ?webgl=off escape hatch + CSS static-monolith fallback; dynamic import ssr:false (three never blocks first paint)
+- Chapters 01-06: hero (headline + dual CTA + marquee), capabilities (genuine live mini-site demo in device frame with real desktop/mobile toggle + tabs + validated booking demo; video sample-frame gallery with Tilt), DB-backed asymmetric showroom (filters w/ animated pill, hover tilt, detail overlay, video support, Sample badges), craft lab (L-01 live material study w/ real sliders + in-view frameloop gating, L-02 pointer-reactive typography, L-03 draggable before/after grade demo), build (configurator entry + real process + indicative packages with only verified price), conversation (honest contact + login routes); persistent chapter rail (IntersectionObserver)
+- Button system: Magnetic (fine-pointer only), LiquidCTA (liquid fill morph), Tilt (perspective), CinematicLink; all keyboard-accessible, reduced-motion aware, transform-only (no layout shift)
+- Project configurator: 7 steps (service→goal→scope→budget/timing→info→contact→review) as a zustand-store modal mounted in (site) layout; submits to the EXISTING POST /api/enquiries (same zod validation, honeypot, rate limits, consent); structured answers preserved inside the message ("PROJECT BRIEF — ..." format); canonical service strings reused; NO schema migration needed; success shows real reference + honest no-email note
+- E2E verified in browser: full configurator run → reference ENQ-MVPCKSR1218E → structured brief in DB (service/goal/scope/budget/timing/description) → OWNER notification → visible in staff inbox /app/enquiries → test record + notification deleted (counts back to baseline); portfolio filter→detail overlay; mini-demo tabs + booking validation + confirmation; ?webgl=off fallback renders; back/forward navigation OK; mobile 390px zero horizontal overflow on all 5 public pages (fixed two real overflow bugs: showroom grid min-width:auto blowout + chapter-title clamp floor); mobile menu + login routes; footer natural push verified
+- Fixes during build: next/dynamic loading fallback must never render DOM inside <Canvas> (R3F "Div is not part of THREE namespace") → Canvas itself is the dynamic boundary; MaterialLab needed its own env-map context; Syne metrics recalibrated (clamp caps) for 2-line hero; mobile scene dimming + desktop left scrim for copy contrast
+- Regression: tsc 0 errors; lint 0 errors 0 warnings (react-hooks/immutability disables documented as canonical R3F imperative patterns); api-security 51/0; video-tracking 67/0 (dev-server OOM wedge reproduced under combined browser+suites load in 4GB sandbox — closed browser + fresh restart before suite = green; already documented in DEPLOYMENT.md §5)
+- Post-work backup VERIFIED: backups/custom-2026-10-26-post-3d-experience.db
+
+Stage Summary:
+- Public site transformed into a cinematic 3D experience (6 chapters, real-time WebGL hero, genuine interactive demos) while ALL business systems preserved: enquiry API/CRM pipeline, staff inbox, portfolio DB, auth/RBAC, client portal — untouched and re-verified by the full suite battery
+- No fake content: samples labelled, only verified price shown, honest no-email messaging, contact placeholders still hidden
+- NOT committed per task instruction ("do not commit or push unless separately authorized") — working tree holds: modified (layout, globals, site pages, header, package.json/bun.lock) + new (site/ components: three/, chapters/, configurator/, buttons, chapter-rail, lib/site/); .zscripts/dev.pid + chmod-mode noise are sandbox artifacts
+- Known sandbox limitation: next dev (Turbopack) wedges under sustained heavy multi-client load in 4GB RAM (documented, dev-mode only)
