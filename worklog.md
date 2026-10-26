@@ -278,3 +278,33 @@ Stage Summary:
 - New files: (site) pages + layout, components/site/*, api/enquiries + api/portfolio, lib/{site-content,site-media,rate-limit,portfolio-schema}, scripts/seed-portfolio.ts, public/images/site/* (8 jpg)
 - Modified: prisma/schema.prisma, src/lib/rbac.ts, src/components/app-shell.tsx, src/app/layout.tsx, scripts/seed.ts; deleted src/app/page.tsx (replaced by (site)/page.tsx)
 - Backup: backups/custom-2026-10-25-pre-public-site.db (VERIFIED). Working tree intentionally left uncommitted (task forbids commit/push)
+
+---
+Task ID: LAUNCH-1
+Agent: Z.ai Code (lead engineer / QA / security / deployment owner)
+Task: AGENCYOS — Final Production Launch, Client CRM & Go-Live
+
+Work Log:
+- Established launch state: previous public-site task fully implemented AND auto-committed (cb18fdd); working tree contained only dev.pid + mtime noise; DB healthy (7 employees, 2 clients, 4 portfolio items, 0 enquiries); bootstrap verified 9 demo accounts; backups/ and .seed-credentials had been wiped by sandbox reset (recreated backup)
+- Pre-launch backup: backups/custom-2026-10-26-pre-launch.db (VACUUM INTO, row-matched, sha256) — VERIFIED
+- Verified reported results rather than trusting them: security suite 51/51, video-tracking 67/67, all 8 public routes 200, enquiry E2E re-run in browser (reference ENQ-MVOXVUOH139D)
+- Launch blockers fixed:
+  * Placeholder contact details (hello@agencyos.example, +44 0000 000000) were rendered publicly → CONTACT_PLACEHOLDERS detection in site-content.ts; email/phone hidden from contact page + footer until real values are supplied (all 7 public pages re-scanned: CLEAN)
+  * Enquiry pipeline gaps vs spec → added FOLLOW_UP/QUALIFIED statuses, owner assignment (assignment no longer stolen by status changes), lastContactedAt/nextFollowUpAt columns (schema push, additive), search/service/assignee/date filters on GET /api/enquiries
+  * Conversion created duplicate contacts for repeat enquirers → duplicate-safe convert (email ci / phone-digits match links to existing contact, matched:true, atomic transaction); verified: same-email repeat enquiry converted with contact count unchanged (3→3)
+  * Convert→client→project glue → triage dialog stays open, "Add as client" inline form (POST /api/clients + PATCH contact.clientId), deep-link ?clientId= preselect + auto-open create dialog on both website and video project pages; verified E2E: enquiry → qualified → contact → client "QA Test Studio Ltd" → project WEB-MVOYGPYR8DDB
+  * GET /api/contacts/[id] added (staff-only) — was 405, broke the converted-contact panel
+- Regression found & fixed during E2E: db.ts startup env-validation throw fired in the browser because /app/projects + /app/video/projects imported roleCan from @/lib/rbac → transitively pulled @/lib/auth → @/lib/db into the CLIENT bundle (latent bug made loud). Split into client-safe src/lib/rbac-shared.ts (capability matrix + roleCan/can/isGlobalReader) with server rbac.ts re-exporting; client pages re-pointed. Full-project client->server import audit: clean
+- Dev-server restart mid-task (Prisma client regeneration): sessions + records persisted — persistence smoke test passed
+- Hardening: fail-fast DATABASE_URL validation in src/lib/db.ts; baseline security headers in next.config.ts (verified present via curl); in-memory rate limiter kept and honestly documented
+- Verification: tsc 0 errors; lint clean; security 51/0; video 67/0 (after rbac split); mobile 390px no horizontal overflow on all 7 public pages; hamburger nav works; fresh-session console 0 errors on /, /contact, /portfolio; role isolation re-verified (WEB_DEVELOPER 403 on enquiries/convert; CLIENT_USER blocked from staff APIs + /app redirects to /portal; anon 401); logout revokes session (UI verified)
+- Test data cleaned: QA enquiries/contact/client/project deleted in FK-safe order; staff inbox 0; suite fixtures ("Audit Cafe (verify fixture)") intentionally retained — suites find-or-reuse them
+- DEPLOYMENT.md created (build/run, env vars, backup/recovery, limitations, checklist) — user-requested documentation
+- Post-launch-prep backup: backups/custom-2026-10-26-post-launch-prep.db VERIFIED; committed as 498d58d; tree clean
+- Deployment NOT executed: no git remote, no vercel/netlify/fly/render/railway/Dockerfile/CI, no hosting credentials in the environment; sandbox Caddyfile only proxies localhost:3000 to the preview URL. Production build (bun run build) not run per sandbox rule. Missing requirement documented in final report.
+
+Stage Summary:
+- Public site + enquiry → CRM → client → project pipeline fully operational and browser-verified; auth/RBAC/portal intact; all four regression suites green
+- Launch blockers remaining (user action required): real contact details (site-content.ts), email provider credentials, external hosting + domain for true production deployment
+- Backups: pre-launch + post-launch-prep, both VERIFIED; DB persistence across restart verified
+- Commit: 498d58d on main; no push (no remote)
