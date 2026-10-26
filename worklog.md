@@ -333,3 +333,17 @@ Stage Summary:
 - Deployment NOT performed: no authorized hosting integration exists (no git remote/CLI/credentials). Deployment is one owner authorization away: Option A (recommended) container host + persistent volume keeps SQLite, no migration; artifacts committed. Exact actions in DEPLOYMENT.md §0
 - Remaining genuine blockers (user action): 1) hosting account/authorization, 2) real contact details in src/lib/site-content.ts, 3) transactional email provider credentials, 4) custom domain (optional; platform URL works first)
 - Backups: pre-work + post-verification, both VERIFIED; commit follows this entry
+
+---
+Task ID: PRODREADY-1a (addendum — hardening found during verification)
+Agent: Z.ai Code (main)
+Task: Production-readiness verification addendum — db.ts production log hardening + dev-server memory characterization
+
+Work Log:
+- OOM root cause found via dmesg: kernel OOM-killed next-server (1.7GB RSS) during regression-suite runs; 4GB sandbox + Turbopack dev mode accumulates memory under sustained traffic and eventually hangs requests (reproduced 3x). Production unaffected (standalone pre-compiled server) — documented in DEPLOYMENT.md §5 with restart + NODE_OPTIONS cap guidance
+- Hardening: src/lib/db.ts now enables Prisma query logging ONLY in development (log: [] in production) — previously unconditional, bloating stdout and leaking query data into prod logs; tsc 0 errors, lint clean, api-security 51/0, video-tracking 67/0 after change; public enquiry smoke (submit→persist→notify→cleanup) passed post-change
+- Server restarts performed with pkill -9 full cleanup; bootstrap-if-empty never reset data (verified each restart)
+
+Stage Summary:
+- All four suites green after hardening commit; dev-server wedge documented as sandbox dev-mode characteristic with exact restart command
+- Commit: db.ts hardening + DEPLOYMENT.md memory note + worklog

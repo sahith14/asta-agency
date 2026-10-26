@@ -14,8 +14,10 @@ const globalForPrisma = globalThis as unknown as {
 
 export const db =
   globalForPrisma.prisma ??
-  new PrismaClient({
-    log: ['query'],
-  })
+  new PrismaClient(
+    // Verbose query logging is a development aid only — in production it
+    // bloats stdout logs, leaks query data into logs and adds memory churn.
+    process.env.NODE_ENV === 'production' ? { log: [] } : { log: ['query'] }
+  )
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db

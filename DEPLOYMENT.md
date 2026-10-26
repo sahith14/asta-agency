@@ -164,6 +164,15 @@ and survives app restarts, but:
    automatically once realistic values are present.
 4. **Sessions are DB-backed** (`Session` table). Logging out invalidates the
    server-side session; rotating demo credentials revokes all sessions.
+5. **Sandbox dev-server memory (dev mode only).** `next dev` (Turbopack) in the
+   4GB sandbox accumulates memory under sustained request traffic and can hang
+   (the kernel OOM-killed a 1.7GB instance during regression-suite runs).
+   Restart with `pkill -9 -f "next dev"; (setsid bun run dev &)`. This is a
+   **development-mode** characteristic (on-demand compilation + HMR); the
+   production runtime is the pre-compiled standalone Node server
+   (`.next/standalone/server.js`) and does not share this profile. If a
+   production host ever shows memory pressure, cap the Node heap with
+   `NODE_OPTIONS="--max-old-space-size=1024"` and size the instance ≥1GB.
 
 ## 6. Pre-deployment checklist (run in order)
 
