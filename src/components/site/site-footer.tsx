@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Clapperboard, Mail, Phone, MapPin } from 'lucide-react'
-import { site } from '@/lib/site-content'
+import { site, CONTACT_PLACEHOLDERS } from '@/lib/site-content'
 
 export function SiteFooter() {
   const year = new Date().getFullYear()
@@ -42,14 +42,18 @@ export function SiteFooter() {
           <div>
             <h2 className="text-sm font-semibold">Get in touch</h2>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <a href={`mailto:${site.company.email}`} className="hover:text-foreground">{site.company.email}</a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <a href={`tel:${site.company.phone.replace(/\s+/g, '')}`} className="hover:text-foreground">{site.company.phone}</a>
-              </li>
+              {!CONTACT_PLACEHOLDERS.email && (
+                <li className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <a href={`mailto:${site.company.email}`} className="hover:text-foreground">{site.company.email}</a>
+                </li>
+              )}
+              {!CONTACT_PLACEHOLDERS.phone && (
+                <li className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <a href={`tel:${site.company.phone.replace(/\s+/g, '')}`} className="hover:text-foreground">{site.company.phone}</a>
+                </li>
+              )}
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
                 <span>{site.company.location}</span>

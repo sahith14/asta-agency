@@ -14,6 +14,16 @@ const updateSchema = z.object({
   notes: z.string().max(2000).optional(),
 })
 
+/** Staff fetch of a single CRM contact. */
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { error } = await requireStaff(req)
+  if (error) return error
+  const { id } = await ctx.params
+  const contact = await db.contact.findUnique({ where: { id } })
+  if (!contact) return jsonError('Contact not found', 404)
+  return json({ contact })
+}
+
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { user, error } = await requireStaff(req)
   if (error) return error

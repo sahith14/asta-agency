@@ -113,18 +113,46 @@ export async function POST(req: NextRequest) {
   return json({ ok: true, reference }, 201)
 }
 
-const STATUSES = ['NEW', 'IN_PROGRESS', 'CONVERTED', 'CLOSED'] as const
+const STATUSES = ['NEW', 'IN_PROGRESS', 'FOLLOW_UP', 'QUALIFIED', 'CONVERTED', 'CLOSED'] as const
 
-/** Staff list of public-site enquiries. Requires enquiries.read (OWNER / CLIENT_MANAGER / SUPPORT_FINANCE). */
+/**
+ * Staff list of public-site enquiries. Requires enquiries.read (OWNER / CLIENT_MANAGER / SUPPORT_FINANCE).
+ * Filters: status, service, assignedTo ('unassigned' or employee id), q (free-text), from/to (inclusive ISO dates).
+ */
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, ['OWNER', 'CLIENT_MANAGER', 'SUPPORT_FINANCE'])
   if (error) return error
 
   const url = new URL(req.url)
   const status = url.searchParams.get('status')
+  const service = url.searchParams.get('service')
+  const assignedTo = url.searchParams.get('assignedTo')
+  const q = url.searchParams.get('q')?.trim()
+  const from = url.searchParams.get('from')
+  const to = url.searchParams.get('to')
   const { skip, take, page, pageSize } = getPagination(url)
 
-  const where = status && (STATUSES as readonly string[]).includes(status) ? { status } : {}
+  const where: Record<string, unknown> = {}
+  if (status && (STATUSES as readonly string[]).includes(status)) where.status = status
+  if (service) where.service = service
+  if (assignedTo === 'unassigned') where.handledById = null
+  else if (assignedTo) where.handledById = assignedTo
+  if (q) {
+    where.OR = ['name', 'email', 'phone', 'companyName', 'reference', 'message'].map(field => ({
+      [field]: { contains: q },
+    }))
+  }
+  const createdAt: Record<string, Date> = {}
+  if (from) {
+    const d = new Date(`${from}T00:00:00.000Z`)
+    if (!Number.isNaN(d.getTime())) createdAt.gte = d
+  }
+  if (to) {
+    const d = new Date(`${to}T23:59:59.999Z`)
+    if (!Number.isNaN(d.getTime())) createdAt.lte = d
+  }
+  if (Object.keys(createdAt).length > 0) where.createdAt = createdAt
+
   const [enquiries, total] = await Promise.all([
     db.siteEnquiry.findMany({
       where,
@@ -134,7 +162,8 @@ export async function GET(req: NextRequest) {
       select: {
         id: true, reference: true, name: true, email: true, phone: true, companyName: true,
         service: true, message: true, contactMethod: true, status: true,
-        convertedContactId: true, notes: true, createdAt: true,
+        convertedContactId: true, handledById: true, notes: true,
+        lastContactedAt: true, nextFollowUpAt: true, createdAt: true,
       },
     }),
     db.siteEnquiry.count({ where }),

@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, FormEvent } from 'react'
+import { useEffect, useRef, useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { api, fmtDate, fmtMoney } from '@/lib/client'
-import { roleCan } from '@/lib/rbac'
+import { roleCan } from '@/lib/rbac-shared'
 import { useMe } from '@/components/app-shell'
 import { StatusBadge, PriorityBadge } from '@/components/status-badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -51,6 +51,24 @@ export default function VideoProjectsPage() {
   useEffect(() => {
     api<{ projects: ProjectRow[] }>('/api/projects?serviceType=VIDEO_PRODUCTION').then(d => setProjects(d.projects)).catch(e => setError(e.message))
   }, [])
+
+  // Support ?clientId=... deep links (e.g. "Create project" from a converted
+  // enquiry): capture the client on mount and clean the URL, then open the
+  // create dialog once the signed-in user's role is known.
+  const preselectedClientId = useRef<string | null>(null)
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const preselect = url.searchParams.get('clientId')
+    if (!preselect) return
+    preselectedClientId.current = preselect
+    setClientId(preselect)
+    url.searchParams.delete('clientId')
+    const qs = url.searchParams.toString()
+    window.history.replaceState({}, '', url.pathname + (qs ? `?${qs}` : ''))
+  }, [])
+  useEffect(() => {
+    if (me && preselectedClientId.current && roleCan(me.role, 'projects.manage')) setCreateOpen(true)
+  }, [me])
 
   // Create-dialog data (client directory, packages, managers) is restricted to
   // projects-manage roles by the API — fetch lazily, only when the dialog opens.

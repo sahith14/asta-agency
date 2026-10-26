@@ -141,10 +141,12 @@ model SiteEnquiry {
   service            String
   message            String
   contactMethod      String    @default("NO_PREFERENCE") // EMAIL | PHONE | NO_PREFERENCE
-  status             String    @default("NEW") // NEW | IN_PROGRESS | CONVERTED | CLOSED
+  status             String    @default("NEW") // NEW | IN_PROGRESS | FOLLOW_UP | QUALIFIED | CONVERTED | CLOSED
   convertedContactId String?
   handledById        String?
   notes              String?
+  lastContactedAt    DateTime?
+  nextFollowUpAt     DateTime?
   ipHash             String? // sha256 of client IP — abuse tracking only, never raw IP
   userAgent          String?
   createdAt          DateTime  @default(now())

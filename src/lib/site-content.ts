@@ -253,3 +253,20 @@ export const PORTFOLIO_CATEGORIES = [
 export function categoryLabel(value: string): string {
   return PORTFOLIO_CATEGORIES.find(c => c.value === value)?.label ?? 'Other work'
 }
+
+/**
+ * ── LAUNCH CHECKLIST ─────────────────────────────────────────────────────────
+ * Real contact details have NOT been supplied yet (see the TODOs in
+ * site.company above). While placeholder values are present, the public site
+ * deliberately HIDES the email and phone instead of publishing fake details.
+ *
+ * When the real details are ready: replace `email` and `phone` above with the
+ * genuine values. These flags will turn false automatically once the values no
+ * longer look like placeholders, and the contact details will appear on the
+ * site. Nothing else needs to change.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const CONTACT_PLACEHOLDERS = {
+  email: /@example\.|@example\.com|@test\.|@localhost/i.test(site.company.email) || site.company.email.includes('.example'),
+  phone: /(\b0{4,}\b|000000|x{4,}|1234567890)/.test(site.company.phone.replace(/[\s()-]/g, '')),
+} as const

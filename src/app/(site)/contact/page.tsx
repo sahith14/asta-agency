@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Mail, Phone, MapPin, ClipboardList, Search, PenLine, Rocket } from 'lucide-react'
 import { EnquiryForm } from '@/components/site/enquiry-form'
-import { site } from '@/lib/site-content'
+import { site, CONTACT_PLACEHOLDERS } from '@/lib/site-content'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -39,19 +39,28 @@ export default function ContactPage() {
             <div className="rounded-2xl border bg-card p-6">
               <h2 className="font-semibold">Prefer direct contact?</h2>
               <ul className="mt-4 space-y-3 text-sm">
-                <li className="flex items-center gap-2.5">
-                  <Mail className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <a href={`mailto:${site.company.email}`} className="hover:underline">{site.company.email}</a>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Phone className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <a href={`tel:${site.company.phone.replace(/\s+/g, '')}`} className="hover:underline">{site.company.phone}</a>
-                </li>
+                {CONTACT_PLACEHOLDERS.email ? null : (
+                  <li className="flex items-center gap-2.5">
+                    <Mail className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                    <a href={`mailto:${site.company.email}`} className="hover:underline">{site.company.email}</a>
+                  </li>
+                )}
+                {CONTACT_PLACEHOLDERS.phone ? null : (
+                  <li className="flex items-center gap-2.5">
+                    <Phone className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                    <a href={`tel:${site.company.phone.replace(/\s+/g, '')}`} className="hover:underline">{site.company.phone}</a>
+                  </li>
+                )}
                 <li className="flex items-start gap-2.5">
                   <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                   <span className="text-muted-foreground">{site.company.location}</span>
                 </li>
               </ul>
+              {(CONTACT_PLACEHOLDERS.email || CONTACT_PLACEHOLDERS.phone) && (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  The enquiry form is the fastest way to reach us — we review every message and reply using the contact method you choose.
+                </p>
+              )}
               <p className="mt-4 text-xs text-muted-foreground">
                 Existing client or team member? Use the <a href="/login" className="underline hover:text-foreground">login page</a> to reach your workspace.
               </p>
