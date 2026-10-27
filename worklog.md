@@ -600,3 +600,27 @@ Stage Summary:
 - Zero logic/copy-contract changes: all forms post to the same APIs with the same payloads, all routes/links/testids preserved, no new dependencies, no data changes beyond my own E2E test record (created and deleted).
 - Working tree uncommitted (no commit authorized). No production deployment exists or was performed.
 - Open question for the user: the login/request-access wordmark still reads "AgencyOS" (platform name) — renaming it to ASTA AGENCY is a brand-text change, deliberately not made under this task's "do not change anything else" constraint.
+
+---
+Task ID: AESTH-FINAL
+Agent: Z.ai Code (main)
+Task: Fresh-session verification of the completed Aesthetic Enhancement Pass ("change the whole UI design to something aesthetic and do not change anything else") — confirm the working tree state, re-run static checks, and re-execute the full browser regression mandated by spec §11 before issuing the 5-item completion report.
+
+Work Log:
+- Read worklog: confirmed AESTH-1 (+AESTH-3-a..f) and AESTH-2 already implemented and QA'd the full Gallery & Oxblood aesthetic (homepage chapters, configurator, secondary pages, auth screens). This session performed independent re-verification, no new edits.
+- Working tree: clean — the sandbox auto-committed all aesthetic work (HEAD 78931af and earlier UUID commits contain the 23+12 AESTH files incl. auth-backdrop.tsx). No uncommitted changes; no manual commit performed.
+- Static QA: bun run lint → clean; bunx tsc --noEmit → 0 errors. Greps confirm .site-scope in (site)/layout, chapter tones (showroom/conversation night, build taupe), "ASTA AGENCY" in site-content (5), zero AgencyOS residue in site scope.
+- Browser desktop 1440px: all six chapters screenshot-verified art-directed (night hero w/ chrome serif-italic headline → ivory capabilities w/ live demo stage → night work gallery → ivory craft w/ ExhibitFrames → taupe build atelier → night conversation finale + ghost-wordmark footer). Header chrome adapts per section; active nav indicator on /about.
+- Configurator E2E: hero CTA → 7 steps (Service→Goal→Scope multi-select→Budget&timing→Project info→Contact+consent→Review ledger) → submit → success panel ref ENQ-MVRBVGQ95E75 → verified persisted in DB (SiteEnquiry, status NEW) → record deleted, baseline restored (enquiries 0, contacts 2, portfolio 4). Progress ticks, blush selected states, accent-ink buttons all confirmed visually.
+- Portfolio filter: 4 items → Restaurant & food (1: Café Monthly Reels Package) → All work (4). 
+- Craft experiments: all 3 live; material-lab roughness slider 0.16→0.80 changed the 3D knot chrome→matte in real time with readout update; compare slider value changes confirmed.
+- Mobile 390px: horizontal overflow 0px on /, /about, /services, /portfolio, /contact, /login; hero clamp fits 2 lines; hamburger menu opens (numbered ivory overlay), navigates to /about, auto-closes.
+- Auth/RBAC: cleared cookies → /login renders on-brand logged-out (oxblood medallion, warm shadows; "AgencyOS" wordmark remains — flagged, rename not authorized for auth scope); one-click client sign-in (Marta) → /portal "Welcome, The Anchor Bar & Grill" with stats; earlier staff session → /app dashboard rendered. POST /api/auth/login 200, /api/portal/overview 200.
+- Fallbacks/perf: /?webgl=off renders full content, 0 page errors. Footer sits at viewport bottom on long page (no gap, no overlap). Console: only benign THREE.Clock deprecation warning. dev.log: no 5xx.
+- QA suites re-run: tests/api-security-suite.sh → 51 passed / 0 failed; bun scripts/verify-video-tracking.ts → 69 passed / 0 failed.
+- DB note: suites leave their standard "Audit Cafe (verify fixture)" client (1 stub project, 2 shoots, 21 deliverables, 1 client user) — same accepted post-suite artifact as AESTH-1's baseline (cli3); left in place deliberately, internal CRM only, not public-facing. My own E2E enquiry was deleted FK-safe.
+
+Stage Summary:
+- Aesthetic Enhancement Pass independently re-verified end-to-end in a fresh session: visual system (ivory/oxblood editorial + night cinematic rhythm), configurator funnel to real CRM, portfolio filtering, live experiments, mobile safety, auth/RBAC, fallbacks — all green with zero regressions found and zero new edits required.
+- Deployment status: NO production deployment exists or was performed (dev server only; no git remote/hosting credentials).
+- Open flag for the user: auth/app-shell wordmark still reads "AgencyOS" (platform name) — renaming it to ASTA AGENCY was outside the authorized scopes so far and remains a one-line-scope decision for the user.
