@@ -371,3 +371,29 @@ Stage Summary:
 - No fake content: samples labelled, only verified price shown, honest no-email messaging, contact placeholders still hidden
 - NOT committed per task instruction ("do not commit or push unless separately authorized") — working tree holds: modified (layout, globals, site pages, header, package.json/bun.lock) + new (site/ components: three/, chapters/, configurator/, buttons, chapter-rail, lib/site/); .zscripts/dev.pid + chmod-mode noise are sandbox artifacts
 - Known sandbox limitation: next dev (Turbopack) wedges under sustained heavy multi-client load in 4GB RAM (documented, dev-mode only)
+---
+Task ID: LAUNCH-VERIFY
+Agent: Z.ai Code (main — DevOps / QA / operations verification)
+Task: ASTAS Agency — Final Production Launch Verification (evidence-based; no deployment)
+
+Work Log:
+- Pre-state audit found a cross-lineage corruption event: platform commit 8d07f7e (Oct 27) had restored ~438 files from a foreign AgencyOS lineage (different Prisma models, different lib/API surface, FOUNDER-role universe, legacy route groups (app)/(portal) duplicating src/app/app + src/app/portal) → 15 route conflicts, GET / 500 on every route, schedulers crash-looping on missing models; sandbox reset had also rolled db/custom.db back to a foreign Oct-22 User-based snapshot (22 tables, zero tables used by current code) and wiped backups/
+- Forensic backup of the foreign DB: backups/custom-2026-10-22-foreign-schema-forensics.db (VACUUM INTO, 22/22 row-matched, sha256 recorded)
+- Route surgery: deleted ALL restoration-added files that fail tsc vs the last-green commit e1b6248 (400 files: (app)/(portal) groups, agency views, legacy api/*, legacy lib/*) — nothing from e1b6248 or my lineage removed; kept verified-clean additions (middleware.ts, login/signup/change-password/forgot-password pages, constants.ts merged)
+- constants.ts reconciliation: full 7-role OWNER universe restored, FOUNDER aliased to 'OWNER' so restored comparisons match the seeded founder
+- instrumentation.ts: legacy scheduler boot removed (modules deleted); documented no-op
+- DB rebuilt from current 33-model schema: db push + generate + bootstrap (9 demo accounts, ASTAS-branded seed incl. 4 isDemo portfolio items, AppSetting agencyName='ASTAS agency')
+- Leftover rebrand fixes: (site)/page.tsx + about metadata 'AgencyOS' → 'ASTAS agency'
+- Regression-suite stale-credential fix: suites still logged in with pre-rebrand @agencyos.local emails → updated to @astas.local (root cause of a false 19/32 regression)
+- Acquisition battery (API): 10/10 — valid 201; honeypot & speed traps silent-200-no-store; 5×400 validation; 429 on 6th/h; configurator-shaped payload 201
+- Staff chain: founder login → inbox (7 rows, 0 spam rows) → OWNER notification (5-min identical-event dedup verified as designed) → triage PATCH → convert 201 → repeat convert 409 → exactly 1 contact (no duplicate) → client 201 → project 201 DISCOVERY
+- Persistence: full server restart + logout/login → all rows + triage fields + DB-backed session survive
+- Backup/recovery: backups/custom-2026-10-27-launch-verify.db VERIFIED (33/33, sha256); recovery demonstrated in isolated sandbox copy (integrity ok, known triaged row recovered); live DB untouched
+- Security: suite 51/0 + video-tracking 69/0 + tsc 0 + lint clean; session revocation verified server-side (me 401 after logout); security headers present; middleware cookie-gate + layout guards intact
+- Browser (agent-browser): desktop hero with live WebGL canvas; 7-step configurator E2E → ENQ-MVQRGMG1BC67 with structured PROJECT BRIEF in DB + staff inbox; mobile 390px zero horizontal overflow top+bottom; mobile menu opens/navigates/auto-closes; ?webgl=off renders full content without canvas; console clean (benign THREE.Clock deprecation only); UI login → /app → /app/enquiries inbox; UI sign-out → /login
+- Cleanup: all QA rows deleted FK-safe (enquiries/notifications/contact/client/project); suite fixtures retained per convention; baseline enq0/con2/cli2/prj3 restored before suites (+ suite fixtures after)
+
+Stage Summary:
+- Every verifiable engineering item PASSES in the dev/preview environment; production does NOT exist (no git remote, no hosting config, no deploy performed or authorized)
+- Remaining blockers (owner actions): hosting authorization (Option A container+volume ready in Dockerfile/DEPLOYMENT.md), custom domain, real contact details (placeholders currently auto-hidden from public pages), transactional email provider, re-entry of real data (previous data unrecoverable after the environment reset)
+- Working tree intentionally LEFT UNCOMMITTED per task constraints (400 deletions + 7 modifications await review); no push (no remote); dev.log clean of 5xx

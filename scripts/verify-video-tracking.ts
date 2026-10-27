@@ -60,7 +60,7 @@ async function main(): Promise<void> {
   const fpw = creds('OWNER')
   const loginRes = await fetch(`${BASE}/api/auth/login`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'founder@agencyos.local', password: fpw }),
+    body: JSON.stringify({ email: 'founder@astas.local', password: fpw }),
   })
   check('founder login 200', loginRes.status === 200)
   const rawCookie = loginRes.headers.get('set-cookie') ?? ''

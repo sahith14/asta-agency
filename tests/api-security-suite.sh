@@ -19,7 +19,7 @@ login() { # cookiejar, email, password
 check "anon /api/overview -> 401" 401 "$(curl -s -o /dev/null -w '%{http_code}' $BASE/api/overview)"
 check "anon /api/clients -> 401" 401 "$(curl -s -o /dev/null -w '%{http_code}' $BASE/api/clients)"
 check "anon /api/audit -> 401" 401 "$(curl -s -o /dev/null -w '%{http_code}' $BASE/api/audit)"
-check "bad password -> 401" 401 "$(login /tmp/t_bad.json founder@agencyos.local wrongpass)"
+check "bad password -> 401" 401 "$(login /tmp/t_bad.json founder@astas.local wrongpass)"
 check "bad email format -> 400" 400 "$(curl -s -o /dev/null -w '%{http_code}' -X POST $BASE/api/auth/login -H 'Content-Type: application/json' -d '{"email":"notanemail","password":"x"}')"
 
 FOUNDER_PW=$(creds "OWNER:")
@@ -32,13 +32,13 @@ CD_PW=$(creds "CREATIVE_DIRECTOR:")
 MARTA_PW=$(grep "The Anchor" /home/z/my-project/.seed-credentials | awk '{print $NF}')
 JORDAN_PW=$(grep "Brightcuts" /home/z/my-project/.seed-credentials | awk '{print $NF}')
 
-check "founder login -> 200" 200 "$(login /tmp/t_founder.jar founder@agencyos.local "$FOUNDER_PW")"
-check "manager login -> 200" 200 "$(login /tmp/t_cm.jar priya@agencyos.local "$CM_PW")"
-check "webdev login -> 200" 200 "$(login /tmp/t_dev.jar daniel@agencyos.local "$DEV_PW")"
-check "finance login -> 200" 200 "$(login /tmp/t_fin.jar hannah@agencyos.local "$FIN_PW")"
-check "videographer login -> 200" 200 "$(login /tmp/t_vg.jar marcus@agencyos.local "$VG_PW")"
-check "editor login -> 200" 200 "$(login /tmp/t_ed.jar elena@agencyos.local "$ED_PW")"
-check "creative dir login -> 200" 200 "$(login /tmp/t_cd.jar tom@agencyos.local "$CD_PW")"
+check "founder login -> 200" 200 "$(login /tmp/t_founder.jar founder@astas.local "$FOUNDER_PW")"
+check "manager login -> 200" 200 "$(login /tmp/t_cm.jar priya@astas.local "$CM_PW")"
+check "webdev login -> 200" 200 "$(login /tmp/t_dev.jar daniel@astas.local "$DEV_PW")"
+check "finance login -> 200" 200 "$(login /tmp/t_fin.jar hannah@astas.local "$FIN_PW")"
+check "videographer login -> 200" 200 "$(login /tmp/t_vg.jar marcus@astas.local "$VG_PW")"
+check "editor login -> 200" 200 "$(login /tmp/t_ed.jar elena@astas.local "$ED_PW")"
+check "creative dir login -> 200" 200 "$(login /tmp/t_cd.jar tom@astas.local "$CD_PW")"
 check "client marta login -> 200" 200 "$(login /tmp/t_marta.jar marta@anchorbar.local "$MARTA_PW")"
 check "client jordan login -> 200" 200 "$(login /tmp/t_jordan.jar jordan@brightcuts.local "$JORDAN_PW")"
 

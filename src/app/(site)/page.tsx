@@ -12,7 +12,7 @@ import { BuildChapter } from '@/components/site/chapters/build'
 import { ConversationChapter } from '@/components/site/chapters/conversation'
 
 export const metadata: Metadata = {
-  title: 'AgencyOS — We make digital feel different.',
+  title: 'ASTAS agency — We make digital feel different.',
   description:
     'Immersive websites, cinematic video and digital experiences built to make brands impossible to ignore. Website & digital services and video production, delivered by one studio.',
 }

@@ -1,29 +1,44 @@
 // AgencyOS — shared constants (SQLite has no enums; these are the single source of truth)
 
+// Role universe: the canonical platform roles (auth/seed/rbac — see
+// src/lib/auth.ts STAFF_ROLES and src/lib/rbac-shared.ts). FOUNDER is kept as
+// an alias for restored modules that predate the OWNER role name; it resolves
+// to the same canonical 'OWNER' string, so `role === ROLES.FOUNDER` matches the
+// seeded founder account.
 export const ROLES = {
-  FOUNDER: 'FOUNDER',
+  OWNER: 'OWNER',
+  FOUNDER: 'OWNER',
   CLIENT_MANAGER: 'CLIENT_MANAGER',
-  WEB_DEVELOPER: 'WEB_DEVELOPER',
+  CREATIVE_DIRECTOR: 'CREATIVE_DIRECTOR',
   SUPPORT_FINANCE: 'SUPPORT_FINANCE',
+  VIDEOGRAPHER: 'VIDEOGRAPHER',
+  VIDEO_EDITOR: 'VIDEO_EDITOR',
+  WEB_DEVELOPER: 'WEB_DEVELOPER',
   CLIENT: 'CLIENT',
 } as const
 
 export type Role = (typeof ROLES)[keyof typeof ROLES]
 
 export const EMPLOYEE_ROLES: Role[] = [
-  ROLES.FOUNDER,
+  ROLES.OWNER,
   ROLES.CLIENT_MANAGER,
-  ROLES.WEB_DEVELOPER,
+  ROLES.CREATIVE_DIRECTOR,
   ROLES.SUPPORT_FINANCE,
+  ROLES.VIDEOGRAPHER,
+  ROLES.VIDEO_EDITOR,
+  ROLES.WEB_DEVELOPER,
 ]
 
 export const ALL_ROLES: Role[] = [...EMPLOYEE_ROLES, ROLES.CLIENT]
 
 export const ROLE_LABELS: Record<Role, string> = {
-  FOUNDER: 'Founder',
+  OWNER: 'Founder',
   CLIENT_MANAGER: 'Client Manager',
-  WEB_DEVELOPER: 'Web Developer',
+  CREATIVE_DIRECTOR: 'Creative Director',
   SUPPORT_FINANCE: 'Support & Finance',
+  VIDEOGRAPHER: 'Videographer',
+  VIDEO_EDITOR: 'Video Editor',
+  WEB_DEVELOPER: 'Web Developer',
   CLIENT: 'Client',
 }
 
