@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { AuthBackdrop } from '@/components/auth/auth-backdrop'
 import { api, setStoredToken } from '@/lib/client'
 import { Clapperboard, FlaskConical, Loader2 } from 'lucide-react'
 
@@ -159,20 +160,21 @@ export default function LoginPage() {
   const isLoadingAccounts = accounts === undefined
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="flex items-center justify-center gap-2 font-bold text-lg mb-6">
-          <span className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+    <div className="site-scope relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12 lg:py-16">
+      <AuthBackdrop />
+      <div className="relative z-10 w-full max-w-md">
+        <div className="mb-8 flex items-center justify-center gap-2.5 text-lg font-bold tracking-tight">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[0_10px_25px_-12px_rgba(84,26,15,0.55)]">
             <Clapperboard className="h-4 w-4" />
           </span>
           AgencyOS
         </div>
-        <Card>
+        <Card className="border-border shadow-[0_30px_80px_-40px_rgba(61,35,22,0.4)]">
           <CardHeader>
             <CardTitle>Sign in</CardTitle>
             <CardDescription>Team and client portal access</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-2">
             {error && (
               <Alert variant="destructive" className="mb-4" role="alert">
                 <AlertDescription>{error}</AlertDescription>
@@ -207,7 +209,7 @@ export default function LoginPage() {
         </Card>
 
         <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
-          <DialogContent className="max-w-sm">
+          <DialogContent className="site-scope max-w-sm shadow-[0_30px_80px_-40px_rgba(20,10,6,0.55)]">
             <DialogHeader>
               <DialogTitle>Reset your password</DialogTitle>
               <DialogDescription>
@@ -239,7 +241,7 @@ export default function LoginPage() {
         </Dialog>
 
         {isLoadingAccounts && (
-          <Card className="mt-6" aria-label="Test accounts loading">
+          <Card className="mt-6 border-border shadow-[0_30px_80px_-40px_rgba(61,35,22,0.4)]" aria-label="Test accounts loading">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
                 <FlaskConical className="h-4 w-4 text-muted-foreground" /> Test accounts
@@ -254,7 +256,7 @@ export default function LoginPage() {
         )}
 
         {showPanel && (
-          <Card className="mt-6" aria-label="Test accounts">
+          <Card className="mt-6 border-border shadow-[0_30px_80px_-40px_rgba(61,35,22,0.4)]" aria-label="Test accounts">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <FlaskConical className="h-4 w-4 text-muted-foreground" /> Test &amp; demo accounts

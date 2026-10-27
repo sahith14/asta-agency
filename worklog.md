@@ -571,3 +571,32 @@ Stage Summary:
 - Site is now light ivory editorial (Gallery & Oxblood) with night cinematic chapters: night(hero) -> ivory(capabilities) -> night(showroom) -> ivory(craft) -> taupe(build) -> night(conversation+footer)
 - All business systems re-verified live: enquiry API/CRM pipeline, configurator contract, portfolio DB, auth, RBAC (via suites)
 - 23 files changed (+1406/-554), all frontend/presentation; working tree UNCOMMITTED (no commit authorized); NO production deployment exists or was performed (dev server only)
+
+---
+Task ID: AESTH-2
+Agent: Z.ai Code (main)
+Task: "Change the whole UI design to something aesthetic and do not change anything else" — extend the Gallery & Oxblood aesthetic (previously applied to the homepage + configurator in AESTH-1/3-a..f) to the remaining UI: auth entry pages and the secondary public pages. Zero changes to copy, logic, routes, APIs, or data.
+
+Work Log:
+- Surveyed live state in browser first: homepage/chapters/configurator already art-directed (Gallery & Oxblood); /about, /services, /contact, /portfolio plain; /login, /request-access, /forgot-password, /change-password completely default (generic white cards, mint-green gradients, off-palette emerald icons). Confirmed prior pass details from worklog (AESTH-1, AESTH-3-a..f).
+- New component src/components/auth/auth-backdrop.tsx: decorative-only brand backdrop (champagne/blush ambient washes, layered hairline rings, registration marks, paper grain). No text, aria-hidden, pointer-events-none.
+- Auth pages (login, request-access, forgot-password, change-password + its form card): wrapped in .site-scope so the ivory/oxblood token system + studio fonts apply; added AuthBackdrop; cards got warm deep shadows; oxblood primary buttons; replaced off-palette emerald success icons with oxblood medallions; forgot-password dialog also given site-scope. ALL text, handlers, links, test flows, self-heal logic byte-identical. Wordmark "AgencyOS" intentionally left as-is (brand-text change not authorized by this task; noted in report).
+- /about: editorial masthead (oversized Syne display h1, ghost numeral 01, hairline-dash lede, ambient + grain), story section with serif-accent display h2 ("One team, both crafts" — original "Our story" retained as eyebrow), mission card as oxblood-ruled plate, studio photo in layered blush/champagne plate with mono caption, values + whyUs converted from floating uniform cards to indexed hairline plate grids (gap-px) with hover states. All body copy verbatim from site-content.
+- /services: same masthead treatment; divisions now numbered (01/02 eyebrow) with ringed icon medallions; service cards converted to indexed hairline plates; deliverables under a hairline rule; CTA card became a full-bleed .night cinematic band (bg-background text-foreground added after first render check showed token flip without base classes renders transparent) flowing into the dark footer.
+- /services/web-development + /services/video-production (shared DivisionDetail): masthead + framed plate hero, indexed hairline service plates, deliverables plate, packages as lifting chalk cards with oxblood prices, CTA band kept solid oxblood + grain.
+- /contact: masthead treatment; direct-contact card converted to hairline meta rows (divide-y) with oxblood icon medallions; "What happens next" converted to a numbered spine (mono oxblood indices on hairline rail); privacy section on taupe band. EnquiryForm shell only: warm shadow + oxblood success medallion; all validation/honeypot/API payload/logic untouched.
+- /portfolio: masthead treatment; cards got gallery-mat treatment (ring-inset plate on image, lift + deep shadow on hover, mono index, oxblood eyebrow category, hairline above links); empty state now oxblood medallion + display title; CTA band on taupe. Filters/links/data flow untouched.
+- Fixes found during verification: services night CTA rendered transparent (night flips vars but section lacked bg-background) — fixed; contact spine bullet centering corrected to -left-[2.25rem].
+- Dev server OOM-killed mid-session; restarted with standard `pkill -9 -f "next dev"; (setsid bun run dev &)`.
+
+QA:
+- bun run lint: clean. bunx tsc --noEmit: 0 errors.
+- Browser desktop 1440px: login, request-access, forgot-password, about, services (+night CTA), both service detail pages, contact, portfolio — all render on-brand; screenshots captured.
+- Browser mobile 390px: scrollWidth-clientWidth = 0 on /, /about, /services, /contact, /portfolio, /login, /services/video-production, /request-access, /?webgl=off; about renders cleanly.
+- Flows: one-click staff sign-in → lands /app; contact enquiry E2E → success panel with reference ENQ-MVRANTZCC2EE (real POST /api/enquiries with honeypot/formAgeMs) → test record deleted FK-safe afterwards (siteEnquiry count back to baseline; contacts 2, portfolio 4 untouched); portfolio filter RESTAURANT_VIDEO 4→1 items; homepage craft experiments (3D lab, type lab, compare slider) all live; mobile menu open/navigate/auto-close; page errors: none (only benign THREE.Clock deprecation warning); dev.log: no 5xx.
+
+Stage Summary:
+- The entire public-facing UI now shares one art direction: ivory/oxblood editorial light pages, cinematic night finale on services, brand-grade auth screens — 12 files modified + 1 new decorative component (+332/−226), all presentation-layer.
+- Zero logic/copy-contract changes: all forms post to the same APIs with the same payloads, all routes/links/testids preserved, no new dependencies, no data changes beyond my own E2E test record (created and deleted).
+- Working tree uncommitted (no commit authorized). No production deployment exists or was performed.
+- Open question for the user: the login/request-access wordmark still reads "AgencyOS" (platform name) — renaming it to ASTA AGENCY is a brand-text change, deliberately not made under this task's "do not change anything else" constraint.

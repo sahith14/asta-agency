@@ -53,8 +53,8 @@ export function ChangePasswordForm() {
 
   return (
     <div className="w-full max-w-md space-y-4">
-      <div className="text-center space-y-2">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+      <div className="text-center space-y-3">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[0_10px_25px_-12px_rgba(84,26,15,0.55)]">
           <ShieldCheck className="h-6 w-6" />
         </div>
         <h1 className="text-2xl font-bold tracking-tight">Set a new password</h1>
@@ -62,7 +62,7 @@ export function ChangePasswordForm() {
           For security, accounts issued with a temporary password must set their own before continuing.
         </p>
       </div>
-      <Card>
+      <Card className="border-border shadow-[0_30px_80px_-40px_rgba(61,35,22,0.4)]">
         <form onSubmit={onSubmit}>
           <CardContent className="space-y-4 pt-6">
             {error && (

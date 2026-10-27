@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AuthBackdrop } from '@/components/auth/auth-backdrop'
 import { Loader2, KeyRound } from 'lucide-react'
 
 export default function ForgotPasswordPage() {
@@ -34,15 +35,16 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-[color:oklch(0.95_0.025_150)] to-background px-4 py-10">
-      <div className="w-full max-w-md space-y-4">
-        <div className="text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+    <main className="site-scope relative flex flex-1 items-center justify-center overflow-hidden bg-background px-4 py-12 lg:py-16">
+      <AuthBackdrop />
+      <div className="relative z-10 w-full max-w-md space-y-4">
+        <div className="text-center space-y-3">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[0_10px_25px_-12px_rgba(84,26,15,0.55)]">
             <KeyRound className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Reset your password</h1>
         </div>
-        <Card>
+        <Card className="border-border shadow-[0_30px_80px_-40px_rgba(61,35,22,0.4)]">
           <form onSubmit={onSubmit}>
             <CardContent className="space-y-4 pt-6">
               {message && (

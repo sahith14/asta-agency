@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { AuthBackdrop } from '@/components/auth/auth-backdrop'
 import { CheckCircle2, Loader2, Clapperboard } from 'lucide-react'
 
 export default function RequestAccessPage() {
@@ -40,11 +41,12 @@ export default function RequestAccessPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/40">
-      <header className="border-b bg-background">
+    <div className="site-scope relative flex min-h-screen flex-col overflow-hidden bg-background">
+      <AuthBackdrop />
+      <header className="relative z-10 border-b border-border/70 bg-background/90">
         <div className="mx-auto max-w-6xl flex h-16 items-center justify-between px-4 lg:px-6">
-          <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-            <span className="h-8 w-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-2.5 text-lg font-bold tracking-tight">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Clapperboard className="h-4 w-4" />
             </span>
             AgencyOS
@@ -53,9 +55,9 @@ export default function RequestAccessPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex items-start justify-center px-4 py-10">
+      <main className="relative z-10 flex flex-1 items-start justify-center px-4 py-10">
         <div className="w-full max-lg max-w-lg">
-          <Card>
+          <Card className="border-border shadow-[0_30px_80px_-40px_rgba(61,35,22,0.4)]">
             <CardHeader>
               <CardTitle>Request access</CardTitle>
               <CardDescription>
@@ -66,7 +68,9 @@ export default function RequestAccessPage() {
             <CardContent>
               {state === 'done' ? (
                 <div className="text-center py-6" role="status">
-                  <CheckCircle2 className="h-12 w-12 text-emerald-600 mx-auto mb-3" />
+                  <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 ring-1 ring-inset ring-primary/25">
+                    <CheckCircle2 className="h-7 w-7 text-primary" aria-hidden="true" />
+                  </span>
                   <h3 className="text-lg font-semibold">Request received</h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     Thank you. Your request has been received and our team will be in touch.

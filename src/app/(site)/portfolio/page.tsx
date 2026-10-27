@@ -31,15 +31,18 @@ export default async function PortfolioPage({
 
   return (
     <>
-      <section className="border-b bg-gradient-to-b from-muted/70 to-background" aria-labelledby="portfolio-heading">
-        <div className="mx-auto max-w-6xl px-4 py-14 lg:px-6 lg:py-20">
+      <section className="ambient-ivory grain relative overflow-hidden border-b" aria-labelledby="portfolio-heading">
+        <div className="mx-auto max-w-6xl px-4 py-16 lg:px-6 lg:py-24">
           <p className="eyebrow flex items-center gap-3 text-electric">Portfolio<span className="h-px w-10 bg-electric/60" aria-hidden="true" /></p>
-          <h1 id="portfolio-heading" className="mt-2 text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+          <h1 id="portfolio-heading" className="mt-4 max-w-3xl text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]">
             Our <em className="editorial font-normal">work</em>
           </h1>
-          <p className="mt-4 max-w-2xl text-pretty text-lg text-muted-foreground">
-            Websites we have built and videos we have produced. Items marked <Badge variant="secondary" className="mx-1 align-middle">Sample</Badge>
-            are demonstration projects shown to illustrate style and scope — they are not client work, and we never present sample content as real client outcomes.
+          <p className="mt-6 flex max-w-2xl items-start gap-4 text-pretty text-lg text-muted-foreground">
+            <span className="mt-3 hidden h-px w-14 shrink-0 bg-electric/70 sm:block" aria-hidden="true" />
+            <span>
+              Websites we have built and videos we have produced. Items marked <Badge variant="secondary" className="mx-1 align-middle">Sample</Badge>
+              are demonstration projects shown to illustrate style and scope — they are not client work, and we never present sample content as real client outcomes.
+            </span>
           </p>
         </div>
       </section>
@@ -73,21 +76,23 @@ export default async function PortfolioPage({
         </nav>
 
         {items.length === 0 ? (
-          <div className="mt-10 rounded-2xl border border-dashed p-12 text-center">
-            <Globe className="mx-auto h-10 w-10 text-muted-foreground/40" aria-hidden="true" />
-            <p className="mt-3 font-medium">No published work in this category yet</p>
-            <p className="mt-1 text-sm text-muted-foreground">
+          <div className="mt-10 rounded-2xl border border-dashed border-border p-12 text-center">
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 ring-1 ring-inset ring-primary/25">
+              <Globe className="h-6 w-6 text-primary" aria-hidden="true" />
+            </span>
+            <p className="mt-4 font-display font-bold">No published work in this category yet</p>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
               We add portfolio pieces regularly. Ask us for relevant examples and we&apos;ll share them directly.
             </p>
-            <Button variant="outline" className="mt-5" asChild>
+            <Button variant="outline" className="mt-6" asChild>
               <Link href="/contact">Request examples <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /></Link>
             </Button>
           </div>
         ) : (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map(w => (
-              <article key={w.id} className="group flex flex-col overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md">
-                <div className="relative aspect-[4/3] overflow-hidden">
+            {items.map((w, i) => (
+              <article key={w.id} className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[0_25px_70px_-55px_rgba(61,35,22,0.6)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_35px_80px_-50px_rgba(61,35,22,0.55)]">
+                <div className="relative aspect-[4/3] overflow-hidden ring-1 ring-inset ring-foreground/5 transition-all duration-300 group-hover:ring-foreground/15">
                   {w.thumbnailUrl && publicFileExists(w.thumbnailUrl) ? (
                     <Image
                       src={w.thumbnailUrl}
@@ -107,21 +112,24 @@ export default async function PortfolioPage({
                   </div>
                 </div>
                 <div className="flex flex-1 flex-col p-5">
-                  <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {w.division === 'VIDEO' ? <Film className="h-3.5 w-3.5" aria-hidden="true" /> : <Globe className="h-3.5 w-3.5" aria-hidden="true" />}
-                    {categoryLabel(w.category)}
-                  </p>
-                  <h2 className="mt-1.5 font-semibold leading-snug">{w.title}</h2>
-                  <p className="mt-1.5 flex-1 text-sm text-muted-foreground">{w.summary}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="eyebrow flex items-center gap-1.5 text-muted-foreground">
+                      {w.division === 'VIDEO' ? <Film className="h-3.5 w-3.5" aria-hidden="true" /> : <Globe className="h-3.5 w-3.5" aria-hidden="true" />}
+                      {categoryLabel(w.category)}
+                    </p>
+                    <span className="text-xs tabular-nums tracking-[0.2em] text-muted-foreground/60" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                  <h2 className="mt-2 font-display text-base font-bold leading-snug">{w.title}</h2>
+                  <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">{w.summary}</p>
                   {(w.projectUrl || w.mediaUrl) && (
-                    <div className="mt-4 flex gap-3">
+                    <div className="mt-4 flex gap-3 border-t border-border pt-4">
                       {w.projectUrl && (
-                        <a href={w.projectUrl} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:underline">
+                        <a href={w.projectUrl} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors hover:text-electric">
                           View project <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                         </a>
                       )}
                       {w.mediaUrl && (
-                        <a href={w.mediaUrl} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:underline">
+                        <a href={w.mediaUrl} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors hover:text-electric">
                           Watch video <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                         </a>
                       )}
@@ -134,10 +142,10 @@ export default async function PortfolioPage({
         )}
       </section>
 
-      <section className="border-t bg-muted/40" aria-label="Call to action">
+      <section className="border-t bg-secondary/45" aria-label="Call to action">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 px-4 py-12 text-center sm:flex-row sm:text-left lg:px-6">
           <p className="max-w-xl text-lg font-medium">Want work like this for your business?</p>
-          <Button size="lg" asChild>
+          <Button size="lg" className="shadow-[0_20px_50px_-25px_rgba(84,26,15,0.5)]" asChild>
             <Link href="/contact">Discuss Your Project <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /></Link>
           </Button>
         </div>

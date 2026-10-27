@@ -99,9 +99,11 @@ export function EnquiryForm() {
 
   if (status === 'success') {
     return (
-      <div className="rounded-2xl border bg-card p-8" role="status" aria-live="polite">
-        <CheckCircle2 className="h-10 w-10 text-emerald-600" aria-hidden="true" />
-        <h2 className="mt-4 text-xl font-bold">Thank you — your enquiry has been saved.</h2>
+      <div className="rounded-2xl border border-border bg-card p-8 shadow-[0_30px_80px_-45px_rgba(61,35,22,0.45)]" role="status" aria-live="polite">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 ring-1 ring-inset ring-primary/25">
+          <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
+        </span>
+        <h2 className="mt-5 text-xl font-bold">Thank you — your enquiry has been saved.</h2>
         {reference && (
           <p className="mt-2 text-sm text-muted-foreground">
             Your reference is <span className="font-mono font-semibold text-foreground">{reference}</span>. Keep it handy if you contact us about this enquiry.
@@ -128,7 +130,7 @@ export function EnquiryForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="rounded-2xl border bg-card p-6 sm:p-8" aria-describedby="enquiry-form-note">
+    <form onSubmit={onSubmit} noValidate className="rounded-2xl border border-border bg-card p-6 shadow-[0_30px_80px_-45px_rgba(61,35,22,0.45)] sm:p-8" aria-describedby="enquiry-form-note">
       {/* Honeypot — visually hidden, ignored by humans, attractive to bots */}
       <div aria-hidden="true" className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
         <label htmlFor="website">Leave this field empty</label>
