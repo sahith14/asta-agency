@@ -1,5 +1,5 @@
 /**
- * AgencyOS seed — creates founder, staff, clients, portal users, website + video projects,
+ * ASTAS agency seed — creates founder, staff, clients, portal users, website + video projects,
  * deliverables across production stages, equipment, a scheduled shoot, tasks, invoices,
  * meetings, contacts and notifications.
  *
@@ -24,23 +24,23 @@ function ref(prefix: string): string {
 }
 
 async function main() {
-  const existing = await db.employee.findUnique({ where: { email: 'founder@agencyos.local' } })
+  const existing = await db.employee.findUnique({ where: { email: 'founder@astas.local' } })
   if (existing) {
     console.log('Seed already applied (founder exists). Skipping.')
     return
   }
 
-  const creds: string[] = ['AgencyOS seed credentials — ' + new Date().toISOString(), 'CHANGE ALL PASSWORDS AFTER FIRST SIGN-IN', '']
+  const creds: string[] = ['ASTAS agency seed credentials — ' + new Date().toISOString(), 'CHANGE ALL PASSWORDS AFTER FIRST SIGN-IN', '']
 
   // ── Founder & staff ──────────────────────────────────────────
   const staffSpec = [
-    { name: 'Founder', email: 'founder@agencyos.local', role: 'OWNER' as const, title: 'Founder & Managing Director' },
-    { name: 'Priya Sharma', email: 'priya@agencyos.local', role: 'CLIENT_MANAGER' as const, title: 'Client Manager' },
-    { name: 'Daniel Osei', email: 'daniel@agencyos.local', role: 'WEB_DEVELOPER' as const, title: 'Web Developer' },
-    { name: 'Hannah Wells', email: 'hannah@agencyos.local', role: 'SUPPORT_FINANCE' as const, title: 'Support & Finance' },
-    { name: 'Marcus Reid', email: 'marcus@agencyos.local', role: 'VIDEOGRAPHER' as const, title: 'Videographer' },
-    { name: 'Elena Kovacs', email: 'elena@agencyos.local', role: 'VIDEO_EDITOR' as const, title: 'Video Editor' },
-    { name: 'Tom Ashworth', email: 'tom@agencyos.local', role: 'CREATIVE_DIRECTOR' as const, title: 'Creative Director' },
+    { name: 'Founder', email: 'founder@astas.local', role: 'OWNER' as const, title: 'Founder & Managing Director' },
+    { name: 'Priya Sharma', email: 'priya@astas.local', role: 'CLIENT_MANAGER' as const, title: 'Client Manager' },
+    { name: 'Daniel Osei', email: 'daniel@astas.local', role: 'WEB_DEVELOPER' as const, title: 'Web Developer' },
+    { name: 'Hannah Wells', email: 'hannah@astas.local', role: 'SUPPORT_FINANCE' as const, title: 'Support & Finance' },
+    { name: 'Marcus Reid', email: 'marcus@astas.local', role: 'VIDEOGRAPHER' as const, title: 'Videographer' },
+    { name: 'Elena Kovacs', email: 'elena@astas.local', role: 'VIDEO_EDITOR' as const, title: 'Video Editor' },
+    { name: 'Tom Ashworth', email: 'tom@astas.local', role: 'CREATIVE_DIRECTOR' as const, title: 'Creative Director' },
   ]
   const staff: Record<string, string> = {}
   for (const s of staffSpec) {
@@ -155,7 +155,7 @@ async function main() {
     if (status === 'CLIENT_REVIEW') {
       await db.videoVersion.create({
         data: {
-          deliverableId: d.id, versionNumber: 1, previewReference: 'https://preview.agencyos.local/anchor-dish-v1',
+          deliverableId: d.id, versionNumber: 1, previewReference: 'https://preview.astas.local/anchor-dish-v1',
           uploadedById: staff['VIDEO_EDITOR'], uploadedByName: 'Elena Kovacs',
           changeSummary: 'First cut — signature dish hero', reviewStatus: 'PENDING_CLIENT',
         },
@@ -164,7 +164,7 @@ async function main() {
     if (status === 'DELIVERED') {
       await db.videoVersion.create({
         data: {
-          deliverableId: d.id, versionNumber: 1, previewReference: 'https://preview.agencyos.local/final-v1',
+          deliverableId: d.id, versionNumber: 1, previewReference: 'https://preview.astas.local/final-v1',
           uploadedById: staff['VIDEO_EDITOR'], uploadedByName: 'Elena Kovacs',
           reviewStatus: 'APPROVED', approvedAt: new Date(now - 2 * 86400000),
         },
@@ -231,12 +231,12 @@ async function main() {
   await seedPortfolio(db)
 
   // ── App settings ─────────────────────────────────────────────
-  await db.appSetting.create({ data: { key: 'agencyName', value: 'AgencyOS Studio' } })
-  await db.appSetting.create({ data: { key: 'supportEmail', value: 'support@agencyos.local' } })
+  await db.appSetting.create({ data: { key: 'agencyName', value: 'ASTAS agency' } })
+  await db.appSetting.create({ data: { key: 'supportEmail', value: 'support@astas.local' } })
   await db.appSetting.create({ data: { key: 'internalQcChecklist', value: 'Correct aspect ratio and resolution\nAudio clarity and levels\nColour consistency\nCaptions and spelling\nBrand assets\nMusic rights\nCorrect export duration\nCorrect call to action\nClient brief compliance\nFinal playback verification' } })
 
   // ── Welcome notification for founder ─────────────────────────
-  await db.notification.create({ data: { userType: 'EMPLOYEE', userId: staff['OWNER'], type: 'WELCOME', title: 'Welcome to AgencyOS', body: 'Video Production division is live. Seed data loaded for verification.', link: '/app' } })
+  await db.notification.create({ data: { userType: 'EMPLOYEE', userId: staff['OWNER'], type: 'WELCOME', title: 'Welcome to ASTAS agency', body: 'Video Production division is live. Seed data loaded for verification.', link: '/app' } })
 
   writeFileSync('.seed-credentials', creds.join('\n') + '\n')
   console.log('Seed complete. Credentials written to .seed-credentials (gitignored).')
