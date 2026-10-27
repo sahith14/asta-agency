@@ -42,7 +42,7 @@ function StaticMonolith() {
         style={{
           background:
             'linear-gradient(105deg, #d9d5cf 0%, #6f6c67 30%, #f2efe9 50%, #5c5955 72%, #c9c5bf 100%)',
-          boxShadow: '0 40px 120px rgba(0,0,0,0.8), inset 0 0 40px rgba(255,176,58,0.08)',
+          boxShadow: '0 40px 120px rgba(0,0,0,0.8), inset 0 0 40px rgba(208,98,83,0.1)',
           transform: 'translateX(-50%) translateY(-58%) perspective(900px) rotateY(-14deg)',
         }}
       />
@@ -103,7 +103,7 @@ export function SceneCanvas() {
   return (
     <div
       ref={hostRef}
-      className="pointer-events-none fixed inset-0 z-0"
+      className="pointer-events-none fixed inset-0 z-[1]"
       aria-hidden="true"
       data-testid="scene-canvas"
     >
@@ -114,6 +114,8 @@ export function SceneCanvas() {
           <MonolithCanvas renderOn={renderOn} />
           {/* vignette keeps edge typography readable over the scene */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_52%,rgba(8,8,7,0.55)_100%)]" />
+          {/* top scrim grounds the transparent header over the scene's light horizon fog */}
+          <div className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#0b0a09]/85 via-[#0b0a09]/40 to-transparent" />
         </>
       ) : (
         <LoadingPlate />

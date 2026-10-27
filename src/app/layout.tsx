@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Syne, Space_Grotesk } from "next/font/google";
+import { Geist, Geist_Mono, Syne, Space_Grotesk, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 // Public-site identity fonts — Syne for cinematic display type,
-// Space Grotesk for readable body copy. Scoped to the public site
-// via `.site-dark`; the app/portal keep Geist.
+// Space Grotesk for readable body copy, Instrument Serif (italic) for
+// editorial accent words. Scoped to the public site via `.site-scope`;
+// the app/portal keep Geist.
 const syne = Syne({
   variable: "--font-display",
   subsets: ["latin"],
@@ -26,6 +27,14 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+});
+
+// Single-style editorial serif for accent words ("feel different.", etc.)
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-editorial",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -54,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} ${spaceGrotesk.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} antialiased bg-background text-foreground`}
       >
         {children}
         <Toaster />

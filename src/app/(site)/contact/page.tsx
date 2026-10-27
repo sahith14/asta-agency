@@ -20,7 +20,7 @@ export default function ContactPage() {
     <>
       <section className="border-b bg-gradient-to-b from-muted/70 to-background" aria-labelledby="contact-heading">
         <div className="mx-auto max-w-6xl px-4 py-14 lg:px-6 lg:py-20">
-          <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Contact</p>
+          <p className="eyebrow flex items-center gap-3 text-electric">Contact<span className="h-px w-10 bg-electric/60" aria-hidden="true" /></p>
           <h1 id="contact-heading" className="mt-2 text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             {site.contact.heading}
           </h1>

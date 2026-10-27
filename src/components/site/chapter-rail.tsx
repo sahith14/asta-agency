@@ -3,8 +3,9 @@
 /**
  * Persistent chapter rail — unobtrusive fixed navigation (desktop, ≥lg only).
  * Tracks the active chapter with an IntersectionObserver; clicking a dot
- * smooth-scrolls to the chapter. Hidden for reduced-motion visitors is NOT
- * needed (jump navigation aids accessibility); it simply never animates.
+ * smooth-scrolls to the chapter. Rendered in white with `mix-blend-mode:
+ * difference` so it stays legible over both ivory and night sections without
+ * JS colour switching. Never animates (jump navigation aids accessibility).
  */
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -53,20 +54,20 @@ export function ChapterRail() {
             onClick={() => scrollToId(c.id)}
             aria-label={`Chapter ${c.num} — ${c.label}`}
             aria-current={isActive ? 'true' : undefined}
-            className="group flex items-center justify-end gap-3"
+            className="group flex items-center justify-end gap-3 text-white mix-blend-difference"
           >
             <span
               className={cn(
-                'eyebrow text-[0.55rem] transition-all duration-300',
-                isActive ? 'text-electric opacity-100' : 'text-muted-foreground opacity-0 group-hover:opacity-100'
+                'eyebrow text-[0.55rem] text-white transition-all duration-300',
+                isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               )}
             >
               {c.num} {c.label}
             </span>
             <span
               className={cn(
-                'block rounded-full transition-all duration-300',
-                isActive ? 'h-6 w-[3px] bg-electric' : 'h-[3px] w-[3px] bg-foreground/40 group-hover:bg-foreground'
+                'block rounded-full bg-white transition-all duration-300',
+                isActive ? 'h-6 w-[3px]' : 'h-[3px] w-[3px] opacity-45 group-hover:opacity-90'
               )}
             />
           </button>

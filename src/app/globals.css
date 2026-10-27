@@ -42,7 +42,13 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-display: var(--font-display);
+  --font-editorial: var(--font-editorial);
   --color-electric: var(--electric);
+  --color-accent-ink: var(--accent-ink);
+  --color-blush: var(--blush);
+  --color-champagne: var(--champagne);
+  --color-taupe: var(--taupe);
+  --color-ivory: var(--ivory);
 }
 
 :root {
@@ -141,70 +147,129 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   PUBLIC SITE IDENTITY — `.site-dark`
-   Dark editorial system for the public marketing site only. Scoped here so
-   the staff app (/app), client portal (/portal) and login keep their existing
-   light theme. Semantic shadcn tokens are overridden inside the scope, so
-   every existing `bg-background` / `text-muted-foreground` style component
-   automatically adopts the dark identity.
+   PUBLIC SITE IDENTITY — `.site-scope`  (Gallery & Oxblood)
+   ═══════════════════════════════════════════════════════════════════════════
+   Light editorial system for the public marketing site: warm ivory/chalk
+   paper, rich charcoal ink, deep oxblood accent, blush/champagne/taupe
+   secondary washes. Scoped so /app, /portal and /login keep their existing
+   light theme untouched.
+
+   Dark cinematic sections (hero monolith, work gallery, finale, footer)
+   add the `.night` class — it flips every semantic token inside that
+   section, so existing `bg-background` / `text-muted-foreground` markup
+   adapts automatically. `--electric` remains the accent token name for
+   historical reasons: it resolves to oxblood in light sections and to a
+   brighter ember burgundy inside `.night`.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Electric amber — the single restrained accent (harmonises with the warm studio imagery) */
-  --electric: oklch(0.8 0.155 68);
+  /* Art-director palette (site-wide defaults = light editorial values) */
+  --electric: oklch(0.46 0.128 22); /* deep oxblood — the signature accent */
+  --accent-ink: oklch(0.97 0.008 85); /* ivory text on oxblood fills */
+  --blush: oklch(0.925 0.028 25); /* muted blush wash */
+  --champagne: oklch(0.885 0.05 85); /* champagne highlight */
+  --taupe: oklch(0.83 0.024 74); /* warm taupe */
+  --ivory: oklch(0.94 0.012 82); /* ivory for text over dark scenes */
 }
 
-.site-dark {
-  --background: oklch(0.135 0.008 75);
-  --foreground: oklch(0.955 0.006 85);
-  --card: oklch(0.17 0.009 75);
-  --card-foreground: oklch(0.955 0.006 85);
-  --popover: oklch(0.16 0.009 75);
-  --popover-foreground: oklch(0.955 0.006 85);
+.site-scope {
+  --background: oklch(0.972 0.007 85); /* warm ivory chalk */
+  --foreground: oklch(0.245 0.014 55); /* rich warm charcoal */
+  --card: oklch(0.988 0.004 85); /* soft chalk card */
+  --card-foreground: oklch(0.245 0.014 55);
+  --popover: oklch(0.988 0.004 85);
+  --popover-foreground: oklch(0.245 0.014 55);
   --primary: var(--electric);
-  --primary-foreground: oklch(0.13 0.008 75);
-  --secondary: oklch(0.215 0.01 75);
-  --secondary-foreground: oklch(0.955 0.006 85);
-  --muted: oklch(0.19 0.009 75);
-  --muted-foreground: oklch(0.66 0.012 80);
-  --accent: oklch(0.215 0.01 75);
-  --accent-foreground: oklch(0.955 0.006 85);
-  --border: oklch(0.255 0.01 75);
-  --input: oklch(0.255 0.01 75);
+  --primary-foreground: var(--accent-ink);
+  --secondary: oklch(0.945 0.012 80); /* taupe wash */
+  --secondary-foreground: oklch(0.245 0.014 55);
+  --muted: oklch(0.945 0.01 82);
+  --muted-foreground: oklch(0.49 0.017 65); /* warm taupe-grey */
+  --accent: oklch(0.94 0.012 80);
+  --accent-foreground: oklch(0.245 0.014 55);
+  --border: oklch(0.885 0.012 78); /* delicate hairline */
+  --input: oklch(0.885 0.012 78);
   --ring: var(--electric);
 
   font-family: var(--font-body), "Geist", ui-sans-serif, system-ui, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-.site-dark h1,
-.site-dark h2,
-.site-dark h3 {
+/* ── Night — cinematic dark sections inside the light site ────────────── */
+.site-scope .night {
+  --background: oklch(0.16 0.012 45); /* warm near-black */
+  --foreground: oklch(0.94 0.012 82); /* ivory */
+  --card: oklch(0.2 0.012 45);
+  --card-foreground: oklch(0.94 0.012 82);
+  --popover: oklch(0.19 0.012 45);
+  --popover-foreground: oklch(0.94 0.012 82);
+  --primary: var(--electric);
+  --primary-foreground: var(--accent-ink);
+  --secondary: oklch(0.24 0.012 48);
+  --secondary-foreground: oklch(0.94 0.012 82);
+  --muted: oklch(0.23 0.01 50);
+  --muted-foreground: oklch(0.67 0.016 75);
+  --accent: oklch(0.24 0.012 48);
+  --accent-foreground: oklch(0.94 0.012 82);
+  --border: oklch(0.29 0.012 50);
+  --input: oklch(0.29 0.012 50);
+  --ring: var(--electric);
+
+  /* ember burgundy — brighter than oxblood so it stays legible on black */
+  --electric: oklch(0.69 0.13 27);
+  --accent-ink: oklch(0.15 0.012 45);
+}
+
+.site-scope h1,
+.site-scope h2,
+.site-scope h3 {
   font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   letter-spacing: -0.01em;
 }
 
-.site-dark ::selection {
+.site-scope ::selection {
   background: var(--electric);
-  color: oklch(0.13 0.008 75);
+  color: var(--accent-ink);
 }
 
-.site-dark *:focus-visible {
+.site-scope *:focus-visible {
   outline: 2px solid var(--electric);
   outline-offset: 2px;
 }
 
-.site-dark .scrollbar-slim,
-.site-dark [role="dialog"] {
+.site-scope .scrollbar-slim,
+.site-scope [role="dialog"] {
   scrollbar-width: thin;
-  scrollbar-color: oklch(0.3 0.01 75) transparent;
+  scrollbar-color: var(--border) transparent;
 }
 
-/* ── Cinematic helpers ─────────────────────────────────────────────────── */
+/* ── Cinematic & editorial helpers ────────────────────────────────────── */
 
-/* Chrome/silver gradient text for select display moments */
-.site-dark .chrome-text {
+/* Mono-ish metadata styling (uses body font, spaced uppercase) */
+.site-scope .eyebrow {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Hairline metadata separators */
+.site-scope .hairline {
+  border-color: var(--border);
+}
+
+/* Editorial serif accent — Instrument Serif italic for display moments */
+.site-scope .editorial {
+  font-family: var(--font-editorial), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Chrome/silver gradient text for select display moments on night sections */
+.site-scope .chrome-text {
   background: linear-gradient(
     100deg,
     oklch(0.92 0.004 85) 0%,
@@ -218,30 +283,61 @@
   color: transparent;
 }
 
-/* Hairline metadata separators */
-.site-dark .hairline {
-  border-color: oklch(0.28 0.008 75);
+/* Oxblood gradient text for light display moments */
+.site-scope .oxblood-text {
+  background: linear-gradient(
+    100deg,
+    oklch(0.5 0.13 22) 0%,
+    oklch(0.38 0.11 25) 45%,
+    oklch(0.52 0.125 20) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
-/* Mono-ish metadata styling (uses body font, spaced uppercase) */
-.site-dark .eyebrow {
-  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.6875rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  font-weight: 500;
+/* Ghost outline numeral — oversized chapter numbers */
+.site-scope .ghost-num {
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in oklab, currentColor 26%, transparent);
 }
 
-/* Subtle film-grain overlay for the hero (pure CSS, no assets) */
-.site-dark .grain::after {
+/* Paper grain — used sparingly. Light scope: multiply; night: soft overlay */
+.site-scope .grain::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.05;
+  opacity: 0.045;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   background-size: 160px 160px;
+  mix-blend-mode: multiply;
+}
+
+.site-scope .night .grain::after,
+.site-scope .grain.night-grain::after {
   mix-blend-mode: overlay;
+  opacity: 0.06;
+}
+
+/* Ambient light — soft atmospheric washes (attach to a relative section) */
+.site-scope .ambient-ivory {
+  background-image:
+    radial-gradient(42rem 30rem at 85% -10%, color-mix(in oklab, var(--champagne) 40%, transparent), transparent 70%),
+    radial-gradient(38rem 28rem at -12% 30%, color-mix(in oklab, var(--blush) 45%, transparent), transparent 72%);
+}
+
+.site-scope .ambient-taupe {
+  background-image:
+    radial-gradient(46rem 32rem at 12% -12%, color-mix(in oklab, var(--blush) 55%, transparent), transparent 70%),
+    radial-gradient(40rem 30rem at 95% 40%, color-mix(in oklab, var(--taupe) 45%, transparent), transparent 72%);
+}
+
+.site-scope .night.ambient-night,
+.site-scope .ambient-night {
+  background-image:
+    radial-gradient(44rem 30rem at 88% -8%, color-mix(in oklab, oklch(0.45 0.09 27) 26%, transparent), transparent 72%),
+    radial-gradient(36rem 26rem at -10% 70%, color-mix(in oklab, oklch(0.4 0.06 60) 22%, transparent), transparent 70%);
 }
 
 /* Marquee strip */
@@ -249,7 +345,7 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-.site-dark .marquee-track {
+.site-scope .marquee-track {
   animation: site-marquee 36s linear infinite;
 }
 
@@ -259,19 +355,29 @@
   60% { transform: translateY(200%); }
   100% { transform: translateY(200%); }
 }
-.site-dark .scroll-drip {
+.site-scope .scroll-drip {
   animation: site-scrolldrip 2.2s ease-in-out infinite;
+}
+
+/* Slow editorial drift for layered hero frames */
+@keyframes site-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0.0001deg); }
+  50% { transform: translate3d(0, -10px, 0) rotate(0.0001deg); }
+}
+.site-scope .drift {
+  animation: site-drift 9s ease-in-out infinite;
 }
 
 /* Respect reduced-motion: kill decorative loops inside the site scope */
 @media (prefers-reduced-motion: reduce) {
-  .site-dark .marquee-track,
-  .site-dark .scroll-drip {
+  .site-scope .marquee-track,
+  .site-scope .scroll-drip,
+  .site-scope .drift {
     animation: none;
   }
-  .site-dark *,
-  .site-dark *::before,
-  .site-dark *::after {
+  .site-scope *,
+  .site-scope *::before,
+  .site-scope *::after {
     scroll-behavior: auto !important;
   }
 }

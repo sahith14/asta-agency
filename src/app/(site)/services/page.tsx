@@ -14,9 +14,9 @@ export default function ServicesPage() {
     <>
       <section className="border-b bg-gradient-to-b from-muted/70 to-background" aria-labelledby="services-page-heading">
         <div className="mx-auto max-w-6xl px-4 py-14 lg:px-6 lg:py-20">
-          <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Services</p>
+          <p className="eyebrow flex items-center gap-3 text-electric">Services<span className="h-px w-10 bg-electric/60" aria-hidden="true" /></p>
           <h1 id="services-page-heading" className="mt-2 max-w-3xl text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            Everything your brand needs online — built and filmed by one team
+            Everything your brand needs online — built and filmed by <em className="editorial font-normal">one team</em>
           </h1>
           <p className="mt-4 max-w-2xl text-pretty text-lg text-muted-foreground">
             We keep two divisions under one roof so your website and your video content are planned together, produced professionally and delivered on schedule.

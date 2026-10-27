@@ -24,7 +24,7 @@ import { motion as motionStore, type QualityTier } from '@/lib/site/motion'
 import { useRoomEnvironment } from './use-room-environment'
 
 const BG = new THREE.Color('#0d0c0a')
-const ELECTRIC = new THREE.Color('#ffb03a')
+const ELECTRIC = new THREE.Color('#d06253')
 
 /* ── Fresnel rim shader (the "lightweight custom shader") ─────────────────── */
 const fresnelVertex = /* glsl */ `

@@ -2,7 +2,8 @@
 
 /**
  * Public site header — slim cinematic bar.
- * Transparent over the 3D hero, solidifies on scroll. Always-available routes
+ * Transparent over the dark 3D hero (light text via `onDark`), resolves into
+ * an ivory paper bar on scroll or on light pages. Always-available routes
  * (Services / Work / About / Contact), Client + Staff login, and the primary
  * "Start a project" action which opens the genuine project configurator.
  */
@@ -50,23 +51,34 @@ export function SiteHeader() {
     }
   }, [open])
 
-  /* Mobile links close the menu via their own onClick handlers. */
+  /* Over the dark opening hero (homepage, top of page) the bar stays
+     transparent and the chrome flips to ivory for contrast. */
+  const onDark = pathname === '/' && !scrolled && !open
 
   return (
     <>
       <header
         className={cn(
-          'sticky top-0 z-50 border-b transition-colors duration-500',
+          'sticky top-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-500',
+          /* on the homepage the opening hero slides under the transparent bar */
+          pathname === '/' && '-mb-16',
           scrolled || open
-            ? 'border-border/80 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70'
+            ? 'border-border/80 bg-background/90 shadow-[0_1px_24px_rgba(38,26,22,0.06)] backdrop-blur-md supports-[backdrop-filter]:bg-background/75'
             : 'border-transparent bg-transparent'
         )}
         data-testid="site-header"
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-5 sm:px-8 lg:px-12">
-          <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label={`${site.company.name} home`}>
+          <Link
+            href="/"
+            className={cn(
+              'group flex shrink-0 items-center gap-2.5 transition-colors',
+              onDark ? 'text-ivory' : 'text-foreground'
+            )}
+            aria-label={`${site.company.name} home`}
+          >
             {/* monolith mark */}
-            <span className="relative flex h-8 w-[18px] items-stretch overflow-hidden rounded-[3px] shadow-[0_0_18px_rgba(255,176,58,0.25)]">
+            <span className="relative flex h-8 w-[18px] items-stretch overflow-hidden rounded-[3px] shadow-[0_0_18px_rgba(178,58,52,0.3)]">
               <span
                 className="h-full w-full"
                 style={{
@@ -75,12 +87,12 @@ export function SiteHeader() {
                 }}
                 aria-hidden="true"
               />
-              <span className="absolute inset-y-0 right-0 w-[2px] bg-electric/80" aria-hidden="true" />
+              <span className="absolute inset-y-0 right-0 w-[2px] bg-electric/90" aria-hidden="true" />
             </span>
             <span className="text-[0.95rem] font-bold tracking-[0.08em]">{site.company.name}</span>
           </Link>
 
-          <nav aria-label="Main" className="ml-auto hidden items-center gap-7 lg:flex">
+          <nav aria-label="Main" className={cn('ml-auto hidden items-center gap-7 lg:flex', onDark && 'text-ivory')}>
             {NAV_LINKS.map(l => (
               <Link
                 key={l.href}
@@ -88,7 +100,13 @@ export function SiteHeader() {
                 aria-current={isActive(pathname, l.href) ? 'page' : undefined}
                 className={cn(
                   'group relative py-2 text-[0.78rem] font-medium uppercase tracking-[0.16em] transition-colors',
-                  isActive(pathname, l.href) ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                  onDark
+                    ? isActive(pathname, l.href)
+                      ? 'text-white'
+                      : 'text-white/65 hover:text-white'
+                    : isActive(pathname, l.href)
+                      ? 'text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {l.label}
@@ -106,7 +124,10 @@ export function SiteHeader() {
           <div className="ml-auto flex items-center gap-1.5 lg:ml-6">
             <Link
               href="/login"
-              className="hidden min-h-11 items-center gap-1.5 rounded-full px-3.5 text-[0.72rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+              className={cn(
+                'hidden min-h-11 items-center gap-1.5 rounded-full px-3.5 text-[0.72rem] font-medium uppercase tracking-[0.14em] transition-colors sm:inline-flex',
+                onDark ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+              )}
             >
               <LogIn className="h-3.5 w-3.5" aria-hidden="true" />
               Client Login
@@ -114,7 +135,10 @@ export function SiteHeader() {
             <Link
               href="/login"
               aria-label="Staff login"
-              className="hidden min-h-11 min-w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground lg:inline-flex"
+              className={cn(
+                'hidden min-h-11 min-w-11 items-center justify-center rounded-full transition-colors lg:inline-flex',
+                onDark ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+              )}
             >
               <KeyRound className="h-4 w-4" aria-hidden="true" />
             </Link>
@@ -122,7 +146,7 @@ export function SiteHeader() {
               type="button"
               onClick={() => openConfigurator()}
               data-testid="header-start-project"
-              className="inline-flex min-h-11 items-center rounded-full bg-electric px-5 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-black transition-transform hover:scale-[1.03] active:scale-[0.98]"
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full bg-electric px-5 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[var(--accent-ink)] transition-transform hover:scale-[1.03] active:scale-[0.98]"
             >
               Start a project
             </button>
@@ -131,7 +155,10 @@ export function SiteHeader() {
               onClick={() => setOpen(v => !v)}
               aria-label={open ? 'Close menu' : 'Open menu'}
               aria-expanded={open}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-white/5 lg:hidden"
+              className={cn(
+                'flex h-11 w-11 items-center justify-center rounded-full transition-colors lg:hidden',
+                onDark ? 'text-white hover:bg-white/10' : 'text-foreground hover:bg-foreground/5'
+              )}
             >
               {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
             </button>
@@ -141,8 +168,9 @@ export function SiteHeader() {
 
       {/* Mobile navigation — full-screen chapter menu */}
       {open && (
-        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
-          <div className="absolute inset-0 bg-background" aria-hidden="true" />
+        <div className="fixed inset-0 z-40 bg-background text-foreground lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
+          {/* subtle warm wash behind the menu links */}
+          <div aria-hidden="true" className="ambient-taupe absolute inset-0 opacity-70" />
           <nav aria-label="Mobile" className="relative flex h-full flex-col justify-center px-8">
             {[{ href: '/', label: 'Home' }, ...NAV_LINKS].map((l, i) => (
               <Link
@@ -151,7 +179,7 @@ export function SiteHeader() {
                 onClick={() => setOpen(false)}
                 aria-current={isActive(pathname, l.href) ? 'page' : undefined}
                 className={cn(
-                  'flex items-baseline gap-4 border-b border-border/60 py-4 text-3xl font-extrabold uppercase tracking-tight transition-colors',
+                  'flex items-baseline gap-4 border-b border-border/70 py-4 text-3xl font-extrabold uppercase tracking-tight transition-colors',
                   isActive(pathname, l.href) ? 'text-electric' : 'text-foreground'
                 )}
               >

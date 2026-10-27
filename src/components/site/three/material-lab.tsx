@@ -55,7 +55,7 @@ function ChromeForm({
 }
 
 const LIGHTS = [
-  { name: 'Amber', value: '#ffb03a' },
+  { name: 'Oxblood', value: '#a8434d' },
   { name: 'Studio white', value: '#ffffff' },
   { name: 'Steel', value: '#c9d2dd' },
 ]

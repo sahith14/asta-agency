@@ -18,7 +18,7 @@ export default function AboutPage() {
     <>
       <section className="border-b bg-gradient-to-b from-muted/70 to-background" aria-labelledby="about-heading">
         <div className="mx-auto max-w-6xl px-4 py-14 lg:px-6 lg:py-20">
-          <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">About us</p>
+          <p className="eyebrow flex items-center gap-3 text-electric">About us<span className="h-px w-10 bg-electric/60" aria-hidden="true" /></p>
           <h1 id="about-heading" className="mt-2 max-w-3xl text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             {site.about.heading}
           </h1>

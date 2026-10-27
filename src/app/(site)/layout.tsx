@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function PublicSiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="site-dark relative flex min-h-screen flex-col bg-background text-foreground">
+    <div className="site-scope relative flex min-h-screen flex-col bg-background text-foreground">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[80] focus:rounded-md focus:bg-electric focus:px-4 focus:py-2 focus:text-black"

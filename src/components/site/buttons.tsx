@@ -89,9 +89,9 @@ const liquidBase =
   'group/liquid relative inline-flex min-h-11 cursor-pointer items-center justify-center overflow-hidden rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.18em] transition-colors duration-300 select-none'
 
 const liquidVariants: Record<LiquidVariant, string> = {
-  primary: 'bg-electric text-black hover:text-black',
-  ghost: 'bg-transparent text-foreground hover:text-black',
-  outline: 'bg-transparent text-foreground border border-border hover:text-black',
+  primary: 'bg-electric text-[var(--accent-ink)] hover:text-[var(--accent-ink)]',
+  ghost: 'bg-transparent text-foreground hover:text-[var(--accent-ink)]',
+  outline: 'bg-transparent text-foreground border border-border hover:text-[var(--accent-ink)] hover:border-electric/50',
 }
 
 export function LiquidCTA({

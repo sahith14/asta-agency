@@ -413,3 +413,161 @@ Stage Summary:
 - Brand name is now "ASTA AGENCY" everywhere user-visible; change is text-only, no logic touched.
 - Working tree has 4 modified files, uncommitted (no commit authorized for this task).
 - Known leftover: placeholder email still contains "astas" spelling — intentionally preserved.
+
+---
+Task ID: AESTH-3-c
+Agent: frontend-styling-expert
+Task: Visual refinement — Chapter 03 "Explore the work" showroom art-directed into a cinematic dark gallery (Gallery & Oxblood night treatment), functionality preserved.
+
+Work Log:
+- Read worklog.md, globals.css design system (.night token flip, .eyebrow/.editorial/.chrome-text/.hairline, --electric ember on night, --accent-ink), chapter.tsx scaffold (AccentWord/ChapterSection tones), buttons.tsx (Tilt).
+- Rewrote src/components/site/chapters/showroom.tsx (only file edited):
+  - Header: passed tone="night" to ChapterSection (flips semantic tokens + ambient-night glow + grain + top gradient hairline automatically); title is now JSX `Explore the <AccentWord>work</AccentWord>`; lede copy unchanged.
+  - Filters: rebuilt as hairline-framed pill tray (rounded-full border hairline bg-card/60 p-1.5 backdrop-blur); active pill is solid ember bg-electric via the same layoutId="filter-pill" motion span, labels switch to text-[var(--accent-ink)] when active; added a static (non-motion) bg-electric pill for prefers-reduced-motion users so the ember state still renders; kept aria-pressed, min-h-9, role="group", all values/labels.
+  - Grid: kept SPANS asymmetric rhythm, group-hover scale 1.045, Tilt maxDeg 4, gradient scrim; added gallery-mat treatment — ring-1 ring-inset ring-white/10 (brightens to white/25 on hover) + deep shadow; index plate is now a "01 / 09"-style mono pair (index/filtered-total) top-left; title promoted to ivory Syne (font-display text-ivory extrabold); ember category eyebrow kept; summary hover reveal kept incl. max-lg:opacity-100; "View project" hairline-extend polished (ember line w-6 -> w-12, custom ease); each canvas got a hairline frame plate underneath carrying categoryLabel (mono, muted) and honest status (Sample in ember / Published in muted); Sample badge upgraded to bordered translucent chip with backdrop blur.
+  - Detail overlay: content column restyled — larger Syne title (up to lg:text-4xl), description measure max-w-2xl, Sample chip restyled as ember-tinted outline chip, hairline separator above the footnote row (conditionally rendered via hasFootnote), "Visit live site" is now an outline pill that fills ember on hover with accent-ink text; close button got border-white/15 + backdrop blur and hover:bg-electric hover:text-[var(--accent-ink)] (replaced hover:text-black); panel shadow deepened (shadow-black/60). Structure, video/image branching, AnimatePresence, Escape-close, body scroll lock, data-testid="showroom-detail", role="dialog"/aria-modal all unchanged.
+  - Empty state: hairline-framed dashed card with ember-ringed icon medallion; copy unchanged. Footer link: full-width top hairline rule, growing ember sweep, mono "/portfolio" path label on sm+; href="/portfolio" kept.
+  - Motion: staggered card entrance via delay (idx % 3) * 0.08, zeroed under useReducedMotion; all transitions use ease [0.22,1,0.36,1]; transforms/opacity only.
+- Verified preserved contracts by grep: ShowroomItem interface export, ShowroomChapter props, filter logic, setActive/Escape/scroll-lock effect, data-testids (showroom-grid / showroom-item-N / showroom-detail), aria roles/labels, min-h-[240px] mobile flow mechanism, SPANS, video branching, isDemo badges, hrefs. Tailwind 4.1.18 confirmed to support ring-inset. No new deps, no emojis, TS strict compatible; dev server/lint/tsc/commit NOT run per task constraints.
+
+Stage Summary:
+- Chapter 03 now renders as a cinematic dark gallery: night tokens, ember active filters, gallery-mat canvases with frame plates, refined cinematic overlay — presentation-only change; all behavior, data flow, a11y and testids intact.
+- Single file modified (src/components/site/chapters/showroom.tsx), uncommitted; awaiting visual QA pass in browser.
+
+---
+Task ID: AESTH-3-b
+Agent: frontend-styling-expert
+Task: Art-direct Chapter 02 "Discover the capabilities" (src/components/site/chapters/capabilities.tsx) into an editorial showcase on the Gallery & Oxblood light-ivory system — visual refinement only, zero behaviour changes.
+
+Work Log:
+- Context pass first: globals.css (site-scope tokens/utilities), chapter.tsx (AccentWord + tone system), buttons.tsx (Tilt/CinematicLink), page.tsx contract (VideoPanel import, videoPanels prop from publicFileExists flags), sibling showroom.tsx conventions (title={<>...<AccentWord>...}</> pattern, asymmetric rhythm).
+- Chapter header: title now passes a serif accent — <>Discover the <AccentWord>capabilities</AccentWord></>; both division h3s accented too ("Website & digital experiences", "Video & visual production"). Division eyebrows restyled as oxblood eyebrow + short hairline dash, mirroring the ChapterSection header motif.
+- Division A staged as the visual anchor: motion wrapper with .ambient-ivory wash + champagne ellipse glow (blur-3xl) + blush accent orb behind the frame; "projection bench" under it (soft foreground cast-shadow ellipse over a gradient hairline floor line); frame shadow retuned for light ivory (rgba(36,20,14,0.45) instead of black/50) + ring-foreground/5.
+- Browser chrome upgraded: traffic dots recolored oxblood/champagne/taupe with hairline rings; URL pill now bordered secondary-fill with Lock glyph, uppercase tracking, same honest copy "live demo — real UI, no data sent". Oxblood "LIVE DEMO" chip (accent-ink text, motion-safe pulse dot) overlaps the frame's top-left corner.
+- Device toggle refined into a segmented control: bg-card pill container; active = bg-electric + text-[var(--accent-ink)] (fixes old text-black-on-oxblood); inactive = muted. role="group"/aria-pressed/aria-label preserved verbatim.
+- Preserved exactly: MiniSiteDemo internals + amber "The Anchor" identity (byte-for-byte), device state, layout spring, maxWidth 320px mobile behaviour, h-[420px]/h-[480px] height transition, data-testid="web-demo-frame" and "video-panels", all aria labels, all CinematicLink hrefs, VideoPanel export, videoPanels prop contract.
+- Division B editorialized: uniform aspect-[4/5] cards replaced by varied rhythm (3/4 / 4/5 / 1/1 / 16/10 via PANEL_RHYTHM) with desktop-only offsets (lg:mt-10, lg:-mt-3, lg:mt-5); mobile stays a clean offset-free 2-col grid. Captions moved BELOW each frame as chalk plaques: hairline top rule, oxblood eyebrow category, mono index 01-04, muted note — chosen over overlay as the more editorial (gallery-label) option. Image scrim softened (captions no longer need the black/85 gradient); "Sample" chip kept honestly, + whisper backdrop-blur. Fixed a latent conflict: old sm:translate-y-6 offset lived on the Tilt root and was wiped by Tilt's inline hover transform — offsets now sit on an outer motion wrapper.
+- Capability matrix refined: mono index 01-04 per column, oxblood Syne h4 headings, hairline rule under each heading block, oxblood list ticks, per-column hover ring (border darkens to foreground/20) inside the gap-px hairline grid, chalk cards on ivory. Every list item verbatim. Full service pages row kept verbatim + hairline top rule.
+- Motion: staggered whileInView entrances (stage 0.8s; panels i*0.07; matrix i*0.06), viewport={{once:true, margin:'-60px'}}, ease [0.22,1,0.36,1], all gated by useReducedMotion; transforms/opacity only. No new deps; no dev server/lint/tsc/commit per constraints (bracket-balance + invariant greps used as static sanity checks).
+
+Stage Summary:
+- Chapter 02 now reads as a light-editorial gallery: the live demo hangs on a projection stage as the anchor, the sample gallery is hung with varied aspects + plaques, and the matrix reads as an indexed exhibition checklist — with all working UI, testids, a11y labels and prop contracts untouched.
+- Single file changed: src/components/site/chapters/capabilities.tsx (uncommitted per task rules). Follow-up candidate: visual QA pass in browser + pixel check of the negative lg:-mt-3 offset at lg breakpoint.
+---
+Task ID: AESTH-3-d
+Agent: frontend-styling-expert
+Task: AESTH-3-d — Visual refinement of Chapter 04 "Experience the craft" into a creative-studio exhibit hall (light ivory scope). Only file edited: src/components/site/chapters/craft.tsx. All three interactive exhibits (L-01 lazy R3F material lab, L-02 pointer-reactive type lab, L-03 draggable before/after grade) stay genuine and fully functional.
+
+Work Log:
+- Read worklog context, globals.css (Gallery & Oxblood system), chapter.tsx scaffold (AccentWord/tones) and craft.tsx before touching anything; confirmed compare image source (public/images/site/work-website.jpg, 1152x864) and no external consumers of the lab internals (data-testids live only here)
+- Header: title now uses the established pattern title={<>Experience the <AccentWord>craft</AccentWord></>}; dropped tone="solid" so the chapter renders on the ChapterSection default light ivory tone
+- New local ExhibitFrame({ code, title, tag, caption, delay, className, children }): chalk card (bg-card, hairline border-border, soft warm shadow) with a museum-plaque header row (mono code in text-electric, Syne h3 mini-title, right-aligned oxblood-tinted tag chip bg-electric/[0.07] + border-electric/25), full-bleed children viewport, and a caption footer (hairline top border, small muted text). Rises in staggered whileInView (delay 0 / 0.08 / 0.1, house ease [0.22,1,0.36,1]) via useReducedMotion gating
+- L-01: dynamic MaterialLab import (ssr:false), webglOn detection effect and useInView gating with active={inView && !reduced} all preserved untouched; material-lab.tsx NOT modified — its own chalk chrome is flattened from outside via a scoped [&>div]:rounded-none/border-0/bg-transparent wrapper so the frame is the single card and the dark viewport + control plinth read as part of the exhibit. WebGL-off fallback now framed too, restyled as a matching dark stage (interior gradient, white/40 etched label "L-01 · MATERIAL STUDY", honest copy verbatim)
+- L-02: interior colours pinned explicitly for the dark-stage-on-light-scope situation — letters text-[#f2efe9] (warm chalk), touched/active letter text-[#d06253] (ember), corner label text-white/40, hint text-white/45; pointer-repel physics (rAF loop, influence/rotate/fontVariationSettings), touch tap (450 ms), role="img" + aria-label, data-testid="type-lab" and the word MOTION kept exactly; viewport now h-[18rem]/sm:h-[21rem] for alternating-height rhythm vs L-01
+- L-03: drag mechanics (pointer capture, setFromClientX clamp 4-96), slider (id compare-range + aria-label) and data-testid="compare-lab" untouched; handle circle keeps bg-electric but text is now text-[var(--accent-ink)] (never text-black on oxblood); Raw chip refined to white/85 on black/60 with backdrop blur, Treated chip is now a solid ember chip bg-[#d06253] with dark ink text-[#0d0c0a] (AA-checked ~5.5:1); corner label stays text-white/60; media re-staged as an inset rounded dark screen (max-w-4xl, h-72/sm:h-80/lg:h-[25rem], subtle depth shadow) on the full-width frame, Image sizes updated to match the new geometry; slider label row stays on the chalk plinth below with scope tokens; the honest caption sentence moved into the frame's caption footer so all three exhibits share one plaque/caption convention
+- Layout: grid lg:grid-cols-2 lg:items-start (L-01 + L-02 side by side with intentionally alternating heights), L-03 in lg:col-span-2 as the wide centrepiece with inset media; verified 390px arithmetic (letter row ~336px worst case inside 350px card, plaques flex-wrap, no fixed widths beyond max-w) — no horizontal overflow sources added
+- Compliance: no new deps, no emojis, TypeScript strict types on ExhibitFrame, only craft.tsx touched; dev server/lint/tsc/commit deliberately not run per task constraints
+
+Stage Summary:
+- Chapter 04 now reads as an exhibit hall: each genuine experiment is a framed, plaque-labelled, honestly captioned exhibit on light ivory, with the dark viewports reading as mounted screens
+- All interactivity and contracts preserved verbatim: dynamic import/ssr:false, webgl fallback, in-view frameloop gating, reduced-motion gating (both useReducedMotion and motionReduced()), pointer/drag/slider logic, data-testids (type-lab, compare-lab), aria labels, compareImage/compareOk props
+- Known follow-up (outside this task's file scope): none blocking — material-lab.tsx chrome flattening is external CSS so any future edit to its root element classes should be cross-checked against the [&>div] wrapper in craft.tsx
+
+---
+Task ID: AESTH-3-a
+Agent: frontend-styling-expert
+Task: Hero chapter art direction
+
+Work Log:
+- Read worklog (ASTAS-3D / LAUNCH-VERIFY / RENAME-1 context), globals.css design system (.night token flip, .eyebrow/.editorial/.chrome-text/.grain/.marquee-track/.scroll-drip helpers), chapter.tsx scaffold, buttons.tsx (Magnetic/LiquidCTA), chapter-rail.tsx (fixed right-6 rail — collision constraint for the headline), motion.ts (scrollToId/reducedMotion)
+- Rewrote ONLY src/components/site/chapters/hero.tsx; section className + id="ch-hero" + aria-label + both scrims preserved verbatim; all imports, data-testids, configurator/scrollToId wiring kept
+- Headline: kept exact copy "We make digital" / "feel different." as data-testid="hero-heading"; rebuilt as controlled kinetic composition — two overflow-hidden line wrappers with inner motion.span y:'110%'→0 staggered (0.3s/0.44s, ease [0.22,1,0.36,1], reduced-motion = initial:false static); line 1 foreground (ivory on night), line 2 chrome-text with <em className="editorial font-normal">different.</em> nested inside for the serif-italic accent; clamp raised to clamp(2.4rem,6.5vw,5.2rem) at ≥480px with a mobile-safe clamp(2.1rem,6.5vw,5.2rem) floor below 480px (Syne wide metrics — guarantees 2-line fit at 390px; no page overflow), lg:pr-44 added to clear the fixed chapter rail
+- Metadata: eyebrow kept verbatim (site.company.name — Website & digital · Video production) with a short electric hairline dash added (matches ChapterSection pattern); new bottom-left corner annotation stack (lg only) — "Digital experiences" / "Film & visual production" eyebrow lines each led by a hairline; gated via arbitrary variant [@media(min-width:1024px)_and_(min-height:720px)] so it can never crowd the CTA row on short windows; aria-hidden, pointer-events-none
+- Pointer parallax: new local useCornerParallax hook on the annotation layer — rAF-throttled pointermove → useMotionValue → useSpring (max ±10px), fine pointers only, disabled for reduced motion/touch; static fallback applies NO transform (style=undefined when disabled); headline itself never parallaxed
+- CTAs: exact labels/tests preserved ("Explore the studio" primary → scrollToId('ch-work'), "Start a project" outline → openConfigurator(), each in Magnetic); hierarchy refined — primary px-8 (wider), outline dimmed to text-muted-foreground/90, vertical hairline divider between (sm+), "No account needed to browse." restyled as eyebrow meta with compact sm:max-w-44 block
+- Lede: same copy; added thin oxblood rule (h-px w-14 bg-electric/80) above, leading-[1.75], kept max-w-xl
+- Scroll cue: kept Scroll · 01/06 + scroll-drip; polished — taller h-14 drip line, bg-border/80, gap-3.5, softened label (text-muted-foreground/85)
+- Marquee: same items/aria-hidden/marquee-track loop math (gap-8 + pr-8 untouched); restyled — border-t-only hairline (dropped border-y), py-3.5 for air, ember dots bg-electric/80, horizontal mask-image fade at both edges (webkit prefix included)
+- Verified WITHOUT running dev server/lint/tsc: standalone @tailwindcss/postcss compile confirmed all risky arbitrary classes generate valid CSS (min-480px clamp media wrap, compound min-width/min-height variant, mask-image pair, sm:max-w-44); curl smoke of running HMR server → GET / 200 with all testids, em accent, annotation stack and clamp variants present in SSR markup
+- Appended this worklog entry; no commit (not authorized)
+
+Stage Summary:
+- Hero is now a staged cinematic composition: masked kinetic 2-line headline with chrome serif-italic accent, eyebrow hairline system, hairline-divided CTA pair with dominant primary, oxblood-ruled lede, corner metadata stack with gentle ±10px spring parallax, polished scroll cue, airier ember-dot marquee — approx 10-15% more expressive while the 3D monolith stays the sole focal object
+- All a11y/behavior contracts intact: section aria-label, hero-heading/hero-explore/hero-start-project testids, configurator + ch-work wiring, aria-hidden on decorative layers, reduced-motion static fallbacks (line reveals, parallax off, CSS loops killed by globals)
+- 390px fit guaranteed via mobile-safe clamp floor; rail collision prevented via lg:pr-44; annotation stack hidden below lg width AND below 720px viewport height
+- Only hero.tsx modified; awaiting coordinator lint/tsc/browser pass
+
+---
+Task ID: AESTH-3-f
+Agent: frontend-styling-expert
+Task: Presentation-only polish of the project configurator modal (src/components/site/configurator/configurator.tsx) on the Gallery & Oxblood light scope — accent pairings, 7-segment progress bar, OptionCard/Chip refinements, AnimatePresence step transitions, review/success/input polish. Absolute logic preservation of the live 7-step enquiry funnel.
+
+Work Log:
+- Context pass first: worklog.md, globals.css (site-scope tokens: --electric oxblood, --accent-ink ivory, blush/champagne washes, .eyebrow), configurator-store.ts (read-only; setStep/patch/reset/openedAt contract confirmed), configurator.tsx (full read before editing)
+- Accent pairings: every text-black on a bg-electric fill replaced with text-[var(--accent-ink)] — OptionCard check circle, Continue button, Submit button, SuccessPanel check disc, Done button (zero text-black remain; bg-black/80 scrim untouched). Error box keeps foreground text per spec
+- Progress indicator: kept the "02/07" eyebrow and the {!reference} guard; single hairline replaced by a 7-segment tick bar (h-1 rounded-full, gap-1, base bg-border, past segments bg-electric, current segment fills via motion.span width 0%→100% at duration 0.45 with house ease, future segments empty; aria-hidden bar since the counter text announces progress); added right-aligned subtle "Step {step} of 7" eyebrow (step title already lives in the h2)
+- OptionCard: selected = border-electric + bg-blush/60 + text-foreground; check circle bg-electric/border-electric with Check in accent-ink (strokeWidth 3) inside a motion.span scale/opacity pop (0.4→1, 0.18s) gated by useReducedMotion; unselected gains hover:-translate-y-px (transition-all already present). aria-pressed + min-h-11 preserved
+- Chip: selected now solid — border-electric bg-electric text-[var(--accent-ink)] (was bg-electric/15 wash); unselected hover unchanged; aria-pressed + min-h-11 preserved
+- Step transitions: the step-body fragment (NOT SuccessPanel) wrapped in <AnimatePresence mode="wait" initial={false}> + <motion.div key={step}> — enter {opacity:0,y:14}→{1,0}, exit {opacity:0,y:-10}, 0.28s house ease; reduced-motion falls back to initial=false + opacity-only exit. h2/headingRef unmoved so the step-change focus effect still fires; Escape/scroll-lock effect untouched
+- Review screen: rows converted from bordered cards to hairline rows (border-b, py-4, first:pt-0 last:border-b-0, container grid without gap-3) with an aria-hidden mono step-index chip (String(step).padStart '0' — doubles as the step the Edit button returns to); Edit button hover:border-electric hover:text-electric, min-h-11 and setStep wiring kept verbatim; error box copy/classes untouched
+- Success panel: oxblood check disc with accent-ink Check + soft shadow-lg shadow-electric/25; reference chip bg-background/60 + hairline; ALL copy verbatim (successNote, keep-this-reference line, "Your brief is in."); data-testid="configurator-reference" and all other testids verified present
+- Inputs: inputCls gained transition-colors + focus:ring-2 focus:ring-electric/25 (kept focus:border-electric focus:outline-none); textarea shares inputCls via cn so it inherits the same treatment
+- Shell: header block gains a champagne top wash (bg-gradient-to-b from-champagne/35 to-transparent — sizes/structure untouched); footer bar keeps hairline, Back gains hover:bg-foreground/5 (disabled:opacity-0 layout behaviour untouched), Continue/Submit/Done gain the soft oxblood shadow; disabled states unchanged
+- Motion: single house EASE tuple [0.22,1,0.36,1] typed as [number,number,number,number]; all new animation gated by useReducedMotion; framer-motion was already a dependency (no new deps)
+- Compliance: only configurator.tsx edited; stepValid/buildMessage/submit/payload shape, SERVICES…STEP_TITLES data, store usage, all conditional rendering, all aria labels byte-identical (git diff reviewed line-by-line); static checks passed — bracket/paren balance 0, all 11 data-testids present, no text-black residue; dev server/lint/tsc/commit deliberately not run per task rules
+
+Stage Summary:
+- The configurator now reads as a first-class Gallery & Oxblood surface: champagne-washed header with a segmented oxblood progress tick bar, blush-washed option cards with pop-in checks, solid oxblood chips, hairline review ledger with mono step indices, ivory-on-oxblood primary actions, and 0.28s wait-mode step transitions with full reduced-motion fallbacks
+- Functional surface untouched: same store calls, same validation, same API payload, same focus management, same testids — safe to QA purely visually
+- Follow-up candidate: browser QA of the AnimatePresence exit/enter overlap on fast Continue/Back tapping (mode="wait" serialises it, but visual rhythm should be eyeballed at 390px and on reduced-motion)
+
+---
+Task ID: AESTH-3-e
+Agent: frontend-styling-expert
+Task: Visual refinement — Chapter 05 "Build a project" art-directed as a taupe atelier band with the configurator as chapter hero, and Chapter 06 "Start a conversation" as the cinematic night finale (Gallery & Oxblood system). Presentation-only; all functionality preserved.
+
+Work Log:
+- Context pass first: worklog.md, globals.css (site-scope tokens, .eyebrow/.editorial/.chrome-text/.hairline, --electric oxblood↔ember flip, --accent-ink, ambient helpers), chapter.tsx (ChapterSection tones + AccentWord), buttons.tsx (Magnetic/LiquidCTA/CinematicLink), site-content.ts (process steps 1–6, packages, CONTACT_PLACEHOLDERS), sibling conventions from AESTH-3-a/b/c/d entries.
+- build.tsx (only Chapter 05 file edited):
+  - Header: tone="taupe" (ambient-taupe wash + bg-secondary/45 + hairline top automatic via scaffold); title now `Build a <AccentWord>project</AccentWord>`; lede/copy untouched.
+  - Configurator entry rebuilt as the chapter hero: chalk card (rounded-3xl, bg-card, hairline, warm 0_30px_80px_-40px rgba(61,35,22,.35) shadow) floating over two soft ambient ellipses (champagne/60 top, electric/10 bottom-right — widths use min(...,%) so nothing overflows the 390px viewport); oxblood "The configurator" eyebrow with hairline dash; big Syne h3 "Build your brief like a product" with serif-italic accent on "product".
+  - 7 brief steps set as a vertical hairline spine (chose spine over 2-col mini-grid as the more editorial option): mono 01–07 in 32px oxblood circles (bg-electric, text-[var(--accent-ink)] — never text-black) with ring-4 ring-card masking the spine line through the medallions; spine span lives in a wrapper div (valid ol markup preserved). Interior lg:grid-cols-[1.05fr_0.95fr] with explicit row-span placement so DOM order = spec order (heading → steps → CTA → footnote) on mobile and a split composition on desktop; CTA cell bottom-anchored with justify-end.
+  - CTA row: Magnetic > LiquidCTA primary "Open the configurator" (data-testid="build-open-configurator", onClick={() => openConfigurator()} intact) + CinematicLink "Prefer a simple form?" → /contact; honest CRM footnote verbatim under a hairline rule.
+  - Process: eyebrow keeps id="process" + scroll-mt-24 (electric dash added); 6 steps (site.process.steps.slice(0,6)) as a gap-px hairline plate grid (rounded-2xl, bg-border seams) — mono oxblood index + hairline dash + Syne step title per card; sm:2 / lg:3 columns.
+  - Packages: eyebrow keeps id="packages"; card A chalk + hairline (web[0], price "Custom quote"); card B border-electric/40 with price text-electric ("From £720 / month") + "Indicative — confirmed in a written proposal." verbatim; site.packages.note verbatim under a full-width hairline. All includes arrays still sliced to 3 with oxblood Check ticks.
+  - Motion: hero card, each spine step (i*0.05), each process plate (i*0.05) and both package cards (0/0.08) stagger via whileInView viewport once, ease [0.22,1,0.36,1] (typed as [number,number,number,number] tuple for TS strict), all initial={reduced ? false : ...} gated by useReducedMotion; transforms/opacity only.
+- conversation.tsx (only Chapter 06 file edited):
+  - tone="night" (near-black tokens, ember --electric, ambient-night glow + grain + top gradient hairline all automatic); className="border-b-0" kept; title now `Start a <AccentWord>conversation</AccentWord>`; lede untouched.
+  - Finale headline: copy intact ("Let's make something" / "worth staring at."); clamp raised to clamp(1.9rem,4.6vw,3.4rem) (from 1.8/4.5/3.2); second line chrome-text with "staring at." as <em className="editorial font-normal"> for the serif moment (hero.tsx chrome+em precedent); tracking-tight added.
+  - CTA row: Magnetic > LiquidCTA "Start a project" (data-testid="contact-open-configurator", openConfigurator wiring intact) + hairline vertical divider (sm+) + CinematicLink "Use the simple form" → /contact.
+  - Contact block: rows rebuilt as hairline-separated meta rows (eyebrow label left, value right, flex-wrap for 390px; Email/Phone rows border-t, Where row border-y closes the block); mailto:/tel: hrefs, values, labels and the 3-sentence placeholder note copy all byte-identical; CONTACT_PLACEHOLDERS conditionals untouched (note card gets mb-5 so its card border never doubles against the Where hairline); note card night treatment: bg-card, hairline border, ember left rule (border-l-2 border-l-electric).
+  - Login cards: night-card treatment (rounded-2xl bg-card, hairline, hover:border-electric/60, gap-4 + shrink-0 icons); LogIn/KeyRound hover ember via group-hover:text-electric; hrefs (/login ×2), data-testid="conversation-client-login", all copy verbatim; "Already working with us?" eyebrow now carries the electric dash motif.
+  - Motion: parent motion.div dissolved into staggered children — headline (0), CTA row (0.08), contact block (0.16), login eyebrow (0.10), login cards (0.18/0.26); viewport once margin -60px, house ease, reduced-motion = static (initial:false); transforms/opacity only.
+- Compliance greps + bracket-balance node script: both files balanced; data-testids (build-open-configurator, contact-open-configurator, conversation-client-login), ids (process, packages), openConfigurator wiring, CONTACT_PLACEHOLDERS conditionals, all site.* copy verified present; no text-black on accent fills (text-[var(--accent-ink)] used); no new deps, no emojis; dev server/lint/tsc/commit deliberately NOT run per task constraints.
+
+Stage Summary:
+- Chapter 05 now opens on a floating chalk configurator card with an oxblood-numbered step spine as the hero, followed by numbered hairline process plates and two contrasting package cards (chalk vs oxblood-tinted, only verified £720 price in oxblood) on the taupe atelier band.
+- Chapter 06 resolves as the cinematic night finale: chrome serif-accented display line, hairline meta-row contact block with ember-ruled placeholder card, and ember-hover login night cards.
+- Two files changed (src/components/site/chapters/build.tsx, conversation.tsx), uncommitted per task rules; behavior/data-flow/testids/anchors untouched; follow-up: browser QA pass at 390px + lg breakpoints.
+
+---
+Task ID: AESTH-1 (coordinator) + AESTH-3-a..f (subagents)
+Agent: Z.ai Code (main coordinator) + 6x frontend-styling-expert
+Task: ASTA AGENCY aesthetic enhancement pass — ivory/oxblood editorial art direction, 10-15% less minimal, all functionality preserved.
+
+Work Log:
+- Explored: .site-dark scope, 6 chapters, SceneCanvas fixed z-0 (fades at ch-craft), configurator store/API contract, hardcoded text-black pairings, amber #ffb03a in monolith-scene + material-lab, token-driven secondary pages
+- Foundation (main): globals.css rewritten — .site-scope = light ivory chalk/charcoal/oxblood (accent token name --electric kept, value now oxblood oklch(0.46 0.128 22)); .night token-flip utility (near-black/ivory/ember, ambient glow); new tokens accent-ink/blush/champagne/taupe/ivory; helpers .editorial (Instrument Serif italic), .ghost-num, .oxblood-text, .grain (multiply light / overlay night), .ambient-ivory/.ambient-taupe/.ambient-night, .drift; reduced-motion killswitches extended
+- Fonts: added Instrument_Serif (--font-editorial) in root layout; scope class renamed site-dark -> site-scope in (site)/layout.tsx
+- Buttons: accent-ink pairings, outline hover border-electric/50
+- ChapterSection: tone system open/ivory/taupe/night + ghost numeral + AccentWord helper; ChapterRail: mix-blend-difference white (legible over both tones); SiteHeader: onDark state (home + not scrolled -> ivory chrome, transparent) + -mb-16 hero tuck + whitespace-nowrap CTA; SiteFooter: night cinematic + ghost wordmark
+- 3D harmonised: monolith ELECTRIC #ffb03a -> #d06253 ember, StaticMonolith glow, material-lab Amber swatch -> Oxblood #a8434d; scene-canvas host z-0 -> z-[1] (ABOVE hero dark base, BELOW z-10 content) + top scrim for header fog; hero = night + opaque dark base
+- Subagent sections: hero (kinetic line reveals, chrome+serif "different.", corner parallax metadata, rail-safe pr-44), capabilities (ambient demo stage, LIVE DEMO chip, segmented toggle, varied aspect video panels w/ caption plaques, numbered matrix), showroom (tone=night, ember filter pill, gallery-mat ring, 01/09 indices, cinematic overlay), craft (ExhibitFrame plaques L-01..03, TypeLab colors pinned to chalk/ember for dark interior on light scope), build (taupe atelier, spine step list, package contrast cards), conversation (night finale, chrome+serif headline, meta rows), configurator (7-segment progress, blush selected states, AnimatePresence step transitions, accent-ink everywhere, review ledger) — ALL logic/testids/contracts preserved
+- Secondary pages: oxblood eyebrow+hairline headers, serif accents (services "one team", portfolio "work")
+- Fixes: hero.tsx set-state-in-effect lint error (rAF-deferred init); hero opacity layering (canvas z-1); header fog band (in-host top scrim)
+- QA: lint 0/0; tsc 0 errors; browser desktop full-chapter sweep (screenshots per chapter); configurator E2E -> ENQ-MVR7261SF478 (structured PROJECT BRIEF verified in staff CRM via API, then deleted FK-safe); contact form E2E -> ENQ-MVR77A400BE5 (deleted FK-safe); showroom filter 4->1->4; mini-demo booking validation + confirmation; compare slider clip-path live; type-lab chalk letters; scene fade at craft; ?webgl=off full content; mobile 390px: zero horizontal overflow on /, /about, /services, /portfolio, /contact, ?webgl=off; mobile menu open/navigate/auto-close; suites: api-security 51/0, video-tracking 67/0; dev.log zero 5xx; DB baseline restored (enq1/con2/cli3/pf4)
+
+Stage Summary:
+- Site is now light ivory editorial (Gallery & Oxblood) with night cinematic chapters: night(hero) -> ivory(capabilities) -> night(showroom) -> ivory(craft) -> taupe(build) -> night(conversation+footer)
+- All business systems re-verified live: enquiry API/CRM pipeline, configurator contract, portfolio DB, auth, RBAC (via suites)
+- 23 files changed (+1406/-554), all frontend/presentation; working tree UNCOMMITTED (no commit authorized); NO production deployment exists or was performed (dev server only)

@@ -15,9 +15,13 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, CircleAlert, X } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useConfigurator, type ConfiguratorAnswers } from './configurator-store'
 import { site } from '@/lib/site-content'
+
+/* House easing — matches the site-wide motion language */
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 /* ── Catalogue (service ids map to canonical public enquiry services) ─────── */
 type Category = 'web' | 'video' | 'other'
@@ -59,6 +63,7 @@ function OptionCard({
   onClick: () => void
   children: React.ReactNode
 }) {
+  const reduced = useReducedMotion()
   return (
     <button
       type="button"
@@ -67,8 +72,8 @@ function OptionCard({
       className={cn(
         'group w-full rounded-xl border p-4 text-left transition-all duration-200 min-h-11',
         selected
-          ? 'border-electric bg-electric/10 text-foreground'
-          : 'border-border bg-card/60 text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+          ? 'border-electric bg-blush/60 text-foreground'
+          : 'border-border bg-card/60 text-muted-foreground hover:-translate-y-px hover:border-foreground/30 hover:text-foreground'
       )}
     >
       <span className="flex items-center justify-between gap-3">
@@ -77,10 +82,19 @@ function OptionCard({
           aria-hidden="true"
           className={cn(
             'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors',
-            selected ? 'border-electric bg-electric text-black' : 'border-border'
+            selected ? 'border-electric bg-electric' : 'border-border'
           )}
         >
-          {selected && <Check className="h-3 w-3" />}
+          {selected && (
+            <motion.span
+              initial={reduced ? false : { scale: 0.4, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.18, ease: EASE }}
+              className="flex"
+            >
+              <Check className="h-3 w-3 text-[var(--accent-ink)]" strokeWidth={3} />
+            </motion.span>
+          )}
         </span>
       </span>
     </button>
@@ -104,7 +118,7 @@ function Chip({
       className={cn(
         'rounded-full border px-4 py-2 text-xs font-medium transition-colors min-h-11 md:min-h-min',
         selected
-          ? 'border-electric bg-electric/15 text-foreground'
+          ? 'border-electric bg-electric text-[var(--accent-ink)]'
           : 'border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
       )}
     >
@@ -114,7 +128,7 @@ function Chip({
 }
 
 const inputCls =
-  'w-full rounded-lg border border-input bg-background/60 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-electric focus:outline-none'
+  'w-full rounded-lg border border-input bg-background/60 px-4 py-3 text-sm text-foreground transition-colors placeholder:text-muted-foreground/60 focus:border-electric focus:outline-none focus:ring-2 focus:ring-electric/25'
 
 /* ── The modal ────────────────────────────────────────────────────────────── */
 export function ProjectConfigurator() {
@@ -124,6 +138,7 @@ export function ProjectConfigurator() {
   const [reference, setReference] = useState<string | null>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const reduced = useReducedMotion()
 
   const category: Category = useMemo(
     () => SERVICES.find(s => s.id === answers.serviceId)?.category ?? 'web',
@@ -260,7 +275,7 @@ export function ProjectConfigurator() {
         className="relative flex h-[94vh] w-full flex-col overflow-hidden rounded-t-2xl border border-border bg-card shadow-2xl sm:h-[88vh] sm:max-w-2xl sm:rounded-2xl"
       >
         {/* header */}
-        <div className="shrink-0 border-b border-border px-5 pb-4 pt-5 sm:px-7">
+        <div className="shrink-0 border-b border-border bg-gradient-to-b from-champagne/35 to-transparent px-5 pb-4 pt-5 sm:px-7">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="eyebrow text-electric">Start a project</p>
@@ -286,12 +301,28 @@ export function ProjectConfigurator() {
               <span className="eyebrow shrink-0 text-muted-foreground">
                 {String(step).padStart(2, '0')}/07
               </span>
-              <div className="h-px flex-1 bg-border">
-                <div
-                  className="h-px bg-electric transition-all duration-500"
-                  style={{ width: `${(step / 7) * 100}%` }}
-                />
+              <div className="flex flex-1 items-center gap-1" aria-hidden="true">
+                {STEP_TITLES.map((title, i) => {
+                  const n = i + 1
+                  if (n < step) {
+                    return <span key={title} className="h-1 flex-1 rounded-full bg-electric" />
+                  }
+                  if (n === step) {
+                    return (
+                      <span key={title} className="relative h-1 flex-1 overflow-hidden rounded-full bg-border">
+                        <motion.span
+                          className="absolute inset-y-0 left-0 rounded-full bg-electric"
+                          initial={reduced ? false : { width: '0%' }}
+                          animate={{ width: '100%' }}
+                          transition={{ duration: 0.45, ease: EASE }}
+                        />
+                      </span>
+                    )
+                  }
+                  return <span key={title} className="h-1 flex-1 rounded-full bg-border" />
+                })}
               </div>
+              <span className="eyebrow shrink-0 text-muted-foreground/70">Step {step} of 7</span>
             </div>
           )}
         </div>
@@ -301,7 +332,14 @@ export function ProjectConfigurator() {
           {reference ? (
             <SuccessPanel reference={reference} onClose={closeConfigurator} />
           ) : (
-            <>
+            <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={step}
+              initial={reduced ? false : { opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, y: -10 }}
+              transition={{ duration: 0.28, ease: EASE }}
+            >
               {step === 1 && (
                 <StepShell title="What do you need?" hint="Pick the closest match — you can refine it later.">
                   <div className="grid gap-2.5">
@@ -566,7 +604,7 @@ export function ProjectConfigurator() {
 
               {step === 7 && (
                 <StepShell title="Review your brief" hint="Check everything — use Edit to go back to any step.">
-                  <div className="grid gap-3" data-testid="configurator-review">
+                  <div className="grid" data-testid="configurator-review">
                     <ReviewRow label="Service" value={SERVICES.find(s => s.id === answers.serviceId)?.label ?? '—'} step={1} />
                     {answers.alsoInterested.length > 0 && (
                       <ReviewRow
@@ -608,7 +646,8 @@ export function ProjectConfigurator() {
                   </div>
                 </StepShell>
               )}
-            </>
+            </motion.div>
+            </AnimatePresence>
           )}
         </div>
 
@@ -619,7 +658,7 @@ export function ProjectConfigurator() {
               type="button"
               onClick={() => setStep(Math.max(1, step - 1))}
               disabled={step === 1}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[0.8rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-0"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[0.8rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground disabled:opacity-0"
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Back
             </button>
@@ -629,7 +668,7 @@ export function ProjectConfigurator() {
                 onClick={() => canNext && setStep(step + 1)}
                 disabled={!canNext}
                 data-testid="configurator-next"
-                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-black transition-opacity disabled:opacity-30"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)] shadow-lg shadow-electric/25 transition-opacity disabled:opacity-30"
               >
                 Continue <ArrowRight className="h-3.5 w-3.5" />
               </button>
@@ -639,7 +678,7 @@ export function ProjectConfigurator() {
                 onClick={submit}
                 disabled={submitting}
                 data-testid="configurator-submit"
-                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-black transition-opacity disabled:opacity-50"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)] shadow-lg shadow-electric/25 transition-opacity disabled:opacity-50"
               >
                 {submitting ? 'Sending…' : <>Submit enquiry <ArrowRight className="h-3.5 w-3.5" /></>}
               </button>
@@ -664,10 +703,18 @@ function StepShell({ title, hint, children }: { title: string; hint?: string; ch
 function ReviewRow({ label, value, step }: { label: string; value: string; step: number }) {
   const { setStep } = useConfigurator()
   return (
-    <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-background/40 p-4">
-      <div className="min-w-0">
-        <p className="eyebrow text-muted-foreground">{label}</p>
-        <p className="mt-1 break-words text-sm text-foreground">{value}</p>
+    <div className="flex items-start justify-between gap-4 border-b border-border py-4 first:pt-0 last:border-b-0">
+      <div className="flex min-w-0 items-start gap-3">
+        <span
+          aria-hidden="true"
+          className="mt-0.5 inline-flex h-6 shrink-0 items-center justify-center rounded-full border border-border bg-background/60 px-2 font-mono text-[0.65rem] leading-none text-muted-foreground"
+        >
+          {String(step).padStart(2, '0')}
+        </span>
+        <div className="min-w-0">
+          <p className="eyebrow text-muted-foreground">{label}</p>
+          <p className="mt-1 break-words text-sm text-foreground">{value}</p>
+        </div>
       </div>
       <button
         type="button"
@@ -683,12 +730,12 @@ function ReviewRow({ label, value, step }: { label: string; value: string; step:
 function SuccessPanel({ reference, onClose }: { reference: string; onClose: () => void }) {
   return (
     <div className="flex flex-col items-start gap-4 py-6" data-testid="configurator-success">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-electric text-black">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-electric text-[var(--accent-ink)] shadow-lg shadow-electric/25">
         <Check className="h-6 w-6" />
       </span>
       <h3 className="text-2xl font-bold">Your brief is in.</h3>
       <p className="text-sm text-muted-foreground">{site.contact.successNote}</p>
-      <div className="w-full rounded-xl border border-border bg-background/50 p-4">
+      <div className="w-full rounded-xl border border-border bg-background/60 p-4">
         <p className="eyebrow text-muted-foreground">Your enquiry reference</p>
         <p className="mt-1 font-mono text-lg tracking-wide text-electric" data-testid="configurator-reference">
           {reference}
@@ -698,7 +745,7 @@ function SuccessPanel({ reference, onClose }: { reference: string; onClose: () =
       <button
         type="button"
         onClick={onClose}
-        className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-black"
+        className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)] shadow-lg shadow-electric/25"
       >
         Done <ArrowRight className="h-3.5 w-3.5" />
       </button>

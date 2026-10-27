@@ -2,8 +2,10 @@
 
 /**
  * Chapter 03 — EXPLORE THE WORK.
- * DB-backed spatial showroom: asymmetric editorial canvases, category
- * filters with animated state, perspective hover, and a full viewing mode.
+ * DB-backed spatial showroom staged as a cinematic dark gallery (tone="night"):
+ * asymmetric editorial canvases with gallery-mat inner rings and hairline frame
+ * plates, hairline-framed category filter tray with an ember animated pill,
+ * perspective hover, and a full cinematic viewing mode.
  * Data comes from the existing PortfolioItem records (published only);
  * sample items stay clearly labelled. Supports image and real video media.
  */
@@ -13,7 +15,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Play, X, ExternalLink, ImageIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tilt } from '@/components/site/buttons'
-import { ChapterSection } from './chapter'
+import { AccentWord, ChapterSection } from './chapter'
 
 export interface ShowroomItem {
   id: string
@@ -57,6 +59,8 @@ export function ShowroomChapter({ items }: { items: ShowroomItem[] }) {
     [items, filter]
   )
 
+  const hasFootnote = Boolean(active?.projectUrl) || (active?.isVideo && !active.mediaUrl)
+
   useEffect(() => {
     if (!active) return
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setActive(null) }
@@ -73,42 +77,48 @@ export function ShowroomChapter({ items }: { items: ShowroomItem[] }) {
     <ChapterSection
       id="ch-work"
       num="03"
-      title="Explore the work"
+      tone="night"
+      title={<>Explore the <AccentWord>work</AccentWord></>}
       lede="Published pieces from our studio portfolio. Items marked “Sample” are demonstrations we built to show style and scope — nothing here is claimed as client work unless it genuinely is."
     >
       {items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border p-14 text-center">
-          <ImageIcon className="mx-auto h-8 w-8 text-muted-foreground/40" aria-hidden="true" />
-          <p className="mt-4 font-medium">Our public portfolio is being prepared</p>
-          <p className="mt-1 text-sm text-muted-foreground">Ask us for examples relevant to your project — we&apos;ll happily share them directly.</p>
+        <div className="rounded-2xl border border-dashed hairline bg-card/40 p-12 text-center sm:p-16">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-electric/30 bg-electric/10">
+            <ImageIcon className="h-5 w-5 text-electric" aria-hidden="true" />
+          </span>
+          <p className="mt-6 font-display text-lg font-bold">Our public portfolio is being prepared</p>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">Ask us for examples relevant to your project — we&apos;ll happily share them directly.</p>
         </div>
       ) : (
         <>
-          {/* filters */}
-          <div className="mb-12 flex flex-wrap gap-2" role="group" aria-label="Filter work by category">
-            {[{ value: 'ALL', label: 'All work' }, ...categories].map(c => (
-              <button
-                key={c.value}
-                type="button"
-                onClick={() => setFilter(c.value)}
-                aria-pressed={filter === c.value}
-                className={cn(
-                  'relative rounded-full border px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.16em] transition-colors min-h-9',
-                  filter === c.value
-                    ? 'border-electric text-foreground'
-                    : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'
-                )}
-              >
-                {filter === c.value && !reduced && (
-                  <motion.span
-                    layoutId="filter-pill"
-                    className="absolute inset-0 rounded-full bg-electric/15"
-                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                  />
-                )}
-                <span className={cn('relative', filter === c.value && 'text-electric')}>{c.label}</span>
-              </button>
-            ))}
+          {/* filters — hairline-framed tray, ember active pill */}
+          <div className="mb-12 flex" role="group" aria-label="Filter work by category">
+            <div className="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border hairline bg-card/60 p-1.5 backdrop-blur-sm">
+              {[{ value: 'ALL', label: 'All work' }, ...categories].map(c => (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => setFilter(c.value)}
+                  aria-pressed={filter === c.value}
+                  className={cn(
+                    'relative min-h-9 rounded-full px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.16em] transition-colors duration-300',
+                    filter === c.value ? 'text-[var(--accent-ink)]' : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {filter === c.value &&
+                    (reduced ? (
+                      <span aria-hidden="true" className="absolute inset-0 rounded-full bg-electric" />
+                    ) : (
+                      <motion.span
+                        layoutId="filter-pill"
+                        className="absolute inset-0 rounded-full bg-electric"
+                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      />
+                    ))}
+                  <span className="relative">{c.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* asymmetric grid */}
@@ -122,7 +132,7 @@ export function ShowroomChapter({ items }: { items: ShowroomItem[] }) {
                   initial={reduced ? false : { opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: reduced ? 0 : (idx % 3) * 0.08 }}
                   className={cn('group min-w-0 cursor-pointer', span)}
                   onClick={() => setActive(item)}
                   onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActive(item) } }}
@@ -132,7 +142,8 @@ export function ShowroomChapter({ items }: { items: ShowroomItem[] }) {
                   data-testid={`showroom-item-${idx}`}
                 >
                   <Tilt maxDeg={4}>
-                    <div className="relative h-full overflow-hidden rounded-2xl border border-border bg-card transition-colors duration-500 group-hover:border-foreground/25">
+                    {/* gallery-mat canvas: 1px inner ring + deep shadow */}
+                    <div className="relative h-full overflow-hidden rounded-2xl bg-card shadow-[0_30px_80px_-40px_rgba(0,0,0,0.85)] ring-1 ring-inset ring-white/10 transition-all duration-500 group-hover:ring-white/25">
                       <div className="absolute inset-0">
                         {item.thumbOk ? (
                           <Image
@@ -153,29 +164,39 @@ export function ShowroomChapter({ items }: { items: ShowroomItem[] }) {
                       {/* meta */}
                       <div className="relative flex h-full min-h-[240px] flex-col justify-between p-5 sm:p-6">
                         <div className="flex items-start justify-between gap-3">
-                          <span className="font-mono text-[0.65rem] tracking-widest text-white/50">
-                            {String(idx + 1).padStart(2, '0')}
+                          <span aria-hidden="true" className="font-mono text-[0.65rem] tracking-[0.3em] text-white/55">
+                            <span className="text-white/90">{String(idx + 1).padStart(2, '0')}</span>
+                            <span className="mx-1.5 text-white/35">/</span>
+                            {String(filtered.length).padStart(2, '0')}
                           </span>
                           {item.isDemo && (
-                            <span className="rounded-full bg-black/60 px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-white/90">
+                            <span className="rounded-full border border-white/20 bg-black/60 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-white/90 backdrop-blur-sm">
                               Sample
                             </span>
                           )}
                         </div>
-                        <div className="translate-y-1 transition-transform duration-500 group-hover:translate-y-0">
+                        <div className="translate-y-1 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
                           <p className="eyebrow text-electric">{item.categoryLabel}</p>
-                          <h3 className="mt-1.5 text-xl font-bold text-white sm:text-2xl">{item.title}</h3>
-                          <p className="mt-1.5 max-w-md text-sm leading-snug text-white/70 opacity-0 transition-opacity duration-500 group-hover:opacity-100 max-lg:opacity-100">
+                          <h3 className="mt-2 font-display text-xl font-extrabold tracking-tight text-ivory sm:text-2xl">{item.title}</h3>
+                          <p className="mt-2 max-w-md text-sm leading-snug text-white/75 opacity-0 transition-opacity duration-500 group-hover:opacity-100 max-lg:opacity-100">
                             {item.summary}
                           </p>
-                          <span className="mt-3 inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/90">
+                          <span className="mt-3.5 inline-flex items-center gap-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-white/85 transition-colors duration-500 group-hover:text-white">
                             View project
-                            <span className="h-px w-6 bg-electric transition-all duration-500 group-hover:w-10" aria-hidden="true" />
+                            <span aria-hidden="true" className="h-px w-6 bg-electric transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-12" />
                           </span>
                         </div>
                       </div>
                     </div>
                   </Tilt>
+
+                  {/* hairline frame plate under each canvas */}
+                  <div className="mt-3.5 flex items-center justify-between gap-3 border-t hairline pt-2.5">
+                    <span className="truncate font-mono text-[0.6rem] uppercase tracking-[0.24em] text-muted-foreground">{item.categoryLabel}</span>
+                    <span className={cn('shrink-0 font-mono text-[0.6rem] uppercase tracking-[0.24em]', item.isDemo ? 'text-electric' : 'text-muted-foreground/60')}>
+                      {item.isDemo ? 'Sample' : 'Published'}
+                    </span>
+                  </div>
                 </motion.article>
               )
             })}
@@ -203,7 +224,7 @@ export function ShowroomChapter({ items }: { items: ShowroomItem[] }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              className="relative max-h-[88vh] w-full max-w-4xl overflow-y-auto scrollbar-slim rounded-2xl border border-border bg-card shadow-2xl"
+              className="relative max-h-[88vh] w-full max-w-4xl overflow-y-auto scrollbar-slim rounded-2xl border border-border bg-card shadow-2xl shadow-black/60"
               onClick={e => e.stopPropagation()}
             >
               <div className="relative aspect-[16/9] w-full">
@@ -234,38 +255,42 @@ export function ShowroomChapter({ items }: { items: ShowroomItem[] }) {
                   type="button"
                   onClick={() => setActive(null)}
                   aria-label="Close project detail"
-                  className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/70 text-white transition-colors hover:bg-electric hover:text-black"
+                  className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white backdrop-blur-sm transition-colors duration-300 hover:border-electric hover:bg-electric hover:text-[var(--accent-ink)]"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <div className="p-6 sm:p-8">
-                <div className="flex flex-wrap items-center gap-3">
+              <div className="p-6 sm:p-8 lg:p-10">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
                   <p className="eyebrow text-electric">{active.categoryLabel}</p>
                   {active.isDemo && (
-                    <span className="rounded-full border border-border px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    <span className="rounded-full border border-electric/40 bg-electric/10 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-electric">
                       Sample — demonstration piece
                     </span>
                   )}
                 </div>
-                <h3 className="mt-3 text-2xl font-bold sm:text-3xl">{active.title}</h3>
+                <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl">{active.title}</h3>
                 {active.description && (
-                  <p className="mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">{active.description}</p>
+                  <p className="mt-4 max-w-2xl text-pretty text-[0.95rem] leading-relaxed text-muted-foreground sm:text-base">{active.description}</p>
                 )}
-                {active.projectUrl && (
-                  <a
-                    href={active.projectUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] transition-colors hover:border-electric hover:text-electric"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" /> Visit live site
-                  </a>
-                )}
-                {active.isVideo && !active.mediaUrl && (
-                  <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-                    <Play className="h-3.5 w-3.5 text-electric" /> Motion preview available on request.
-                  </p>
+                {hasFootnote && (
+                  <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 border-t hairline pt-6">
+                    {active.projectUrl && (
+                      <a
+                        href={active.projectUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-11 items-center gap-2.5 rounded-full border border-border px-6 text-[0.72rem] font-semibold uppercase tracking-[0.16em] transition-colors duration-300 hover:border-electric hover:bg-electric hover:text-[var(--accent-ink)]"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /> Visit live site
+                      </a>
+                    )}
+                    {active.isVideo && !active.mediaUrl && (
+                      <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Play className="h-3.5 w-3.5 text-electric" aria-hidden="true" /> Motion preview available on request.
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
             </motion.div>
@@ -273,13 +298,15 @@ export function ShowroomChapter({ items }: { items: ShowroomItem[] }) {
         )}
       </AnimatePresence>
 
-      <div className="mt-14">
+      {/* archive footer — hairline rule + ember sweep */}
+      <div className="mt-16 border-t hairline pt-8">
         <a
           href="/portfolio"
-          className="group/link inline-flex min-h-11 items-center gap-3 text-[0.8rem] font-medium uppercase tracking-[0.18em] text-foreground transition-colors hover:text-electric"
+          className="group/link flex min-h-11 w-full items-center gap-3 text-[0.8rem] font-medium uppercase tracking-[0.18em] text-foreground transition-colors duration-300 hover:text-electric"
         >
           Browse the full portfolio
-          <span className="h-px w-10 bg-electric transition-all duration-500 group-hover/link:w-16" aria-hidden="true" />
+          <span aria-hidden="true" className="h-px w-10 bg-electric transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:w-16" />
+          <span className="ml-auto hidden font-mono text-[0.6rem] tracking-[0.24em] text-muted-foreground sm:block">/portfolio</span>
         </a>
       </div>
     </ChapterSection>

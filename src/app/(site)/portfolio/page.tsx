@@ -33,9 +33,9 @@ export default async function PortfolioPage({
     <>
       <section className="border-b bg-gradient-to-b from-muted/70 to-background" aria-labelledby="portfolio-heading">
         <div className="mx-auto max-w-6xl px-4 py-14 lg:px-6 lg:py-20">
-          <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Portfolio</p>
+          <p className="eyebrow flex items-center gap-3 text-electric">Portfolio<span className="h-px w-10 bg-electric/60" aria-hidden="true" /></p>
           <h1 id="portfolio-heading" className="mt-2 text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            Our work
+            Our <em className="editorial font-normal">work</em>
           </h1>
           <p className="mt-4 max-w-2xl text-pretty text-lg text-muted-foreground">
             Websites we have built and videos we have produced. Items marked <Badge variant="secondary" className="mx-1 align-middle">Sample</Badge>

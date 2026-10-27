@@ -7,16 +7,31 @@
  *      website (tabs, forms, validation) inside a desktop/mobile device
  *      frame with a real responsive-preview toggle. Nothing is faked —
  *      the demo is real HTML responding to input, labelled as a demo.
- *   B. Video & creative → a cinematic sample-frame gallery; media is
- *      clearly labelled as sample content until real client work exists.
+ *      Presentation: the frame sits on an atmospheric projection stage
+ *      (ambient ivory wash, champagne glow, hairline bench) as the
+ *      chapter's visual anchor. MiniSiteDemo deliberately keeps its own
+ *      amber demo identity — only its container/staging is art-directed.
+ *   B. Video & creative → a cinematic sample-frame gallery hung with
+ *      varied aspect ratios and desktop-only offsets, captions set on
+ *      chalk plaques below each frame; media is clearly labelled as
+ *      sample content until real client work exists.
  */
 import { useState } from 'react'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowUpRight, Monitor, Smartphone, ImageIcon, Check } from 'lucide-react'
+import { ArrowUpRight, Monitor, Smartphone, ImageIcon, Check, Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CinematicLink, Tilt } from '@/components/site/buttons'
-import { ChapterSection } from './chapter'
+import { AccentWord, ChapterSection } from './chapter'
+
+/* ── B. Editorial gallery rhythm — varied aspects with deliberate
+   desktop-only vertical offsets (mobile stays a clean 2-col grid) ────────── */
+const PANEL_RHYTHM = [
+  { aspect: 'aspect-[3/4]', offset: '' },
+  { aspect: 'aspect-[4/5]', offset: 'lg:mt-10' },
+  { aspect: 'aspect-[1/1]', offset: 'lg:-mt-3' },
+  { aspect: 'aspect-[16/10]', offset: 'lg:mt-5' },
+] as const
 
 /* ── A. Genuine mini-site demo (all interactions real, nothing sent) ─────── */
 type DemoTab = 'home' | 'menu' | 'book'
@@ -176,19 +191,28 @@ export function CapabilitiesChapter({ videoPanels }: { videoPanels: VideoPanel[]
     <ChapterSection
       id="ch-capabilities"
       num="02"
-      title="Discover the capabilities"
+      title={<>Discover the <AccentWord>capabilities</AccentWord></>}
       lede="Two divisions with one standard: work you can interact with before you ever speak to us. Try the interface below — it is real, working UI."
     >
       <div className="grid gap-16 lg:grid-cols-2 lg:gap-12">
-        {/* ── Web & digital: live interface study ── */}
+        {/* ── Web & digital: live interface study on a projection stage ── */}
         <div>
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="eyebrow text-muted-foreground">Division A — Live interface study</p>
-              <h3 className="mt-2 text-2xl font-bold sm:text-3xl">Website &amp; digital experiences</h3>
+              <p className="eyebrow flex items-center gap-3 text-electric">
+                <span className="h-px w-6 bg-electric/50" aria-hidden="true" />
+                Division A — Live interface study
+              </p>
+              <h3 className="mt-2 text-2xl font-bold sm:text-3xl">
+                Website &amp; digital <AccentWord>experiences</AccentWord>
+              </h3>
             </div>
-            {/* genuine responsive preview toggle */}
-            <div className="flex shrink-0 rounded-full border border-border p-1" role="group" aria-label="Preview device">
+            {/* genuine responsive preview toggle — refined segmented control */}
+            <div
+              className="flex shrink-0 items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm"
+              role="group"
+              aria-label="Preview device"
+            >
               {([['desktop', Monitor], ['mobile', Smartphone]] as const).map(([d, Icon]) => (
                 <button
                   key={d}
@@ -197,8 +221,10 @@ export function CapabilitiesChapter({ videoPanels }: { videoPanels: VideoPanel[]
                   aria-pressed={device === d}
                   aria-label={`Preview at ${d} width`}
                   className={cn(
-                    'flex h-9 w-9 items-center justify-center rounded-full transition-colors',
-                    device === d ? 'bg-electric text-black' : 'text-muted-foreground hover:text-foreground'
+                    'flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-300',
+                    device === d
+                      ? 'bg-electric text-[var(--accent-ink)] shadow-[0_2px_10px_rgba(36,20,14,0.28)]'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -207,84 +233,130 @@ export function CapabilitiesChapter({ videoPanels }: { videoPanels: VideoPanel[]
             </div>
           </div>
 
+          {/* atmospheric stage — ambient wash + warm glow behind the device frame */}
           <motion.div
-            layout
-            transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 26 }}
-            className="mt-6 rounded-2xl border border-border bg-card p-2.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
-            data-testid="web-demo-frame"
-            style={{ maxWidth: device === 'desktop' ? '100%' : '320px' }}
+            initial={reduced ? false : { opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="ambient-ivory relative mt-8"
           >
-            {/* browser chrome */}
-            <div className="flex items-center gap-1.5 px-2 pb-2 pt-1" aria-hidden="true">
-              <span className="h-2 w-2 rounded-full bg-white/15" />
-              <span className="h-2 w-2 rounded-full bg-white/15" />
-              <span className="h-2 w-2 rounded-full bg-white/15" />
-              <span className="ml-2 flex-1 rounded-full bg-white/[0.06] px-3 py-1 text-[0.6rem] text-neutral-500">
-                live demo — real UI, no data sent
-              </span>
-            </div>
-            <div
-              className={cn(
-                'overflow-hidden rounded-xl transition-[height] duration-500',
-                device === 'desktop' ? 'h-[420px]' : 'h-[480px]'
-              )}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-4 top-10 bottom-2 rounded-[100%] bg-champagne/50 blur-3xl" />
+            <div aria-hidden="true" className="pointer-events-none absolute -left-2 top-1/3 h-32 w-32 rounded-full bg-blush/50 blur-2xl" />
+
+            <motion.div
+              layout
+              transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 26 }}
+              className="relative rounded-2xl border border-border bg-card p-2.5 shadow-[0_36px_90px_-30px_rgba(36,20,14,0.45)] ring-1 ring-foreground/5"
+              data-testid="web-demo-frame"
+              style={{ maxWidth: device === 'desktop' ? '100%' : '320px' }}
             >
-              <MiniSiteDemo />
-            </div>
+              {/* oxblood live chip on the frame corner */}
+              <span className="absolute -top-3 left-5 z-10 inline-flex items-center gap-1.5 rounded-full bg-electric px-2.5 py-1 text-[0.55rem] font-bold uppercase tracking-[0.24em] text-[var(--accent-ink)] shadow-sm">
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--accent-ink)] motion-safe:animate-pulse" />
+                Live demo
+              </span>
+
+              {/* browser chrome */}
+              <div className="flex items-center gap-1.5 px-2 pb-2 pt-1.5" aria-hidden="true">
+                <span className="h-2.5 w-2.5 rounded-full bg-electric/70 ring-1 ring-foreground/10" />
+                <span className="h-2.5 w-2.5 rounded-full bg-champagne ring-1 ring-foreground/10" />
+                <span className="h-2.5 w-2.5 rounded-full bg-taupe ring-1 ring-foreground/10" />
+                <span className="ml-2 flex flex-1 items-center justify-center gap-1.5 rounded-full border border-border bg-secondary/70 px-3 py-1 text-center text-[0.55rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  <Lock className="h-2.5 w-2.5 shrink-0" aria-hidden="true" />
+                  live demo — real UI, no data sent
+                </span>
+              </div>
+              <div
+                className={cn(
+                  'overflow-hidden rounded-xl transition-[height] duration-500',
+                  device === 'desktop' ? 'h-[420px]' : 'h-[480px]'
+                )}
+              >
+                <MiniSiteDemo />
+              </div>
+            </motion.div>
+
+            {/* projection bench — soft cast shadow over a hairline floor line */}
+            <div aria-hidden="true" className="mx-auto mt-6 h-5 w-[72%] rounded-[100%] bg-foreground/[0.09] blur-lg" />
+            <div aria-hidden="true" className="mx-auto -mt-2 h-px w-[86%] bg-gradient-to-r from-transparent via-foreground/25 to-transparent" />
           </motion.div>
 
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-5 text-sm text-muted-foreground">
             Tabs, validation and states in this frame genuinely work — the same discipline we
             bring to booking systems, portals and storefronts.
           </p>
           <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
             <CinematicLink href="/services/web-development">Web division in detail</CinematicLink>
-            <CinematicLink href="/portfolio" >Recent interface work</CinematicLink>
+            <CinematicLink href="/portfolio">Recent interface work</CinematicLink>
           </div>
         </div>
 
-        {/* ── Video & creative: cinematic sample gallery ── */}
+        {/* ── Video & creative: sample gallery with chalk caption plaques ── */}
         <div>
           <div>
-            <p className="eyebrow text-muted-foreground">Division B — Sample frames</p>
-            <h3 className="mt-2 text-2xl font-bold sm:text-3xl">Video &amp; visual production</h3>
+            <p className="eyebrow flex items-center gap-3 text-electric">
+              <span className="h-px w-6 bg-electric/50" aria-hidden="true" />
+              Division B — Sample frames
+            </p>
+            <h3 className="mt-2 text-2xl font-bold sm:text-3xl">
+              Video &amp; visual <AccentWord>production</AccentWord>
+            </h3>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-3" data-testid="video-panels">
+          <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 lg:mt-10 lg:gap-x-6" data-testid="video-panels">
             {videoPanels.map((p, i) => {
+              const rhythm = PANEL_RHYTHM[i % PANEL_RHYTHM.length]
               return (
-                <Tilt key={p.cat} maxDeg={4} className={cn(i % 2 === 1 && 'sm:translate-y-6')}>
-                  <figure className="group relative overflow-hidden rounded-xl border border-border bg-card">
-                    <div className="relative aspect-[4/5]">
-                      {p.ok ? (
-                        <Image
-                          src={p.src}
-                          alt={`Sample frame — ${p.cat}`}
-                          fill
-                          sizes="(max-width: 1024px) 50vw, 25vw"
-                          className="object-cover transition-transform duration-700 group-hover:scale-[1.05]"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground/40">
-                          <ImageIcon className="h-6 w-6" aria-hidden="true" />
+                <motion.div
+                  key={p.cat}
+                  initial={reduced ? false : { opacity: 0, y: 26 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.7, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                  className={rhythm.offset}
+                >
+                  <Tilt maxDeg={4}>
+                    <figure className="group">
+                      <div className="relative overflow-hidden rounded-xl border border-border bg-card shadow-[0_20px_45px_-28px_rgba(36,20,14,0.4)] transition-colors duration-500 group-hover:border-foreground/25">
+                        <div className={cn('relative', rhythm.aspect)}>
+                          {p.ok ? (
+                            <Image
+                              src={p.src}
+                              alt={`Sample frame — ${p.cat}`}
+                              fill
+                              sizes="(max-width: 1024px) 50vw, 25vw"
+                              className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground/40">
+                              <ImageIcon className="h-6 w-6" aria-hidden="true" />
+                            </div>
+                          )}
+                          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
+                          <span className="absolute left-2.5 top-2.5 rounded-full bg-black/60 px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-white/90 backdrop-blur-[2px]">
+                            Sample
+                          </span>
                         </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-                      <span className="absolute left-2.5 top-2.5 rounded-full bg-black/60 px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-white/90">
-                        Sample
-                      </span>
-                      <figcaption className="absolute inset-x-0 bottom-0 p-3">
-                        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-electric">{p.cat}</p>
-                        <p className="mt-1 text-[0.72rem] leading-snug text-white/85">{p.note}</p>
+                      </div>
+                      {/* chalk caption plaque below the frame */}
+                      <figcaption className="mt-3 border-t border-border pt-3">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <p className="eyebrow text-electric">{p.cat}</p>
+                          <span aria-hidden="true" className="font-mono text-[0.6rem] tracking-[0.2em] text-muted-foreground/70">
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 text-[0.72rem] leading-snug text-muted-foreground">{p.note}</p>
                       </figcaption>
-                    </div>
-                  </figure>
-                </Tilt>
+                    </figure>
+                  </Tilt>
+                </motion.div>
               )
             })}
           </div>
 
-          <p className="mt-6 text-sm text-muted-foreground">
+          <p className="mt-8 text-sm text-muted-foreground">
             Frames above are demonstration content. When your project ships, this gallery carries
             your approved footage with full play controls and portal-based review.
           </p>
@@ -294,31 +366,44 @@ export function CapabilitiesChapter({ videoPanels }: { videoPanels: VideoPanel[]
         </div>
       </div>
 
-      {/* capability matrix */}
+      {/* capability matrix — chalk columns, mono indices, hairline rules */}
       <div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Full capability list">
         {[
           { h: 'Build', items: ['Business websites', 'E-commerce', 'Booking & enquiry systems', 'Custom web apps & portals'] },
           { h: 'Refine', items: ['Responsive UI design', 'Redesigns & performance', 'Integrations & technical build', 'Dashboards & internal tools'] },
           { h: 'Produce', items: ['Commercial films', 'Social reels & short-form', 'Product & food content', 'Property walkthroughs'] },
           { h: 'Sustain', items: ['Hosting & maintenance', 'Care plans & support', 'Recurring content packages', 'Ongoing iteration'] },
-        ].map(col => (
-          <div key={col.h} className="bg-card p-6">
-            <p className="eyebrow text-electric">{col.h}</p>
+        ].map((col, i) => (
+          <motion.div
+            key={col.h}
+            initial={reduced ? false : { opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.6, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+            className="group relative bg-card p-6 sm:p-7"
+          >
+            <span aria-hidden="true" className="pointer-events-none absolute inset-0 border border-transparent transition-colors duration-300 group-hover:border-foreground/20" />
+            <div className="border-b border-border pb-4">
+              <p className="font-mono text-[0.6rem] tracking-[0.3em] text-muted-foreground/80">{String(i + 1).padStart(2, '0')}</p>
+              <h4 className="mt-2.5 font-display text-base font-bold uppercase tracking-[0.14em] text-electric">{col.h}</h4>
+            </div>
             <ul className="mt-4 space-y-2.5">
               {col.items.map(item => (
                 <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-foreground/40" aria-hidden="true" />
+                  <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-electric/60" aria-hidden="true" />
                   {item}
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      <div className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
-        <ArrowUpRight className="h-3.5 w-3.5 text-electric" />
-        Full service pages: <a href="/services" className="underline underline-offset-4 hover:text-electric">all services</a>
+      <div className="mt-10 flex items-center gap-2 border-t border-border pt-6 text-xs text-muted-foreground">
+        <ArrowUpRight className="h-3.5 w-3.5 text-electric" aria-hidden="true" />
+        <span>
+          Full service pages: <a href="/services" className="underline underline-offset-4 transition-colors hover:text-electric">all services</a>
+        </span>
       </div>
     </ChapterSection>
   )
