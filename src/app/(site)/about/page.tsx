@@ -8,7 +8,7 @@ import { site } from '@/lib/site-content'
 
 export const metadata: Metadata = {
   title: 'About Us',
-  description: 'ASTAS agency is a two-division creative studio — websites and video produced by one accountable team, built around long-term client relationships.',
+  description: 'ASTA AGENCY is a two-division creative studio — websites and video produced by one accountable team, built around long-term client relationships.',
 }
 
 const VALUE_ICONS = [Target, HeartHandshake, Compass]

@@ -397,3 +397,19 @@ Stage Summary:
 - Every verifiable engineering item PASSES in the dev/preview environment; production does NOT exist (no git remote, no hosting config, no deploy performed or authorized)
 - Remaining blockers (owner actions): hosting authorization (Option A container+volume ready in Dockerfile/DEPLOYMENT.md), custom domain, real contact details (placeholders currently auto-hidden from public pages), transactional email provider, re-entry of real data (previous data unrecoverable after the environment reset)
 - Working tree intentionally LEFT UNCOMMITTED per task constraints (400 deletions + 7 modifications await review); no push (no remote); dev.log clean of 5xx
+
+---
+Task ID: RENAME-1
+Agent: Z.ai Code (main)
+Task: Change the site brand name to "ASTA AGENCY" — nothing else.
+
+Work Log:
+- Grepped src/ for all brand-name occurrences (ASTAS/Astas/astas): found in src/lib/site-content.ts, src/app/layout.tsx, src/app/(site)/page.tsx, src/app/(site)/about/page.tsx.
+- Replaced the name string "ASTAS agency" -> "ASTA AGENCY" in all 4 files (12 line changes total): company.name, legalName, intro body, about story, consent label, metadata default/template/description/keywords/openGraph, homepage + about page metadata.
+- Deliberately left untouched (per user's "do not change anything else"): placeholder email hello@astas.example (hidden TODO placeholder, never rendered publicly), and all other content/logic.
+- Ran `bun run lint` — clean. Verified via agent-browser: page title "ASTA AGENCY — We make digital feel different. · ASTA AGENCY", header link/hero eyebrow/footer all render "ASTA AGENCY" (4+ occurrences in a11y tree), no page errors, no console errors (only benign THREE.Clock deprecation warning). dev.log clean, GET / 200.
+
+Stage Summary:
+- Brand name is now "ASTA AGENCY" everywhere user-visible; change is text-only, no logic touched.
+- Working tree has 4 modified files, uncommitted (no commit authorized for this task).
+- Known leftover: placeholder email still contains "astas" spelling — intentionally preserved.

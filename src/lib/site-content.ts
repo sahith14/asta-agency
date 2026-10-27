@@ -26,9 +26,9 @@ import {
 
 export const site = {
   company: {
-    name: 'ASTAS agency',
+    name: 'ASTA AGENCY',
     // TODO: replace with the real trading name if different.
-    legalName: 'ASTAS agency',
+    legalName: 'ASTA AGENCY',
     tagline: 'Websites and videos, delivered by one studio.',
     // Short value proposition used in the hero and meta tags.
     valueProposition:
@@ -44,7 +44,7 @@ export const site = {
   intro: {
     heading: 'One studio for your website and your video',
     body: [
-      'ASTAS agency is a two-division creative studio. Our web team designs and builds websites, custom applications and online stores. Our video team plans, films and edits brand films, food content, property tours and social reels.',
+      'ASTA AGENCY is a two-division creative studio. Our web team designs and builds websites, custom applications and online stores. Our video team plans, films and edits brand films, food content, property tours and social reels.',
       'We work with restaurants and cafés, food and beverage brands, property professionals, corporate teams and other growing businesses that need their online presence to actually pull its weight — and need one accountable partner for both pixels and footage.',
       'Every project runs through the same operating platform our team uses internally: clear briefs, tracked deliverables, review rounds you can see, and delivery you can verify. You always know where things stand.',
     ],
@@ -200,7 +200,7 @@ export const site = {
   about: {
     heading: 'About us',
     story: [
-      'ASTAS agency started from a simple observation: businesses were juggling a web agency, a videographer and a dozen freelancers — and nobody was accountable for the whole picture. We built one studio where the website and the video content are planned, produced and delivered by the same team, on the same platform.',
+      'ASTA AGENCY started from a simple observation: businesses were juggling a web agency, a videographer and a dozen freelancers — and nobody was accountable for the whole picture. We built one studio where the website and the video content are planned, produced and delivered by the same team, on the same platform.',
       'Today our web division and video division work side by side for restaurants, cafés, property professionals, corporate teams and other growing businesses. Shared planning means your website launch can coincide with your brand film; one account manager means nothing falls between two suppliers.',
     ],
     mission: 'To give growing businesses big-agency quality in website and video — delivered reliably, priced honestly, and supported long after launch.',
@@ -220,7 +220,7 @@ export const site = {
     // TODO: replace with real response-time commitment if different.
     privacy:
       'We use the details you provide solely to respond to your enquiry and prepare a proposal. We never sell or share your information with third parties for marketing. This demo environment does not send marketing emails. You can ask us to correct or delete your enquiry at any time by contacting us.',
-    consentLabel: 'I agree that ASTAS agency may store these details and contact me about my enquiry.',
+    consentLabel: 'I agree that ASTA AGENCY may store these details and contact me about my enquiry.',
     successNote:
       'Your enquiry has been saved and a member of our team will review it shortly. We have NOT sent an automated confirmation email — you will be contacted directly using the contact method you selected.',
     services: [

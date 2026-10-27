@@ -30,17 +30,17 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: "ASTAS agency — Websites and videos, delivered by one studio.",
-    template: "%s · ASTAS agency",
+    default: "ASTA AGENCY — Websites and videos, delivered by one studio.",
+    template: "%s · ASTA AGENCY",
   },
   description:
-    "ASTAS agency designs and builds websites, web apps and e-commerce, and produces brand, food and property videos. Two creative divisions, one accountable team.",
-  keywords: ["ASTAS agency", "web agency", "video production", "websites", "brand videos"],
+    "ASTA AGENCY designs and builds websites, web apps and e-commerce, and produces brand, food and property videos. Two creative divisions, one accountable team.",
+  keywords: ["ASTA AGENCY", "web agency", "video production", "websites", "brand videos"],
   icons: {
     icon: "/logo.svg",
   },
   openGraph: {
-    title: "ASTAS agency — Websites and videos, delivered by one studio.",
+    title: "ASTA AGENCY — Websites and videos, delivered by one studio.",
     description: "Website & digital services and video production & creative services, delivered by one accountable team.",
     type: "website",
   },
