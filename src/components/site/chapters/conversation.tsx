@@ -13,7 +13,7 @@
  */
 import { motion, useReducedMotion } from 'framer-motion'
 import { LogIn, KeyRound } from 'lucide-react'
-import { Magnetic, LiquidCTA, CinematicLink } from '@/components/site/buttons'
+import { Magnetic, SlabCTA, CinematicLink } from '@/components/site/buttons'
 import { useConfigurator } from '@/components/site/configurator/configurator-store'
 import { site, CONTACT_PLACEHOLDERS } from '@/lib/site-content'
 import { AccentWord, ChapterSection } from './chapter'
@@ -50,7 +50,7 @@ export function ConversationChapter() {
             Let&apos;s make something
             <br />
             <span className="chrome-text">
-              worth <em className="editorial font-normal">staring at.</em>
+              worth staring at.
             </span>
           </motion.h3>
 
@@ -62,9 +62,9 @@ export function ConversationChapter() {
             className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5"
           >
             <Magnetic>
-              <LiquidCTA onClick={() => openConfigurator()} data-testid="contact-open-configurator">
+              <SlabCTA onClick={() => openConfigurator()} data-testid="contact-open-configurator">
                 Start a project
-              </LiquidCTA>
+              </SlabCTA>
             </Magnetic>
             <span aria-hidden="true" className="hidden h-6 w-px bg-border sm:block" />
             <CinematicLink href="/contact">Use the simple form</CinematicLink>

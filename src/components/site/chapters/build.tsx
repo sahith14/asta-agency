@@ -14,7 +14,7 @@
  */
 import { motion, useReducedMotion } from 'framer-motion'
 import { Check } from 'lucide-react'
-import { Magnetic, LiquidCTA, CinematicLink } from '@/components/site/buttons'
+import { Magnetic, SlabCTA, CinematicLink } from '@/components/site/buttons'
 import { useConfigurator } from '@/components/site/configurator/configurator-store'
 import { site } from '@/lib/site-content'
 import { AccentWord, ChapterSection } from './chapter'
@@ -72,10 +72,10 @@ export function BuildChapter() {
           </p>
 
           <div className="mt-8 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-x-14 lg:gap-y-8">
-            {/* display heading — serif accent on the last word */}
+            {/* display heading — oxblood accent on the last word */}
             <div>
               <h3 className="text-[clamp(1.75rem,3.4vw,2.6rem)] font-extrabold leading-[1.08] tracking-tight">
-                Build your brief like a <em className="editorial font-normal">product</em>
+                Build your brief like a <span className="text-electric">product</span>
               </h3>
             </div>
 
@@ -105,9 +105,9 @@ export function BuildChapter() {
             <div className="flex flex-col justify-end">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Magnetic>
-                  <LiquidCTA onClick={() => openConfigurator()} data-testid="build-open-configurator">
+                  <SlabCTA onClick={() => openConfigurator()} data-testid="build-open-configurator">
                     Open the configurator
-                  </LiquidCTA>
+                  </SlabCTA>
                 </Magnetic>
                 <CinematicLink href="/contact">Prefer a simple form?</CinematicLink>
               </div>

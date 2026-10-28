@@ -35,7 +35,7 @@ export default async function PortfolioPage({
         <div className="mx-auto max-w-6xl px-4 py-16 lg:px-6 lg:py-24">
           <p className="eyebrow flex items-center gap-3 text-electric">Portfolio<span className="h-px w-10 bg-electric/60" aria-hidden="true" /></p>
           <h1 id="portfolio-heading" className="mt-4 max-w-3xl text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]">
-            Our <em className="editorial font-normal">work</em>
+            Our <span className="text-electric">work</span>
           </h1>
           <p className="mt-6 flex max-w-2xl items-start gap-4 text-pretty text-lg text-muted-foreground">
             <span className="mt-3 hidden h-px w-14 shrink-0 bg-electric/70 sm:block" aria-hidden="true" />
@@ -145,7 +145,7 @@ export default async function PortfolioPage({
       <section className="border-t bg-secondary/45" aria-label="Call to action">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 px-4 py-12 text-center sm:flex-row sm:text-left lg:px-6">
           <p className="max-w-xl text-lg font-medium">Want work like this for your business?</p>
-          <Button size="lg" className="shadow-[0_20px_50px_-25px_rgba(84,26,15,0.5)]" asChild>
+          <Button size="lg" className="slab shadow-[0_20px_50px_-25px_rgba(84,26,15,0.5)]" asChild>
             <Link href="/contact">Discuss Your Project <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /></Link>
           </Button>
         </div>

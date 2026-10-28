@@ -10,14 +10,14 @@
  *  - 'night'  cinematic dark section (token flip via `.night`)
  *
  * Header: ghost chapter numeral, eyebrow annotation, Syne display title with
- * optional serif-italic accent (<AccentWord>), and a lede. Entrance respects
+ * optional oxblood accent word (<AccentWord>), and a lede. Entrance respects
  * prefers-reduced-motion.
  */
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 export function AccentWord({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <em className={cn('editorial font-normal', className)}>{children}</em>
+  return <span className={cn('text-electric', className)}>{children}</span>
 }
 
 export function ChapterSection({

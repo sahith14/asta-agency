@@ -16,7 +16,7 @@ export default function ServicesPage() {
         <div className="mx-auto max-w-6xl px-4 py-16 lg:px-6 lg:py-24">
           <p className="eyebrow flex items-center gap-3 text-electric">Services<span className="h-px w-10 bg-electric/60" aria-hidden="true" /></p>
           <h1 id="services-page-heading" className="mt-4 max-w-3xl text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]">
-            Everything your brand needs online — built and filmed by <em className="editorial font-normal">one team</em>
+            Everything your brand needs online — built and filmed by <span className="text-electric">one team</span>
           </h1>
           <p className="mt-6 flex max-w-2xl items-start gap-4 text-pretty text-lg text-muted-foreground">
             <span className="mt-3 hidden h-px w-14 shrink-0 bg-electric/70 sm:block" aria-hidden="true" />
@@ -83,13 +83,13 @@ export default function ServicesPage() {
             Next step<span className="h-px w-10 bg-electric/60" aria-hidden="true" />
           </p>
           <h2 id="svc-cta-heading" className="mx-auto mt-4 max-w-2xl text-balance text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Not sure which service <em className="editorial font-normal">you need?</em>
+            Not sure which service <span className="text-electric">you need?</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-[1.8] text-muted-foreground">
             Describe your project in plain words — we&apos;ll recommend the right approach and a realistic budget band.
           </p>
           <div className="mt-8">
-            <Button size="lg" className="shadow-[0_20px_50px_-25px_rgba(208,98,83,0.6)]" asChild>
+            <Button size="lg" className="slab shadow-[0_20px_50px_-25px_rgba(208,98,83,0.6)]" asChild>
               <Link href="/contact">
                 Discuss Your Project
                 <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />

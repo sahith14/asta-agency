@@ -6,7 +6,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Reusable branded interactions shared by every CTA on the public site:
  *  - <Magnetic>        pointer-attraction wrapper (desktop fine pointers only)
- *  - <LiquidCTA>       liquid-fill morphing action button
+ *  - <SlabCTA>         tactile 3D key action button (press physics)
  *  - <Tilt>            subtle 3D perspective wrapper for cards/actions
  *  - <CinematicLink>   animated underline + sliding arrow text link
  *
@@ -82,35 +82,33 @@ export function Magnetic({
   )
 }
 
-/* ── Liquid CTA ───────────────────────────────────────────────────────────── */
-type LiquidVariant = 'primary' | 'ghost' | 'outline'
+/* ── Slab CTA — tactile 3D key ──────────────────────────────────────────────
+ * Physical button: a hard contrasting edge sits under the face and the key
+ * presses flat into the page on click. Hover lifts it, a glass specular
+ * highlight sells the extrusion, lucide arrows glide on hover. All motion
+ * is CSS (see .slab in globals.css) and respects prefers-reduced-motion.
+ * Variants: primary (oxblood key) · outline (light chalk key) · ghost (flat)
+ */
+type SlabVariant = 'primary' | 'ghost' | 'outline'
 
-const liquidBase =
-  'group/liquid relative inline-flex min-h-11 cursor-pointer items-center justify-center overflow-hidden rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.18em] transition-colors duration-300 select-none'
+const slabBase =
+  'group/slab inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.18em] select-none'
 
-const liquidVariants: Record<LiquidVariant, string> = {
-  primary: 'bg-electric text-[var(--accent-ink)] hover:text-[var(--accent-ink)]',
-  ghost: 'bg-transparent text-foreground hover:text-[var(--accent-ink)]',
-  outline: 'bg-transparent text-foreground border border-border hover:text-[var(--accent-ink)] hover:border-electric/50',
+const slabVariants: Record<SlabVariant, string> = {
+  primary: 'slab bg-electric text-[var(--accent-ink)]',
+  ghost: 'bg-transparent text-foreground hover:text-electric',
+  outline:
+    'slab slab-soft border border-border bg-card text-foreground hover:border-electric/60 hover:text-electric',
 }
 
-export function LiquidCTA({
+export function SlabCTA({
   children,
   variant = 'primary',
   className,
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: LiquidVariant }) {
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: SlabVariant }) {
   return (
-    <button {...props} className={cn(liquidBase, liquidVariants[variant], className)}>
-      {/* liquid fill — scales from the pointer side on hover/press */}
-      <span
-        aria-hidden="true"
-        className={cn(
-          'absolute inset-0 -z-0 rounded-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
-          variant === 'primary' ? 'bg-foreground' : 'bg-electric',
-          'scale-y-0 origin-bottom group-hover/liquid:scale-y-100 group-active/liquid:scale-y-100 group-active/liquid:duration-200'
-        )}
-      />
+    <button {...props} className={cn(slabBase, slabVariants[variant], className)}>
       <span className="relative z-10 flex items-center gap-2">{children}</span>
     </button>
   )

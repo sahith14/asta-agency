@@ -668,7 +668,7 @@ export function ProjectConfigurator() {
                 onClick={() => canNext && setStep(step + 1)}
                 disabled={!canNext}
                 data-testid="configurator-next"
-                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)] shadow-lg shadow-electric/25 transition-opacity disabled:opacity-30"
+                className="slab inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)] transition-opacity disabled:opacity-30"
               >
                 Continue <ArrowRight className="h-3.5 w-3.5" />
               </button>
@@ -678,7 +678,7 @@ export function ProjectConfigurator() {
                 onClick={submit}
                 disabled={submitting}
                 data-testid="configurator-submit"
-                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)] shadow-lg shadow-electric/25 transition-opacity disabled:opacity-50"
+                className="slab inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)] transition-opacity disabled:opacity-50"
               >
                 {submitting ? 'Sending…' : <>Submit enquiry <ArrowRight className="h-3.5 w-3.5" /></>}
               </button>
@@ -745,7 +745,7 @@ function SuccessPanel({ reference, onClose }: { reference: string; onClose: () =
       <button
         type="button"
         onClick={onClose}
-        className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)] shadow-lg shadow-electric/25"
+        className="slab mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-electric px-6 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-ink)]"
       >
         Done <ArrowRight className="h-3.5 w-3.5" />
       </button>

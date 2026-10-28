@@ -37,7 +37,7 @@ export default function AboutPage() {
           <div>
             <p className="eyebrow flex items-center gap-3 text-muted-foreground">Our story<span className="h-px w-8 bg-border" aria-hidden="true" /></p>
             <h2 id="about-story-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              One team, <em className="editorial font-normal">both crafts</em>
+              One team, <span className="text-electric">both crafts</span>
             </h2>
             {site.about.story.map((p, i) => (
               <p key={i} className="mt-5 text-pretty leading-[1.8] text-muted-foreground">{p}</p>
@@ -76,7 +76,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-6xl px-4 py-16 lg:px-6 lg:py-20">
           <p className="eyebrow flex items-center gap-3 text-muted-foreground">What we value<span className="h-px w-8 bg-border" aria-hidden="true" /></p>
           <h2 id="about-values-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            How the studio <em className="editorial font-normal">thinks</em>
+            How the studio <span className="text-electric">thinks</span>
           </h2>
           <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border shadow-[0_25px_70px_-50px_rgba(61,35,22,0.55)] sm:grid-cols-2 lg:grid-cols-4">
             {site.about.values.map((v, i) => {
@@ -104,14 +104,14 @@ export default function AboutPage() {
           <div>
             <p className="eyebrow flex items-center gap-3 text-muted-foreground">Our approach<span className="h-px w-8 bg-border" aria-hidden="true" /></p>
             <h2 id="about-approach-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              Deliberate, <em className="editorial font-normal">visible</em> work
+              Deliberate, <span className="text-electric">visible</span> work
             </h2>
             <p className="mt-5 text-pretty leading-[1.8] text-muted-foreground">{site.about.approach}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg">
+              <Button asChild size="lg" className="slab">
                 <Link href="/contact">Discuss Your Project <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /></Link>
               </Button>
-              <Button variant="outline" size="lg" asChild>
+              <Button variant="outline" size="lg" asChild className="slab slab-soft">
                 <Link href="/portfolio">See our work</Link>
               </Button>
             </div>

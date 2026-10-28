@@ -226,7 +226,7 @@ export function EnquiryForm() {
         {fieldErrors.consent && <p id="ef-consent-err" className="text-xs text-destructive">{fieldErrors.consent}</p>}
       </div>
 
-      <Button type="submit" size="lg" className="mt-6 w-full sm:w-auto" disabled={status === 'submitting'}>
+      <Button type="submit" size="lg" className="slab mt-6 w-full sm:w-auto" disabled={status === 'submitting'}>
         {status === 'submitting' && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
         {status === 'submitting' ? 'Sending…' : 'Send enquiry'}
       </Button>

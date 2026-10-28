@@ -18,7 +18,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
-import { Magnetic, LiquidCTA } from '@/components/site/buttons'
+import { Magnetic, SlabCTA } from '@/components/site/buttons'
 import { scrollToId } from '@/lib/site/motion'
 import { useConfigurator } from '@/components/site/configurator/configurator-store'
 import { site } from '@/lib/site-content'
@@ -156,7 +156,7 @@ export function HeroChapter() {
           </span>
           <span className="block overflow-hidden">
             <motion.span {...line(0.44)} className="block chrome-text">
-              feel <em className="editorial font-normal">different.</em>
+              feel different.
             </motion.span>
           </span>
         </h1>
@@ -175,20 +175,20 @@ export function HeroChapter() {
           className="mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-x-6 sm:gap-y-4"
         >
           <Magnetic strength={0.32}>
-            <LiquidCTA onClick={() => scrollToId('ch-work')} data-testid="hero-explore" className="px-8">
+            <SlabCTA onClick={() => scrollToId('ch-work')} data-testid="hero-explore" className="px-8">
               Explore the studio
-            </LiquidCTA>
+            </SlabCTA>
           </Magnetic>
           <span aria-hidden="true" className="hidden h-9 w-px bg-border/80 sm:block" />
           <Magnetic strength={0.26}>
-            <LiquidCTA
+            <SlabCTA
               variant="outline"
               onClick={() => openConfigurator()}
               data-testid="hero-start-project"
               className="text-muted-foreground/90"
             >
               Start a project
-            </LiquidCTA>
+            </SlabCTA>
           </Magnetic>
           <span className="eyebrow text-muted-foreground/80 sm:ml-1 sm:max-w-44 sm:leading-[1.9]">
             No account needed to browse.

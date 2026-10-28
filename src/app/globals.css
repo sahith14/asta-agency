@@ -42,7 +42,6 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-display: var(--font-display);
-  --font-editorial: var(--font-editorial);
   --color-electric: var(--electric);
   --color-accent-ink: var(--accent-ink);
   --color-blush: var(--blush);
@@ -260,12 +259,89 @@
   border-color: var(--border);
 }
 
-/* Editorial serif accent — Instrument Serif italic for display moments */
-.site-scope .editorial {
-  font-family: var(--font-editorial), Georgia, "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: 0;
+/* ── Slab buttons — tactile 3D keys ───────────────────────────────────────
+   A hard contrasting edge sits under the face like a physical keycap: hover
+   lifts the slab further off the page, pressing collapses it flat into the
+   surface. A glass specular highlight sells the extrusion. Colours adapt
+   automatically to light (oxblood edge) and night (ember edge) scopes.
+   Pair with .slab-soft for light-faced (outline/secondary) keys. */
+.site-scope .slab {
+  --slab-edge: color-mix(in oklab, var(--electric) 58%, black 42%);
+  --slab-glow: color-mix(in oklab, var(--electric) 46%, black 54%);
+  position: relative;
+  z-index: 0;
+  transform: translateY(0);
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* the hard 3D edge the key rests on */
+.site-scope .slab::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--slab-edge);
+  transform: translateY(4px);
+  box-shadow: 0 14px 26px -14px var(--slab-glow);
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* glass specular face — sells the extrusion, keeps text readable */
+.site-scope .slab::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.2) 0%, transparent 46%);
+}
+
+.site-scope .slab:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+.site-scope .slab:hover::before {
+  transform: translateY(6px);
+  box-shadow: 0 20px 30px -14px var(--slab-glow);
+}
+.site-scope .slab:active {
+  transform: translateY(3px);
+  filter: brightness(0.97);
+  transition-duration: 0.07s;
+}
+.site-scope .slab:active::before {
+  transform: translateY(1px);
+  box-shadow: 0 6px 12px -10px var(--slab-glow);
+  transition-duration: 0.07s;
+}
+.site-scope .slab:disabled,
+.site-scope .slab[aria-disabled="true"] {
+  transform: none;
+  filter: none;
+}
+.site-scope .slab:disabled::before {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* light-faced key — outline / secondary CTAs */
+.site-scope .slab-soft {
+  --slab-edge: color-mix(in oklab, var(--foreground) 26%, var(--card) 74%);
+  --slab-glow: color-mix(in oklab, var(--foreground) 30%, transparent);
+}
+
+/* arrow glide inside slab buttons (lucide arrow icons only) */
+.site-scope .slab svg[class*="lucide-arrow-"] {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.site-scope .slab:hover svg[class*="lucide-arrow-"] {
+  transform: translateX(2px);
 }
 
 /* Chrome/silver gradient text for select display moments on night sections */
@@ -374,6 +450,23 @@
   .site-scope .scroll-drip,
   .site-scope .drift {
     animation: none;
+  }
+  /* slab keys keep their 3D shape but stop moving */
+  .site-scope .slab,
+  .site-scope .slab::before,
+  .site-scope .slab svg[class*="lucide-arrow-"] {
+    transition: none;
+  }
+  .site-scope .slab:hover,
+  .site-scope .slab:active {
+    transform: none;
+  }
+  .site-scope .slab:hover::before,
+  .site-scope .slab:active::before {
+    transform: translateY(4px);
+  }
+  .site-scope .slab:hover svg[class*="lucide-arrow-"] {
+    transform: none;
   }
   .site-scope *,
   .site-scope *::before,

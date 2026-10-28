@@ -109,7 +109,7 @@ export default function RequestAccessPage() {
                     <Label htmlFor="message">What do you need?</Label>
                     <Textarea id="message" rows={4} maxLength={4000} value={message} onChange={e => setMessage(e.target.value)} placeholder="e.g. Monthly social reels for our restaurant + a new website" />
                   </div>
-                  <Button type="submit" className="w-full" disabled={state === 'loading'}>
+                  <Button type="submit" className="slab w-full" disabled={state === 'loading'}>
                     {state === 'loading' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Submit request
                   </Button>
                 </form>

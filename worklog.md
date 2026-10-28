@@ -624,3 +624,29 @@ Stage Summary:
 - Aesthetic Enhancement Pass independently re-verified end-to-end in a fresh session: visual system (ivory/oxblood editorial + night cinematic rhythm), configurator funnel to real CRM, portfolio filtering, live experiments, mobile safety, auth/RBAC, fallbacks — all green with zero regressions found and zero new edits required.
 - Deployment status: NO production deployment exists or was performed (dev server only; no git remote/hosting credentials).
 - Open flag for the user: auth/app-shell wordmark still reads "AgencyOS" (platform name) — renaming it to ASTA AGENCY was outside the authorized scopes so far and remains a one-line-scope decision for the user.
+
+---
+Task ID: SLAB-1
+Agent: Z.ai Code (main)
+Task: "remove caliography and keep the big bold texts. make the BUTTONS 3D, reactive, new, unique, UI" — strip all serif-italic (Instrument Serif) accent styling from display type while keeping the big bold Syne headlines, and replace the site button system with a tactile 3D "slab key" system. Zero logic/copy/contract changes.
+
+Work Log:
+- Calligraphy removal (11 accent sites + helper + font):
+  - chapter.tsx AccentWord: <em class="editorial"> → <span class="text-electric"> (covers capabilities/showroom/conversation/build/craft chapter titles + division headings)
+  - hero.tsx "feel different." + conversation.tsx "worth staring at.": em wrappers removed — lines now fully bold chrome-gradient Syne
+  - services (2), about (3), portfolio (1), division-detail (1), build (1): <em class="editorial font-normal"> → <span class="text-electric">
+  - globals.css: .editorial helper + --font-editorial theme line deleted; layout.tsx: Instrument_Serif import/const/variable removed (font no longer loaded)
+  - Result: zero editorial/serif residues (rg clean); every display line is big bold Syne, accents now bold oxblood (light) / ember (night)
+- New 3D button system ("slab keys"):
+  - globals.css: .slab utility — hard contrasting edge layer (::before, translateY(4px), color-mixed oxblood edge + glow) that the face rests on; hover lifts -2px and deepens edge to 6px; :active presses face down 3px and collapses edge to 1px (physical key press); glass specular ::after face highlight; lucide-arrow icon glide on hover; .slab-soft variant (charcoal edge on light faces for outline/secondary); disabled states pinned; full prefers-reduced-motion fallback (shape preserved, motion removed)
+  - buttons.tsx: LiquidCTA → SlabCTA (renamed, 4 usage files updated): primary = oxblood slab key, outline = chalk slab-soft key, ghost = flat (unused); removed old liquid-fill span + overflow-hidden (edge must overflow)
+  - Applied slab to: site-header START A PROJECT, hero Explore/Start pair (inside existing Magnetic wrappers), conversation + build CTAs, configurator Continue/Submit/Done, enquiry-form submit, secondary-page CTA band Buttons (services, about ×2, portfolio, division-detail ×3), auth submit buttons (login, forgot-password, change-password, request-access)
+- signup-form slab reverted: /signup is a legacy mint-gradient page outside .site-scope (was deliberately left out of the AESTH-2 branded auth suite) — slab class would be dead there; left page untouched
+- QA: lint clean (fixed one self-introduced JSX closing-tag error from the rename mid-way); tsc --noEmit 0 errors; rg confirms zero editorial residues and 0px horizontal overflow at 390px on /, /about, /portfolio, /contact, /login, /services/web-development
+- Browser 1440px: hero/chapters/secondary pages screenshot-verified (chrome bold headline, oxblood accent words, slab keys with visible edges); hover state verified (edge deepens, button lifts); configurator full E2E re-run with new buttons → POST /api/enquiries 201 → ENQ-MVRD6O9J3EDD persisted (status NEW) → deleted FK-safe (enquiries back to 0); login page slab Sign in verified; no page errors; dev.log shows 201/200s only
+- 18 files changed (+163/−81), all presentation-layer; test screenshot artifacts in .qa-shots/
+
+Stage Summary:
+- Site-wide: no more serif/calligraphy anywhere — all display type is big bold Syne with bold oxblood/ember accent words; buttons are now tactile 3D slab keys with press physics, glass highlights, arrow glide, magnetic wrappers, and reduced-motion-safe behavior
+- All functional contracts intact (configurator E2E passed end-to-end, enquiry persisted then cleaned, zero page errors, zero overflow)
+- Working tree UNCOMMITTED (sandbox auto-commits aside, no manual commit authorized); NO production deployment performed

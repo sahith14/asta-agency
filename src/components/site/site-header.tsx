@@ -146,7 +146,7 @@ export function SiteHeader() {
               type="button"
               onClick={() => openConfigurator()}
               data-testid="header-start-project"
-              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full bg-electric px-5 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[var(--accent-ink)] transition-transform hover:scale-[1.03] active:scale-[0.98]"
+              className="slab inline-flex min-h-11 items-center whitespace-nowrap rounded-full bg-electric px-5 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[var(--accent-ink)]"
             >
               Start a project
             </button>

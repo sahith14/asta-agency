@@ -21,13 +21,13 @@ export function DivisionDetail({ division }: { division: SiteDivision }) {
             <p className="mt-5 text-lg font-medium text-foreground/85">{division.tagline}</p>
             <p className="mt-4 text-pretty leading-[1.8] text-muted-foreground">{division.intro}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" asChild>
+              <Button size="lg" asChild className="slab">
                 <Link href="/contact">
                   {division.cta}
                   <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" asChild className="slab slab-soft">
                 <Link href="/#packages">See packages</Link>
               </Button>
             </div>
@@ -53,7 +53,7 @@ export function DivisionDetail({ division }: { division: SiteDivision }) {
       <section className="mx-auto max-w-6xl px-4 py-16 lg:px-6 lg:py-20" aria-labelledby="division-services-heading">
         <p className="eyebrow flex items-center gap-3 text-muted-foreground">What we offer<span className="h-px w-8 bg-border" aria-hidden="true" /></p>
         <h2 id="division-services-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-          Built by this <em className="editorial font-normal">division</em>
+          Built by this <span className="text-electric">division</span>
         </h2>
         <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border shadow-[0_25px_70px_-50px_rgba(61,35,22,0.55)] sm:grid-cols-2 lg:grid-cols-3">
           {division.services.map((s, si) => (
@@ -133,7 +133,7 @@ export function DivisionDetail({ division }: { division: SiteDivision }) {
         <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-4 py-14 text-center md:flex-row md:text-left lg:px-6">
           <h2 id="division-cta-heading" className="text-2xl font-extrabold tracking-tight sm:text-3xl">Have a project in mind?</h2>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button size="lg" variant="secondary" asChild>
+            <Button size="lg" variant="secondary" asChild className="slab slab-soft">
               <Link href="/contact">{division.cta}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10" asChild>
