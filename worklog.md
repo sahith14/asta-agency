@@ -691,3 +691,17 @@ Stage Summary:
 - User PC flow: unzip → setup.bat (or bash setup.sh) → bun run dev → http://localhost:3000 — verified end-to-end in a clean directory
 - No third-party API secrets in the zip (only self-owned demo logins, documented in INSTALL.md); workspace-full zip (390MB) untouched as secondary option
 - Main dev server healthy after restart; INSTALL-1 complete
+
+---
+Task ID: INSTALL-1b
+Agent: Z.ai Code (main)
+Task: Harden setup.bat after first real Windows user attempt (PowerShell)
+
+Work Log:
+- User hit two Windows quirks: PowerShell requires .\setup.bat (current-dir scripts not on PATH); `bun run dev` silently no-oped (bun not installed — classic Windows Store alias stub behavior)
+- Hardened setup.bat: replaced `where bun` detection with `bun --version` exit-code check (stubs can fool `where`), added WinGet Links to session PATH, added explicit failure block with manual-install remediation (irm bun.sh/install.ps1) + version echo
+- Rebuilt /home/z/asta-agency-source.zip (2,752,151 bytes) and verified /api/download/source serves byte-exact (content-length match)
+- User guidance delivered: run .\setup.bat → close & reopen PowerShell (PATH refresh) → bun --version sanity check → bun run dev
+
+Stage Summary:
+- setup.bat now self-diagnoses Bun install failure and prints exact recovery commands; zip re-shipped through existing download route; awaiting user confirmation of local run

@@ -10,12 +10,27 @@ cd /d "%~dp0"
 echo === ASTA AGENCY - local setup ===
 
 rem 1) Bun runtime (required - package scripts use Bun's cross-platform shell)
-where bun >nul 2>nul
+rem    NOTE: we test `bun --version`, not `where bun` - Windows Store alias stubs
+rem    can make `where` succeed while bun is NOT actually installed.
+bun --version >nul 2>nul
 if %errorlevel% neq 0 (
   echo ^> Installing Bun runtime...
   powershell -NoProfile -ExecutionPolicy Bypass -Command "irm bun.sh/install.ps1 | iex"
 )
 set "PATH=%USERPROFILE%\.bun\bin;%PATH%"
+set "PATH=%LOCALAPPDATA%\Microsoft\WinGet\Links;%PATH%"
+bun --version >nul 2>nul
+if %errorlevel% neq 0 (
+  echo.
+  echo [ERROR] Bun could not be installed automatically.
+  echo   Fix: run this command, then CLOSE and REOPEN PowerShell and
+  echo   run setup.bat again:
+  echo     powershell -c "irm bun.sh/install.ps1 | iex"
+  echo.
+  pause
+  exit /b 1
+)
+for /f "delims=" %%v in ('bun --version 2^>nul') do echo ^> Bun v%%v OK
 
 rem 2) Install dependencies (Prisma client generated automatically on postinstall)
 echo ^> Installing packages...
