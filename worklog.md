@@ -672,3 +672,22 @@ Stage Summary:
 - The landing page now has a unique signature moment: the scroll-reactive Oxblood Ribbon — kinetic gallery tape that stitches the ivory→night seam, runs the studio tagline in bold Syne, and physically responds to how hard and which way you scroll. No other route mounts it; all motion is transform-only, paused off-screen, and fully static under prefers-reduced-motion.
 - Zero logic/copy/contract changes: 2 files edited + 1 new presentational component; configurator E2E re-verified end-to-end with the ribbon live; test enquiry cleaned up; DB baseline restored (enquiries 0, contacts/portfolio untouched).
 - Working tree uncommitted (sandbox auto-commits aside, no manual commit authorized); NO production deployment exists or was performed.
+
+---
+Task ID: INSTALL-1
+Agent: Z.ai Code (main)
+Task: "make this website install in my pc" — package the full website as a downloadable, one-click installable local app
+
+Work Log:
+- Inspected runtime coupling: `dev` script is bun-shell-specific (pipe/tee); `.env` DATABASE_URL was an absolute sandbox path (file:/home/z/my-project/db/custom.db); db/custom.db (540KB) holds all seeded content + 9 demo accounts
+- Wrote installer assets at project root: INSTALL.md (3-step guide, demo login table, troubleshooting, deploy notes), setup.sh (macOS/Linux: auto-installs Bun → bun install → prisma generate → recreates db if missing → minimal .env fallback), setup.bat (Windows equivalent via irm bun.sh/install.ps1)
+- Rebuilt /home/z/asta-agency-source.zip (2,751,898 bytes, 417 files): excluded node_modules/.next/.git/skills/examples/mini-services/tests/.qa-shots/logs/worklog/Caddyfile/seed-credential files; appended db/custom.db + a patched .env with portable DATABASE_URL=file:../db/custom.db (Prisma resolves relative to schema dir)
+- CLEAN-ROOM TEST: unzipped to /tmp/asta-pkg-test → bun install OK (841 pkgs, 3.9s) → bash setup.sh OK → bootstrap-if-empty: "Environment healthy — nothing to do (9 demo accounts verified)" → bun x next dev -p 3100 → GET / 200 (155KB, live Prisma PortfolioItem queries) + GET /portfolio 200 → killed test server, removed temp dir
+- Side effect: pkill for the test server also killed the main :3000 server → restarted via proven recipe (pkill next-server + next dev + bun run dev → setsid bun run dev) → / 200 in 3.9s; HEAD /api/download/source → 200, content-length 2751898 (byte-exact vs new zip)
+- Temporary /api/download route intentionally kept — it is the delivery channel for this package; REMOVE-BEFORE-PROD marker stands
+
+Stage Summary:
+- Deliverable: preview-gateway URL /api/download/source → asta-agency-source.zip (2.75MB) — full site + bundled SQLite DB + demo accounts + one-click setup for Windows/macOS/Linux
+- User PC flow: unzip → setup.bat (or bash setup.sh) → bun run dev → http://localhost:3000 — verified end-to-end in a clean directory
+- No third-party API secrets in the zip (only self-owned demo logins, documented in INSTALL.md); workspace-full zip (390MB) untouched as secondary option
+- Main dev server healthy after restart; INSTALL-1 complete
