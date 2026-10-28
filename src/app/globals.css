@@ -444,12 +444,58 @@
   animation: site-drift 9s ease-in-out infinite;
 }
 
+/* ── The Oxblood Ribbon — landing-only signature band ──────────────────
+   A full-bleed, slightly-rotated kinetic ticker pinned across the
+   ivory→night seam. Static composition lives here; the drift/skew scroll
+   reaction is driven from PulseRibbon's rAF loop (transform-only, paused
+   off-screen). The hard offset bottom edge echoes the slab-key language. */
+.site-scope .ribbon-band {
+  --ribbon-ink: oklch(0.97 0.008 85); /* ivory ink — tone-independent here */
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--electric) 90%, white 10%) 0%,
+    var(--electric) 42%,
+    color-mix(in oklab, var(--electric) 86%, black 14%) 100%
+  );
+  border-top: 1px solid color-mix(in oklab, var(--ribbon-ink) 24%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, black 38%, transparent);
+  box-shadow:
+    0 6px 0 -1px color-mix(in oklab, var(--electric) 52%, black 48%),
+    0 34px 54px -26px color-mix(in oklab, var(--electric) 60%, black 40%);
+}
+
+.site-scope .ribbon-face {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  color: var(--ribbon-ink);
+  text-shadow: 0 1px 0 color-mix(in oklab, black 22%, transparent);
+}
+
+.site-scope .ribbon-outline {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in oklab, var(--ribbon-ink) 72%, transparent);
+}
+
+.site-scope .ribbon-gem {
+  background: var(--champagne);
+  box-shadow: 0 0 10px 1px color-mix(in oklab, var(--champagne) 60%, transparent);
+}
+
+.site-scope .ribbon-track {
+  will-change: transform;
+}
+
 /* Respect reduced-motion: kill decorative loops inside the site scope */
 @media (prefers-reduced-motion: reduce) {
   .site-scope .marquee-track,
   .site-scope .scroll-drip,
   .site-scope .drift {
     animation: none;
+  }
+  /* the ribbon's rAF loop never starts under reduced motion — this pins
+     the band static even if a transform was written before the flip */
+  .site-scope .ribbon-track {
+    transform: none !important;
   }
   /* slab keys keep their 3D shape but stop moving */
   .site-scope .slab,

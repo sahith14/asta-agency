@@ -8,7 +8,7 @@
  *
  * Art direction (Gallery & Oxblood, night finale): cinematic dark tokens via
  * tone="night" (ambient glow + grain come with it), a chrome display moment
- * with a serif-italic accent, contact details set as hairline meta rows and
+ * in fully bold Syne, contact details set as hairline meta rows and
  * login routes as night cards with ember hover.
  */
 import { motion, useReducedMotion } from 'framer-motion'

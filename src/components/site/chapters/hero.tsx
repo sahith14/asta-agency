@@ -4,8 +4,8 @@
  * Chapter 01 — ENTER THE STUDIO (night cinematic opening).
  *
  * Art direction (AESTH-3): a controlled kinetic composition layered over the
- * 3D monolith — overflow-hidden per-line headline reveal (line 2 in chrome
- * with a serif-italic accent moment), eyebrow metadata with hairline
+ * 3D monolith — overflow-hidden per-line headline reveal (line 2 in chrome,
+ * fully bold Syne), eyebrow metadata with hairline
  * annotation, a hairline-divided CTA pair with the primary action visually
  * dominant, a thin oxblood rule over the lede, polished scroll cue and an
  * airier ember-dot capability marquee with hairline top border. A corner

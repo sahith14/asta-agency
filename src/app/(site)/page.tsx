@@ -6,6 +6,7 @@ import { SceneCanvas } from '@/components/site/three/scene-canvas'
 import { ChapterRail } from '@/components/site/chapter-rail'
 import { HeroChapter } from '@/components/site/chapters/hero'
 import { CapabilitiesChapter, type VideoPanel } from '@/components/site/chapters/capabilities'
+import { PulseRibbon } from '@/components/site/pulse-ribbon'
 import { ShowroomChapter, type ShowroomItem } from '@/components/site/chapters/showroom'
 import { CraftChapter } from '@/components/site/chapters/craft'
 import { BuildChapter } from '@/components/site/chapters/build'
@@ -70,6 +71,9 @@ export default async function HomePage() {
 
         {/* 02 — Discover the capabilities */}
         <CapabilitiesChapter videoPanels={videoPanels} />
+
+        {/* Landing-only signature band — the Oxblood Ribbon (scroll-reactive) */}
+        <PulseRibbon />
 
         {/* 03 — Explore the work (DB-backed showroom) */}
         <ShowroomChapter items={showroomItems} />

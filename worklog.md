@@ -650,3 +650,25 @@ Stage Summary:
 - Site-wide: no more serif/calligraphy anywhere — all display type is big bold Syne with bold oxblood/ember accent words; buttons are now tactile 3D slab keys with press physics, glass highlights, arrow glide, magnetic wrappers, and reduced-motion-safe behavior
 - All functional contracts intact (configurator E2E passed end-to-end, enquiry persisted then cleaned, zero page errors, zero overflow)
 - Working tree UNCOMMITTED (sandbox auto-commits aside, no manual commit authorized); NO production deployment performed
+
+---
+Task ID: RIBBON-1
+Agent: Z.ai Code (main)
+Task: "add something special design only on landing page" — design and mount a landing-only signature element. (Prior task SLAB-1 — calligraphy removal + 3D slab buttons — was confirmed already complete in worklog and left untouched.)
+
+Work Log:
+- Read worklog: confirmed SLAB-1 (serif strip + slab-key buttons) fully implemented and QA'd; verified dev server healthy (200), working tree clean (sandbox auto-commits), QA baselines 51/0 + 69/0 standing.
+- Surveyed landing composition: 6 chapters (night hero → ivory capabilities → night showroom → ivory craft → taupe build → night conversation), fixed 3D canvas + chapter rail, existing hero mini-marquee. Chose the capabilities(02)→showroom(03) ivory→night seam as the stage (hero's own marquee stays untouched).
+- Built THE OXBLOOD RIBBON (src/components/site/pulse-ribbon.tsx, new): full-bleed ~1.3°-rotated oxblood ticker band pinned across the seam like gallery tape. Studio tagline "WE MAKE DIGITAL ✦ FEEL DIFFERENT." runs as giant bold Syne — solid ivory alternating with stroked-outline letters, champagne gem separators, hard offset bottom edge + glow echoing the slab-key button language, film-grain overlay.
+- REACTIVE physics (not just an animation): rAF loop drifts the band and feeds off live scroll velocity — scrolling down accelerates the run and leans the type into the scroll (skewX), scrolling up bleeds speed off and can pull the tape backward (direction-aware, spring-smoothed). Transform-only writes, IntersectionObserver + visibilitychange pause when off-screen/hidden, ResizeObserver re-measures the seamless 2-copy loop after font swap, track transform reset on cleanup.
+- Safety: aria-hidden + pointer-events-none + select-none throughout; prefers-reduced-motion → rAF never starts + CSS `.ribbon-track { transform: none !important }` pin in globals.css; overflow-x-clip wrapper keeps rotated over-scaled band from creating horizontal scroll.
+- globals.css: added .ribbon-band/.ribbon-face/.ribbon-outline/.ribbon-gem/.ribbon-track block (tone-independent ivory ink var so the band looks identical over light or night scopes) + reduced-motion pin.
+- page.tsx: PulseRibbon mounted ONLY between chapters 02/03 — no other route imports it. Also fixed two stale "serif-italic" doc comments left by SLAB-1 (hero.tsx, conversation.tsx) — comments only, zero behavior.
+- QA: bun run lint clean; bunx tsc --noEmit 0 errors. Browser 1440px: ribbon present, drifts at idle (~34px/s), skew reacts directionally (+7° hard down-scroll / −6.8° on up-scroll before temper; tempered to MAX_SKEW 5° / MAX_VEL 750 after taste pass), 0px horizontal overflow; ghost-numeral collision seen in first screenshot fixed by softening overlap (-my-5 → -my-3). Mobile 390px: present, 0px overflow, band ~61px AABB, no collisions. Landing-only verified: ribbon absent on /about, /services, /portfolio, /contact. Console clean (only benign THREE.Clock deprecation), page errors none, dev.log no 5xx.
+- Golden path regression with ribbon mounted: hero Explore CTA scrolls to ch-work (scrollY 2957); configurator full 7-step E2E → POST /api/enquiries 201 → "Enquiry received / Your brief is in." → ENQ-MVRE21FX6316 persisted (status NEW, correct service/name) → deleted FK-safe, siteEnquiry count back to 0.
+- Screenshots: .qa-shots/ribbon-desktop.png, ribbon-desktop-2.png, ribbon-final.png, ribbon-mobile.png, ribbon-hero-final.png.
+
+Stage Summary:
+- The landing page now has a unique signature moment: the scroll-reactive Oxblood Ribbon — kinetic gallery tape that stitches the ivory→night seam, runs the studio tagline in bold Syne, and physically responds to how hard and which way you scroll. No other route mounts it; all motion is transform-only, paused off-screen, and fully static under prefers-reduced-motion.
+- Zero logic/copy/contract changes: 2 files edited + 1 new presentational component; configurator E2E re-verified end-to-end with the ribbon live; test enquiry cleaned up; DB baseline restored (enquiries 0, contacts/portfolio untouched).
+- Working tree uncommitted (sandbox auto-commits aside, no manual commit authorized); NO production deployment exists or was performed.
